@@ -14,7 +14,7 @@ export function exportToCSV(expenses: Expense[]): void {
 
     // CSV rows
     const rows = expenses.map(expense => [
-        formatDate(expense.date, 'yyyy-MM-dd'),
+        expense.date,
         expense.category,
         `"${expense.description.replace(/"/g, '""')}"`, // Escape quotes
         expense.amount.toFixed(2),

@@ -29,8 +29,8 @@ export function useSettings() {
 
         try {
             setIsLoading(true);
-            const { data, error } = await supabase
-                .from('user_settings')
+            const { data, error } = await (supabase
+                .from('user_settings') as any)
                 .select('*')
                 .eq('user_id', user.id)
                 .single();
@@ -38,8 +38,8 @@ export function useSettings() {
             if (error) {
                 // If no settings exist, create default settings
                 if (error.code === 'PGRST116') {
-                    const { data: newSettings, error: insertError } = await supabase
-                        .from('user_settings')
+                    const { data: newSettings, error: insertError } = await (supabase
+                        .from('user_settings') as any)
                         .insert({
                             user_id: user.id,
                             currency_code: 'USD',
@@ -85,8 +85,8 @@ export function useSettings() {
             if (!user) return;
 
             try {
-                const { error } = await supabase
-                    .from('user_settings')
+                const { error } = await (supabase
+                    .from('user_settings') as any)
                     .update({
                         currency_code: newSettings.currency,
                         currency_symbol: newSettings.currencySymbol,

@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Expense, ExpenseFormData } from '../types';
 import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
+import type { Database } from '../supabase/types';
 
 export interface UseExpensesReturn {
     expenses: Expense[];
@@ -33,8 +34,8 @@ export function useExpenses(): UseExpensesReturn {
 
         try {
             setIsLoading(true);
-            const { data, error } = await supabase
-                .from('expenses')
+            const { data, error } = await (supabase
+                .from('expenses') as any)
                 .select('*')
                 .eq('user_id', user.id)
                 .order('date', { ascending: false });
@@ -42,7 +43,7 @@ export function useExpenses(): UseExpensesReturn {
             if (error) throw error;
 
             // Transform database format to app format
-            const transformedExpenses: Expense[] = (data || []).map((expense) => ({
+            const transformedExpenses: Expense[] = (data || []).map((expense: Database['public']['Tables']['expenses']['Row']) => ({
                 id: expense.id,
                 amount: parseFloat(expense.amount.toString()),
                 category: expense.category as any,
@@ -101,17 +102,19 @@ export function useExpenses(): UseExpensesReturn {
             }
 
             try {
-                const { data: newExpense, error } = await supabase
-                    .from('expenses')
+                const { data: newExpenseData, error } = await (supabase
+                    .from('expenses') as any)
                     .insert({
                         user_id: user.id,
                         amount: parseFloat(data.amount),
                         category: data.category,
                         description: data.description || null,
                         date: data.date,
-                    })
+                    } as any)
                     .select()
                     .single();
+
+                const newExpense = newExpenseData as unknown as Database['public']['Tables']['expenses']['Row'];
 
                 if (error) throw error;
 
@@ -145,14 +148,14 @@ export function useExpenses(): UseExpensesReturn {
             }
 
             try {
-                const { error } = await supabase
-                    .from('expenses')
+                const { error } = await (supabase
+                    .from('expenses') as any)
                     .update({
                         amount: parseFloat(data.amount),
                         category: data.category,
                         description: data.description || null,
                         date: data.date,
-                    })
+                    } as any)
                     .eq('id', id)
                     .eq('user_id', user.id);
 
@@ -189,8 +192,8 @@ export function useExpenses(): UseExpensesReturn {
             }
 
             try {
-                const { error } = await supabase
-                    .from('expenses')
+                const { error } = await (supabase
+                    .from('expenses') as any)
                     .delete()
                     .eq('id', id)
                     .eq('user_id', user.id);
