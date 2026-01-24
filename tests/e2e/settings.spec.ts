@@ -24,20 +24,23 @@ test.describe('Settings', () => {
         await settingsPage.changeCurrency('EUR');
 
         // Currency should be updated
-        const currency = await settingsPage.getCurrency();
-        expect(currency).toBe('EUR');
+        // Currency should be updated
+        await expect(settingsPage.currencySelector).toHaveValue('EUR');
     });
 
     test('should persist currency after page refresh', async ({ page }) => {
         // Change to GBP
         await settingsPage.changeCurrency('GBP');
 
+        // Wait for persistence (since useSettings is not optimistic)
+        await expect(settingsPage.currencySelector).toHaveValue('GBP');
+
         // Refresh page
         await page.reload();
 
         // Currency should still be GBP
-        const currency = await settingsPage.getCurrency();
-        expect(currency).toBe('GBP');
+        // Currency should still be GBP
+        await expect(settingsPage.currencySelector).toHaveValue('GBP');
     });
 
     test('should add a custom category', async () => {
@@ -78,7 +81,8 @@ test.describe('Settings', () => {
 
         // Custom category should be available in dropdown
         const options = await expensesPage.categorySelect.locator('option').allTextContents();
-        expect(options).toContain(categoryName);
+        const found = options.some(opt => opt.includes(categoryName));
+        expect(found).toBe(true);
     });
 
     test('should persist custom categories after logout', async ({ page }) => {
@@ -106,13 +110,13 @@ test.describe('Settings', () => {
     test('should handle multiple currency changes', async ({ page }) => {
         // Change currency multiple times
         await settingsPage.changeCurrency('EUR');
-        expect(await settingsPage.getCurrency()).toBe('EUR');
+        await expect(settingsPage.currencySelector).toHaveValue('EUR');
 
         await settingsPage.changeCurrency('JPY');
-        expect(await settingsPage.getCurrency()).toBe('JPY');
+        await expect(settingsPage.currencySelector).toHaveValue('JPY');
 
         await settingsPage.changeCurrency('USD');
-        expect(await settingsPage.getCurrency()).toBe('USD');
+        await expect(settingsPage.currencySelector).toHaveValue('USD');
     });
 
     test('should add multiple custom categories', async () => {

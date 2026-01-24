@@ -33,6 +33,7 @@ export default function CurrencySelector({ selectedCurrency, onCurrencyChange }:
                     value={selectedCurrency}
                     onChange={handleChange}
                     className={styles.select}
+                    data-testid="currency-selector"
                 >
                     {CURRENCIES.map((currency) => (
                         <option key={currency.code} value={currency.code}>

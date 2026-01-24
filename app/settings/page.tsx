@@ -55,7 +55,7 @@ export default function SettingsPage() {
 
     if (isLoading) {
         return (
-            <div className={styles.loading}>
+            <div className={styles.loading} data-testid="settings-loading">
                 <div className={styles.spinner}></div>
                 <p>Loading settings...</p>
             </div>
@@ -79,14 +79,14 @@ export default function SettingsPage() {
 
             <main className={styles.main}>
                 <div className={styles.container}>
-                    <div className={styles.section}>
+                    <div className={styles.section} data-testid="currency-section">
                         <CurrencySelector
                             selectedCurrency={settings.currency}
                             onCurrencyChange={updateCurrency}
                         />
                     </div>
 
-                    <div className={styles.section}>
+                    <div className={styles.section} data-testid="category-section">
                         <CategoryManager
                             categories={settings.categories}
                             onAddCategory={handleAddCategory}

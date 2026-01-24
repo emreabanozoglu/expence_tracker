@@ -49,20 +49,21 @@ export default function CategoryManager({
                         variant="ghost"
                         onClick={handleReset}
                         className={confirmReset ? styles.confirmButton : ''}
+                        data-testid="reset-categories-button"
                     >
                         <RotateCcw size={18} />
                         {confirmReset ? 'Click again to confirm' : 'Reset to Defaults'}
                     </Button>
-                    <Button variant="primary" onClick={onAddCategory}>
+                    <Button variant="primary" onClick={onAddCategory} data-testid="add-category-button">
                         <Plus size={18} />
                         Add Category
                     </Button>
                 </div>
             </div>
 
-            <div className={styles.grid}>
+            <div className={styles.grid} data-testid="category-list">
                 {categories.map((category) => (
-                    <div key={category.id} className={styles.categoryCard}>
+                    <div key={category.id} className={styles.categoryCard} data-testid="category-card">
                         <div className={styles.categoryInfo}>
                             <div
                                 className={styles.categoryIcon}
@@ -82,6 +83,7 @@ export default function CategoryManager({
                                 className={styles.actionButton}
                                 onClick={() => onEditCategory(category)}
                                 aria-label="Edit category"
+                                data-testid="edit-category-button"
                             >
                                 <Edit2 size={16} />
                             </button>
@@ -90,6 +92,7 @@ export default function CategoryManager({
                                     className={`${styles.actionButton} ${styles.deleteButton}`}
                                     onClick={() => onDeleteCategory(category.id)}
                                     aria-label="Delete category"
+                                    data-testid="delete-category-button"
                                 >
                                     <Trash2 size={16} />
                                 </button>

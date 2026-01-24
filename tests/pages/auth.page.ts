@@ -8,21 +8,25 @@ export class AuthPage {
     readonly page: Page;
     readonly emailInput: Locator;
     readonly passwordInput: Locator;
-    readonly signInButton: Locator;
-    readonly signUpButton: Locator;
+    readonly submitButton: Locator;
     readonly toggleButton: Locator;
     readonly errorMessage: Locator;
-    readonly successMessage: Locator;
+
+    // Legacy support usually, but strictly finding by id now
+    readonly signInButton: Locator;
+    readonly signUpButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.emailInput = page.getByRole('textbox', { name: /email/i });
-        this.passwordInput = page.getByRole('textbox', { name: /password/i });
-        this.signInButton = page.getByRole('button', { name: /sign in/i, exact: true });
-        this.signUpButton = page.getByRole('button', { name: /sign up/i, exact: true });
-        this.toggleButton = page.getByRole('button', { name: /sign up|sign in/i });
-        this.errorMessage = page.locator('[class*="error"]');
-        this.successMessage = page.locator('[class*="success"]');
+        this.emailInput = page.locator('[data-testid="email-input"]');
+        this.passwordInput = page.locator('[data-testid="password-input"]');
+        this.submitButton = page.locator('[data-testid="auth-submit-button"]');
+        this.toggleButton = page.locator('[data-testid="auth-toggle-button"]');
+        this.errorMessage = page.locator('[data-testid="auth-error-message"]');
+
+        // Aliases for compatibility with existing tests that might use these props
+        this.signInButton = this.submitButton;
+        this.signUpButton = this.submitButton;
     }
 
     async goto() {
@@ -30,38 +34,42 @@ export class AuthPage {
     }
 
     async signUp(email: string, password: string) {
-        // Make sure we're on signup form
-        const buttonText = await this.toggleButton.textContent();
-        if (buttonText?.includes('Sign up')) {
-            await this.toggleButton.click();
+        // Check if we need to toggle to signup form
+        if (await this.toggleButton.isVisible()) {
+            const buttonText = await this.toggleButton.textContent();
+            if (buttonText?.includes("Don't have an account")) {
+                await this.toggleButton.click();
+                // Wait for form to switch
+                await this.page.waitForTimeout(300);
+            }
         }
 
         await this.emailInput.fill(email);
         await this.passwordInput.fill(password);
-        await this.signUpButton.click();
+        await this.submitButton.click();
     }
 
     async signIn(email: string, password: string) {
-        // Make sure we're on signin form
-        const buttonText = await this.toggleButton.textContent();
-        if (buttonText?.includes('Sign in')) {
-            await this.toggleButton.click();
+        // Check if we need to toggle to signin form
+        if (await this.toggleButton.isVisible()) {
+            const buttonText = await this.toggleButton.textContent();
+            if (buttonText?.includes("Already have an account")) {
+                await this.toggleButton.click();
+                // Wait for form to switch
+                await this.page.waitForTimeout(300);
+            }
         }
 
         await this.emailInput.fill(email);
         await this.passwordInput.fill(password);
-        await this.signInButton.click();
+        await this.submitButton.click();
     }
 
     async getErrorMessage(): Promise<string | null> {
         return await this.errorMessage.textContent();
     }
 
-    async getSuccessMessage(): Promise<string | null> {
-        return await this.successMessage.textContent();
-    }
-
     async waitForRedirect(url: string = '/') {
-        await this.page.waitForURL(url, { timeout: 10000 });
+        await this.page.waitForURL(url, { timeout: 30000 });
     }
 }

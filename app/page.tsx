@@ -99,11 +99,11 @@ export default function Home() {
                   Export
                 </Button>
               )}
-              <Button variant="ghost" onClick={handleSignOut}>
+              <Button variant="ghost" onClick={handleSignOut} data-testid="logout-button">
                 <LogOut size={20} />
                 Sign Out
               </Button>
-              <Button variant="primary" onClick={handleAddExpense}>
+              <Button variant="primary" onClick={handleAddExpense} data-testid="add-expense-button">
                 <Plus size={20} />
                 Add Expense
               </Button>
@@ -124,19 +124,21 @@ export default function Home() {
 
             {/* Summary Cards */}
             {filteredExpenses.length > 0 && (
-              <SummaryCards expenses={filteredExpenses} />
+              <div data-testid="summary-cards">
+                <SummaryCards expenses={filteredExpenses} />
+              </div>
             )}
 
             {/* Dashboard Grid */}
             {filteredExpenses.length > 0 && (
               <div className={styles.dashboardGrid}>
-                <div className={styles.chartSection}>
+                <div className={styles.chartSection} data-testid="category-chart">
                   <CategoryBreakdown expenses={filteredExpenses} />
                 </div>
               </div>
             )}
 
-            <div className={styles.listSection}>
+            <div className={styles.listSection} data-testid="expense-list-section">
               <h2 className={styles.sectionTitle}>
                 {getDateRangeLabel(dateRange)}
               </h2>

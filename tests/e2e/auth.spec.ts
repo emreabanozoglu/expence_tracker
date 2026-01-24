@@ -20,22 +20,33 @@ test.describe('Authentication', () => {
 
         await authPage.signUp(email, password);
 
-        // Should redirect to home page after successful signup
+        // Wait a bit for the session check and redirect
+        await page.waitForTimeout(1000);
+
+        // Should redirect to home page after successful signup (email confirmation is disabled)
         await expect(page).toHaveURL('/', { timeout: 10000 });
     });
 
     test('should show error for invalid email', async ({ page }) => {
         await authPage.signUp('invalid-email', generatePassword());
 
-        // Should show error message
-        await expect(authPage.errorMessage).toBeVisible();
+        // Browser validation should fail (form not submitted)
+        const isInvalid = await authPage.emailInput.evaluate((e: HTMLInputElement) => !e.checkValidity());
+        expect(isInvalid).toBe(true);
+
+        // Error message should NOT be visible (because submission was blocked)
+        await expect(authPage.errorMessage).not.toBeVisible();
     });
 
     test('should show error for short password', async ({ page }) => {
         await authPage.signUp(generateUniqueEmail(), '12345');
 
-        // Password should be at least 6 characters
-        await expect(authPage.errorMessage).toBeVisible();
+        // Password should be at least 6 characters - browser validation
+        const isInvalid = await authPage.passwordInput.evaluate((e: HTMLInputElement) => !e.checkValidity());
+        expect(isInvalid).toBe(true);
+
+        // Error message should NOT be visible
+        await expect(authPage.errorMessage).not.toBeVisible();
     });
 
     test('should sign in with existing user', async ({ page }) => {

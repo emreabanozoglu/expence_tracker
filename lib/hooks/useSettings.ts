@@ -63,7 +63,9 @@ export function useSettings() {
                 setSettings({
                     currency: data.currency_code,
                     currencySymbol: data.currency_symbol,
-                    categories: data.categories as CustomCategory[],
+                    categories: (data.categories && Array.isArray(data.categories) && data.categories.length > 0)
+                        ? (data.categories as CustomCategory[])
+                        : DEFAULT_CATEGORIES,
                 });
             }
         } catch (error) {

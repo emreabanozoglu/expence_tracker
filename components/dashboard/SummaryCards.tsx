@@ -28,7 +28,7 @@ export default function SummaryCards({ expenses }: SummaryCardsProps) {
                 </div>
                 <div className={styles.content}>
                     <div className={styles.label}>Total Spending</div>
-                    <div className={styles.value}>{formatCurrency(total, settings.currencySymbol)}</div>
+                    <div className={styles.value} data-testid="total-spending">{formatCurrency(total, settings.currencySymbol)}</div>
                 </div>
             </div>
 
@@ -38,7 +38,7 @@ export default function SummaryCards({ expenses }: SummaryCardsProps) {
                 </div>
                 <div className={styles.content}>
                     <div className={styles.label}>Average Expense</div>
-                    <div className={styles.value}>{formatCurrency(average, settings.currencySymbol)}</div>
+                    <div className={styles.value} data-testid="average-expense">{formatCurrency(average, settings.currencySymbol)}</div>
                 </div>
             </div>
 
@@ -48,7 +48,7 @@ export default function SummaryCards({ expenses }: SummaryCardsProps) {
                 </div>
                 <div className={styles.content}>
                     <div className={styles.label}>Top Category</div>
-                    <div className={styles.value}>{topCategory || 'N/A'}</div>
+                    <div className={styles.value} data-testid="top-category">{topCategory || 'N/A'}</div>
                 </div>
             </div>
         </div>

@@ -66,6 +66,7 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
                     }}
                     placeholder="e.g., Pets, Gifts, Travel"
                     error={error}
+                    data-testid="category-name-input"
                 />
             </div>
 
@@ -110,10 +111,10 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
             </div>
 
             <div className={styles.actions}>
-                <Button type="button" variant="ghost" onClick={onCancel}>
+                <Button type="button" variant="ghost" onClick={onCancel} data-testid="cancel-category-button">
                     Cancel
                 </Button>
-                <Button type="submit" variant="primary">
+                <Button type="submit" variant="primary" data-testid="submit-category-button">
                     {category ? 'Update Category' : 'Add Category'}
                 </Button>
             </div>

@@ -4,14 +4,20 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+// Get environment variables with fallback
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
 
 export class DatabaseCleanup {
     private supabase;
 
     constructor() {
-        this.supabase = createClient(supabaseUrl, supabaseKey);
+        if (!supabaseUrl || !supabaseKey) {
+            console.warn('Supabase credentials not found. Database cleanup will be skipped.');
+            this.supabase = null;
+        } else {
+            this.supabase = createClient(supabaseUrl, supabaseKey);
+        }
     }
 
     /**
@@ -19,6 +25,11 @@ export class DatabaseCleanup {
      * Note: This requires admin privileges or proper RLS policies
      */
     async deleteUserData(userId: string): Promise<void> {
+        if (!this.supabase) {
+            console.log('Skipping cleanup - Supabase not configured');
+            return;
+        }
+
         try {
             // Delete user's expenses (will cascade due to foreign key)
             await this.supabase
@@ -42,6 +53,11 @@ export class DatabaseCleanup {
      * Delete all test users (users with test email pattern)
      */
     async deleteAllTestUsers(): Promise<void> {
+        if (!this.supabase) {
+            console.log('Skipping cleanup - Supabase not configured');
+            return;
+        }
+
         try {
             // This would require admin access to auth.users table
             // For now, we'll just clean up the data tables

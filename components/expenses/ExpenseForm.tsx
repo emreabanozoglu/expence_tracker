@@ -106,6 +106,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
                     error={errors.amount}
                     fullWidth
                     autoFocus
+                    data-testid="expense-amount"
                 />
 
                 <div className={styles.field}>
@@ -117,6 +118,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value as Category })}
                         className={styles.select}
+                        data-testid="expense-category"
                     >
                         {settings.categories.map((cat) => (
                             <option key={cat.id} value={cat.name}>
@@ -139,6 +141,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
                     }}
                     error={errors.date}
                     fullWidth
+                    data-testid="expense-date"
                 />
 
                 <div className={styles.fullWidth}>
@@ -158,6 +161,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
                         }}
                         rows={3}
                         maxLength={200}
+                        data-testid="expense-description"
                     />
                     {errors.description && <span className={styles.error}>{errors.description}</span>}
                     <span className={styles.charCount}>{formData.description.length}/200</span>
@@ -165,10 +169,10 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
             </div>
 
             <div className={styles.actions}>
-                <Button type="button" variant="ghost" onClick={onCancel}>
+                <Button type="button" variant="ghost" onClick={onCancel} data-testid="cancel-button">
                     Cancel
                 </Button>
-                <Button type="submit" variant="primary" disabled={isSubmitting}>
+                <Button type="submit" variant="primary" disabled={isSubmitting} data-testid="submit-expense-button">
                     {expense ? 'Update Expense' : 'Add Expense'}
                 </Button>
             </div>

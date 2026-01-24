@@ -3,7 +3,7 @@
  */
 
 import { Page, Locator } from '@playwright/test';
-import { ExpenseData } from '../helpers/test-data';
+import { ExpenseFormData } from '../../lib/types';
 
 export class ExpensesPage {
     readonly page: Page;
@@ -11,97 +11,133 @@ export class ExpensesPage {
     readonly expenseList: Locator;
     readonly emptyState: Locator;
 
-    // Form fields
+    // Form elements
     readonly amountInput: Locator;
     readonly categorySelect: Locator;
-    readonly descriptionInput: Locator;
     readonly dateInput: Locator;
+    readonly descriptionInput: Locator;
     readonly submitButton: Locator;
     readonly cancelButton: Locator;
 
+    // Expense item actions
+    readonly editButton: Locator;
+    readonly deleteButton: Locator;
+
     constructor(page: Page) {
         this.page = page;
-        this.addExpenseButton = page.getByRole('button', { name: /add expense/i });
-        this.expenseList = page.locator('[data-testid="expense-list"], [class*="expense-list"]');
-        this.emptyState = page.getByText(/no expenses/i);
+        this.addExpenseButton = page.locator('[data-testid="add-expense-button"]');
+        this.expenseList = page.locator('[data-testid="expense-list-section"]');
+        this.emptyState = page.locator('[data-testid="empty-state"]');
 
-        // Form fields
-        this.amountInput = page.getByLabel(/amount/i);
-        this.categorySelect = page.getByLabel(/category/i);
-        this.descriptionInput = page.getByLabel(/description/i);
-        this.dateInput = page.getByLabel(/date/i);
-        this.submitButton = page.getByRole('button', { name: /save|add/i });
-        this.cancelButton = page.getByRole('button', { name: /cancel/i });
+        // Form elements
+        this.amountInput = page.locator('[data-testid="expense-amount"]');
+        this.categorySelect = page.locator('[data-testid="expense-category"]');
+        this.dateInput = page.locator('[data-testid="expense-date"]');
+        this.descriptionInput = page.locator('[data-testid="expense-description"]');
+        this.submitButton = page.locator('[data-testid="submit-expense-button"]');
+        this.cancelButton = page.locator('[data-testid="cancel-button"]');
+
+        // Expense item actions (these will match the first item)
+        this.editButton = page.locator('[data-testid="edit-expense-button"]').first();
+        this.deleteButton = page.locator('[data-testid="delete-expense-button"]').first();
     }
 
     async goto() {
         await this.page.goto('/');
     }
 
-    async addExpense(data: ExpenseData) {
+    async addExpense(data: { amount: string; category?: string; description?: string; date?: string }) {
+        // Click add expense button
         await this.addExpenseButton.click();
 
+        // Wait for modal to open
+        await this.amountInput.waitFor({ state: 'visible' });
+
+        // Fill in the form
         await this.amountInput.fill(data.amount);
-        await this.categorySelect.selectOption(data.category);
-        await this.descriptionInput.fill(data.description);
-        await this.dateInput.fill(data.date);
 
+        if (data.category) {
+            await this.categorySelect.selectOption(data.category);
+        }
+
+        if (data.date) {
+            await this.dateInput.fill(data.date);
+        }
+
+        if (data.description) {
+            await this.descriptionInput.fill(data.description);
+        }
+
+        // Submit the form
         await this.submitButton.click();
 
         // Wait for modal to close
-        await this.page.waitForTimeout(500);
-    }
-
-    async editExpense(description: string, newData: Partial<ExpenseData>) {
-        const expenseItem = this.getExpenseByDescription(description);
-        const editButton = expenseItem.getByRole('button', { name: /edit/i });
-
-        await editButton.click();
-
-        if (newData.amount) await this.amountInput.fill(newData.amount);
-        if (newData.category) await this.categorySelect.selectOption(newData.category);
-        if (newData.description) await this.descriptionInput.fill(newData.description);
-        if (newData.date) await this.dateInput.fill(newData.date);
-
-        await this.submitButton.click();
-
-        // Wait for modal to close
-        await this.page.waitForTimeout(500);
-    }
-
-    async deleteExpense(description: string) {
-        const expenseItem = this.getExpenseByDescription(description);
-        const deleteButton = expenseItem.getByRole('button', { name: /delete/i });
-
-        await deleteButton.click();
-
-        // Wait for deletion to complete
-        await this.page.waitForTimeout(500);
+        await this.amountInput.waitFor({ state: 'hidden', timeout: 5000 });
     }
 
     getExpenseByDescription(description: string): Locator {
-        return this.page.locator(`[data-testid="expense-item"]:has-text("${description}")`);
+        return this.page.locator('[data-testid="expense-list-section"]').getByText(description);
+    }
+
+    async editExpense(targetDescription: string, data: { amount?: string; category?: string; description?: string }) {
+        // Find the item container that has the text, then find the edit button within it
+        // The structure is: div.item > div.content > ... > p.description
+        // And div.item > div.actions > button (edit)
+
+        // Using a locator that finds the container based on text presence
+        // Note: Using a broad selector for the item container. 
+        // Based on ExpenseItem.tsx: <div className={styles.item}>
+        // Since we don't have a testid on the item container yet, we have to rely on class structure or text relationship
+        // A better way is to find the common ancestor
+
+        const expenseItem = this.expenseList.locator('div').filter({ hasText: targetDescription }).first();
+        // Note: This 'div' might be too generic, but filtering by text should narrow it down to the Card/Item.
+        // Let's assume the ExpenseList renders ExpenseItems which are div blocks.
+
+        await expenseItem.locator('[data-testid="edit-expense-button"]').click();
+
+        // Wait for modal
+        await this.amountInput.waitFor({ state: 'visible' });
+
+        // Update fields
+        if (data.amount) {
+            await this.amountInput.fill(data.amount);
+        }
+
+        if (data.category) {
+            await this.categorySelect.selectOption(data.category);
+        }
+
+        if (data.description) {
+            await this.descriptionInput.fill(data.description);
+        }
+
+        // Submit
+        await this.submitButton.click();
+
+        // Wait for modal to close
+        await this.amountInput.waitFor({ state: 'hidden', timeout: 5000 });
+    }
+
+    // Overload or modification to support legacy usage (no description)?
+    // The previous tests called editExpense('Original Description', newData);
+    // My signature above is editExpense(targetDescription, data).
+    // So that works perfectly.
+
+    async deleteExpense(targetDescription: string) {
+        const expenseItem = this.expenseList.locator('[data-testid="expense-item"]').filter({ hasText: targetDescription }).first();
+        await expenseItem.locator('[data-testid="delete-expense-button"]').click();
+
+        // Wait a bit for deletion to complete
+        await this.page.waitForTimeout(500);
     }
 
     async getExpenseCount(): Promise<number> {
-        const expenses = this.page.locator('[data-testid="expense-item"]');
-        return await expenses.count();
+        return await this.page.locator('[data-testid="edit-expense-button"]').count();
     }
 
-    async isEmptyStateVisible(): Promise<boolean> {
-        return await this.emptyState.isVisible();
-    }
-
-    async getAllExpenses(): Promise<string[]> {
-        const expenses = this.page.locator('[data-testid="expense-item"]');
-        const count = await expenses.count();
-        const descriptions: string[] = [];
-
-        for (let i = 0; i < count; i++) {
-            const text = await expenses.nth(i).textContent();
-            if (text) descriptions.push(text);
-        }
-
-        return descriptions;
+    async cancelAddingExpense() {
+        await this.addExpenseButton.click();
+        await this.cancelButton.click();
     }
 }

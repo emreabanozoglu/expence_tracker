@@ -5,9 +5,11 @@
 import { Page } from '@playwright/test';
 import { generateUniqueEmail, generatePassword } from '../helpers/test-data';
 import { DatabaseCleanup } from '../helpers/db-cleanup';
+import { AuthPage } from '../pages/auth.page';
 
 export class AuthFixture {
     private page: Page;
+    private authPage: AuthPage;
     private email: string;
     private password: string;
     private userId: string | null = null;
@@ -15,6 +17,7 @@ export class AuthFixture {
 
     constructor(page: Page) {
         this.page = page;
+        this.authPage = new AuthPage(page);
         this.email = generateUniqueEmail();
         this.password = generatePassword();
         this.dbCleanup = new DatabaseCleanup();
@@ -24,21 +27,9 @@ export class AuthFixture {
      * Create a new user and log them in
      */
     async createAndLoginUser(): Promise<{ email: string; password: string }> {
-        await this.page.goto('/auth');
-
-        // Click sign up toggle
-        await this.page.getByRole('button', { name: /sign up/i }).click();
-
-        // Fill in signup form
-        await this.page.getByRole('textbox', { name: /email/i }).fill(this.email);
-        await this.page.getByRole('textbox', { name: /password/i }).fill(this.password);
-
-        // Submit form
-        await this.page.getByRole('button', { name: /sign up/i, exact: true }).click();
-
-        // Wait for successful signup (user should be logged in automatically if email confirmation is disabled)
-        await this.page.waitForURL('/', { timeout: 10000 });
-
+        await this.authPage.goto();
+        await this.authPage.signUp(this.email, this.password);
+        await this.authPage.waitForRedirect('/');
         return { email: this.email, password: this.password };
     }
 
@@ -49,17 +40,9 @@ export class AuthFixture {
         const loginEmail = email || this.email;
         const loginPassword = password || this.password;
 
-        await this.page.goto('/auth');
-
-        // Fill in login form
-        await this.page.getByRole('textbox', { name: /email/i }).fill(loginEmail);
-        await this.page.getByRole('textbox', { name: /password/i }).fill(loginPassword);
-
-        // Submit form
-        await this.page.getByRole('button', { name: /sign in/i }).click();
-
-        // Wait for successful login
-        await this.page.waitForURL('/', { timeout: 10000 });
+        await this.authPage.goto();
+        await this.authPage.signIn(loginEmail, loginPassword);
+        await this.authPage.waitForRedirect('/');
     }
 
     /**
@@ -67,13 +50,21 @@ export class AuthFixture {
      */
     async logout(): Promise<void> {
         // Navigate to home if not already there
-        await this.page.goto('/');
+        if (this.page.url().includes('/auth')) {
+            return;
+        }
 
-        // Click logout button (adjust selector based on your UI)
-        await this.page.getByRole('button', { name: /logout|sign out/i }).click();
-
-        // Wait for redirect to auth page
-        await this.page.waitForURL('/auth', { timeout: 5000 });
+        // This assumes a logout button exists on dashboard or header
+        // Since AuthPage doesn't have logout, we might need to add it or keep simplified logic here
+        // But for consistency let's look for known testid if possible
+        const logoutBtn = this.page.locator('button:has-text("Logout"), button:has-text("Sign Out"), [data-testid="logout-button"]');
+        if (await logoutBtn.count() > 0) {
+            await logoutBtn.first().click();
+            await this.authPage.waitForRedirect('/auth');
+        } else {
+            // Fallback or explicit goto
+            await this.page.goto('/auth');
+        }
     }
 
     /**

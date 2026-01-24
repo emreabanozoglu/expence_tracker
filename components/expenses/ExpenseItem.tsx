@@ -18,15 +18,18 @@ export interface ExpenseItemProps {
 
 export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemProps) {
     const { settings } = useSettingsContext();
-    const categoryColor = CATEGORY_COLORS[expense.category] || CATEGORY_COLORS.Other;
-    const categoryIcon = CATEGORY_ICONS[expense.category] || CATEGORY_ICONS.Other;
+
+    // Find category from settings to support custom categories
+    const categoryObj = settings.categories.find(c => c.name === expense.category);
+    const categoryColor = categoryObj?.color || CATEGORY_COLORS[expense.category] || CATEGORY_COLORS.Other;
+    const categoryIcon = categoryObj?.icon || CATEGORY_ICONS[expense.category] || CATEGORY_ICONS.Other;
 
     const handleDelete = () => {
         onDelete(expense.id);
     };
 
     return (
-        <div className={styles.item}>
+        <div className={styles.item} data-testid="expense-item">
             <div className={styles.categoryBadge} style={{ backgroundColor: categoryColor }}>
                 <span className={styles.icon}>{categoryIcon}</span>
             </div>
@@ -51,6 +54,7 @@ export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemPr
                     onClick={() => onEdit(expense)}
                     aria-label="Edit expense"
                     title="Edit"
+                    data-testid="edit-expense-button"
                 >
                     <Edit2 size={18} />
                 </button>
@@ -59,6 +63,7 @@ export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemPr
                     onClick={handleDelete}
                     aria-label="Delete expense"
                     title="Delete"
+                    data-testid="delete-expense-button"
                 >
                     <Trash2 size={18} />
                 </button>

@@ -32,6 +32,12 @@ jobs:
         echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> .env.local
         echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}" >> .env.local
 
+    - name: Build application
+      run: npm run build
+
+    - name: Start application
+      run: npm run start & npx wait-on http://localhost:3000
+
     - name: Run Playwright tests
       run: npm test
       env:

@@ -20,7 +20,7 @@ export interface ExpenseListProps {
 export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
     if (expenses.length === 0) {
         return (
-            <div className={styles.empty}>
+            <div className={styles.empty} data-testid="empty-state">
                 <div className={styles.emptyIcon}>💸</div>
                 <h3 className={styles.emptyTitle}>No expenses yet</h3>
                 <p className={styles.emptyText}>

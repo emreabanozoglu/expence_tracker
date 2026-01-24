@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase/client';
 import styles from './auth.module.css';
 
 export default function AuthPage() {
@@ -22,15 +23,25 @@ export default function AuthPage() {
         setLoading(true);
 
         try {
-            const { error } = isSignUp
+            const result = isSignUp
                 ? await signUp(email, password)
                 : await signIn(email, password);
 
-            if (error) {
-                setError(error.message);
+            if (result.error) {
+                setError(result.error.message);
             } else {
                 if (isSignUp) {
-                    setError('Check your email to confirm your account!');
+                    // Check if user is already logged in (email confirmation disabled)
+                    // or if they need to confirm email
+                    const { data: { session } } = await supabase.auth.getSession();
+
+                    if (session) {
+                        // User is logged in - email confirmation is disabled
+                        router.push('/');
+                    } else {
+                        // User needs to confirm email
+                        setError('Check your email to confirm your account!');
+                    }
                 } else {
                     router.push('/');
                 }
@@ -66,6 +77,7 @@ export default function AuthPage() {
                             placeholder="you@example.com"
                             required
                             autoComplete="email"
+                            data-testid="email-input"
                         />
                     </div>
 
@@ -83,11 +95,15 @@ export default function AuthPage() {
                             required
                             minLength={6}
                             autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                            data-testid="password-input"
                         />
                     </div>
 
                     {error && (
-                        <div className={error.includes('Check your email') ? styles.success : styles.error}>
+                        <div
+                            className={error.includes('Check your email') ? styles.success : styles.error}
+                            data-testid="auth-error-message"
+                        >
                             {error}
                         </div>
                     )}
@@ -96,6 +112,7 @@ export default function AuthPage() {
                         type="submit"
                         className={styles.button}
                         disabled={loading}
+                        data-testid="auth-submit-button"
                     >
                         {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
                     </button>
@@ -109,6 +126,7 @@ export default function AuthPage() {
                             setError('');
                         }}
                         className={styles.toggleButton}
+                        data-testid="auth-toggle-button"
                     >
                         {isSignUp
                             ? 'Already have an account? Sign in'
