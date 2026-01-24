@@ -106,8 +106,7 @@ test.describe('Dashboard and Analytics', () => {
         await dashboardPage.goto();
         await dashboardPage.waitForDataToLoad();
 
-        let totalSpending = await dashboardPage.getTotalSpending();
-        expect(totalSpending).toContain('50');
+        await expect(dashboardPage.summaryCards).toContainText('50');
 
         // Add another expense
         await expensesPage.goto();
@@ -117,8 +116,8 @@ test.describe('Dashboard and Analytics', () => {
         await dashboardPage.waitForDataToLoad();
 
         // Total should update
-        totalSpending = await dashboardPage.getTotalSpending();
-        expect(totalSpending).toContain('75');
+        // Total should update
+        await expect(dashboardPage.summaryCards).toContainText('75');
     });
 
     test('should show empty state when no expenses', async () => {
