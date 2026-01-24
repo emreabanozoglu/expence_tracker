@@ -14,10 +14,14 @@ test.describe('Expense Management', () => {
     test.beforeEach(async ({ page }) => {
         // Create and login a unique user for each test
         authFixture = new AuthFixture(page);
-        await authFixture.createAndLoginUser();
+        await authFixture.createAndLoginUserViaApi();
 
         expensesPage = new ExpensesPage(page);
         await expensesPage.goto();
+    });
+
+    test.afterEach(async () => {
+        await authFixture.cleanup();
     });
 
     test('should display empty state when no expenses', async () => {

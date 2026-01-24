@@ -6,6 +6,7 @@ import { Page } from '@playwright/test';
 import { generateUniqueEmail, generatePassword } from '../helpers/test-data';
 import { DatabaseCleanup } from '../helpers/db-cleanup';
 import { AuthPage } from '../pages/auth.page';
+import { createClient } from '@supabase/supabase-js';
 
 export class AuthFixture {
     private page: Page;
@@ -24,13 +25,81 @@ export class AuthFixture {
     }
 
     /**
+     * Create a new user and login via Supabase API (bypassing UI)
+     * Faster and more reliable for non-auth tests
+     */
+    async createAndLoginUserViaApi(): Promise<{ email: string; password: string }> {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+        const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!; // Anon key
+
+        if (!supabaseUrl || !supabaseKey) {
+            throw new Error('Supabase env vars missing for API auth');
+        }
+
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // 1. Sign Up
+        const { data, error } = await supabase.auth.signUp({
+            email: this.email,
+            password: this.password,
+        });
+
+        if (error) throw error;
+        if (!data.session) throw new Error('No session returned after signup (Email confirmation might be enabled?)');
+
+        this.userId = data.user?.id || null;
+
+        // 2. Set Session in Browser
+        // Extract project ID from URL (e.g. https://<project-id>.supabase.co)
+        const projectIdResult = /https:\/\/([^.]+)\./.exec(supabaseUrl);
+        const projectId = projectIdResult ? projectIdResult[1] : 'supabase-token';
+        const storageKey = `sb-${projectId}-auth-token`;
+
+        await this.page.goto('/'); // Need to be on the domain to set localStorage? 
+        // Actually best to goto '/' first, but if protected it redirects to /auth.
+        // It's fine to set it then goto '/' again or reload.
+
+        await this.page.evaluate(({ key, value }) => {
+            localStorage.setItem(key, JSON.stringify(value));
+        }, { key: storageKey, value: data.session });
+
+        // 3. Reload/Navigate to verify
+        await this.page.goto('/');
+
+        return { email: this.email, password: this.password };
+    }
+
+    /**
      * Create a new user and log them in
      */
     async createAndLoginUser(): Promise<{ email: string; password: string }> {
         await this.authPage.goto();
+        // toggleMode not needed, signUp handles it
         await this.authPage.signUp(this.email, this.password);
-        await this.authPage.waitForRedirect('/');
+
+        // Capture User ID from localStorage after successful login
+        // This is needed for cleanup
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+        const projectIdResult = /https:\/\/([^.]+)\./.exec(supabaseUrl);
+        const projectId = projectIdResult ? projectIdResult[1] : 'supabase-token';
+        const storageKey = `sb-${projectId}-auth-token`;
+
+        const sessionStr = await this.page.evaluate((key) => localStorage.getItem(key), storageKey);
+        if (sessionStr) {
+            const session = JSON.parse(sessionStr);
+            this.userId = session.user?.id;
+        }
+
         return { email: this.email, password: this.password };
+    }
+
+    /**
+     * Clean up the test user
+     */
+    async cleanup() {
+        if (this.userId) {
+            await this.dbCleanup.deleteUserData(this.userId);
+        }
     }
 
     /**
@@ -79,14 +148,5 @@ export class AuthFixture {
      */
     setUserId(userId: string): void {
         this.userId = userId;
-    }
-
-    /**
-     * Clean up test user data
-     */
-    async cleanup(): Promise<void> {
-        if (this.userId) {
-            await this.dbCleanup.deleteUserData(this.userId);
-        }
     }
 }

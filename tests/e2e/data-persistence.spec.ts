@@ -13,9 +13,13 @@ test.describe('Data Persistence', () => {
 
     test.beforeEach(async ({ page }) => {
         authFixture = new AuthFixture(page);
-        await authFixture.createAndLoginUser();
+        await authFixture.createAndLoginUserViaApi();
 
         expensesPage = new ExpensesPage(page);
+    });
+
+    test.afterEach(async () => {
+        await authFixture.cleanup();
     });
 
     test('should persist expenses after page refresh', async ({ page }) => {
@@ -68,7 +72,7 @@ test.describe('Data Persistence', () => {
         // Create and login user 2 in a new page
         const page2 = await context.newPage();
         const authFixture2 = new AuthFixture(page2);
-        await authFixture2.createAndLoginUser();
+        await authFixture2.createAndLoginUserViaApi();
 
         const expensesPage2 = new ExpensesPage(page2);
         await expensesPage2.goto();
@@ -86,6 +90,7 @@ test.describe('Data Persistence', () => {
         // User 2 should see their own expense
         await expect(expensesPage2.getExpenseByDescription('User 2 Expense')).toBeVisible();
 
+        await authFixture2.cleanup();
         await page2.close();
     });
 

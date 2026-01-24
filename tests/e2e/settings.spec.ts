@@ -13,10 +13,14 @@ test.describe('Settings', () => {
 
     test.beforeEach(async ({ page }) => {
         authFixture = new AuthFixture(page);
-        await authFixture.createAndLoginUser();
+        await authFixture.createAndLoginUserViaApi();
 
         settingsPage = new SettingsPage(page);
         await settingsPage.goto();
+    });
+
+    test.afterEach(async () => {
+        await authFixture.cleanup();
     });
 
     test('should change currency', async ({ page }) => {

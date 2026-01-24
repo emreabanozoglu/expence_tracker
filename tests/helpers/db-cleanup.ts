@@ -7,9 +7,11 @@ import { createClient } from '@supabase/supabase-js';
 // Get environment variables with fallback
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export class DatabaseCleanup {
     private supabase;
+    private adminSupabase;
 
     constructor() {
         if (!supabaseUrl || !supabaseKey) {
@@ -18,13 +20,34 @@ export class DatabaseCleanup {
         } else {
             this.supabase = createClient(supabaseUrl, supabaseKey);
         }
+
+        // Initialize Admin client if service role key is available
+        if (supabaseUrl && serviceRoleKey) {
+            this.adminSupabase = createClient(supabaseUrl, serviceRoleKey, {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            });
+        }
     }
 
     /**
-     * Delete a user and all their associated data
-     * Note: This requires admin privileges or proper RLS policies
+     * Delete a user and ALL their data using Admin API
      */
     async deleteUserData(userId: string): Promise<void> {
+        if (this.adminSupabase) {
+            try {
+                const { error } = await this.adminSupabase.auth.admin.deleteUser(userId);
+                if (error) throw error;
+                console.log(`Deleted user ${userId} via Admin API`);
+                return;
+            } catch (error) {
+                console.error('Error deleting user via Admin API:', error);
+                // Fallback to data deletion if admin fails
+            }
+        }
+
         if (!this.supabase) {
             console.log('Skipping cleanup - Supabase not configured');
             return;

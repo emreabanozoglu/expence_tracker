@@ -15,11 +15,13 @@ test.describe('Dashboard and Analytics', () => {
 
     test.beforeEach(async ({ page }) => {
         authFixture = new AuthFixture(page);
-        await authFixture.createAndLoginUser();
-
         expensesPage = new ExpensesPage(page);
         dashboardPage = new DashboardPage(page);
-        await dashboardPage.goto();
+        await authFixture.createAndLoginUserViaApi();
+    });
+
+    test.afterEach(async () => {
+        await authFixture.cleanup();
     });
 
     test('should display summary cards with correct data', async ({ page }) => {
@@ -34,12 +36,11 @@ test.describe('Dashboard and Analytics', () => {
         await dashboardPage.waitForDataToLoad();
 
         // Check total spending (should be 100.00)
-        const totalSpending = await dashboardPage.getTotalSpending();
-        expect(totalSpending).toContain('100');
+        // Check total spending (should be 100.00)
+        await expect(dashboardPage.summaryCards).toContainText('100');
 
         // Check average expense (should be around 33.33)
-        const averageExpense = await dashboardPage.getAverageExpense();
-        expect(averageExpense).toContain('33');
+        await expect(dashboardPage.summaryCards).toContainText('33');
     });
 
     test('should display category breakdown chart', async ({ page }) => {
