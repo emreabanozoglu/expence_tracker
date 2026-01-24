@@ -1,0 +1,145 @@
+.container {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    border: 1px solid var(--border);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-xl);
+    gap: var(--spacing-lg);
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.description {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+.confirmButton {
+    background: var(--warning) !important;
+    color: white !important;
+    border-color: var(--warning) !important;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.categoryCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    background: var(--hover-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    transition: all var(--transition-fast);
+}
+
+.categoryCard:hover {
+    border-color: var(--primary-500);
+    box-shadow: var(--shadow-sm);
+}
+
+.categoryInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-width: 0;
+}
+
+.categoryIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.categoryDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.categoryName {
+    font-weight: 600;
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.defaultBadge {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    font-weight: 500;
+}
+
+.categoryActions {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+}
+
+.actionButton {
+    padding: var(--spacing-sm);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--foreground);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actionButton:hover {
+    background: var(--card-bg);
+    border-color: var(--primary-500);
+}
+
+.deleteButton:hover {
+    background: var(--error);
+    border-color: var(--error);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

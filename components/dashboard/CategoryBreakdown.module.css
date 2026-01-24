@@ -1,0 +1,99 @@
+.card {
+    padding: var(--spacing-xl);
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xl);
+}
+
+.chartContainer {
+    margin-bottom: var(--spacing-xl);
+}
+
+.empty {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--gray-500);
+}
+
+.tooltip {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-lg);
+}
+
+.tooltipLabel {
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+    color: var(--foreground);
+}
+
+.tooltipValue {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-500);
+    margin-bottom: var(--spacing-xs);
+}
+
+.tooltipMeta {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+.legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+}
+
+.legendItem:hover {
+    background: var(--hover-bg);
+}
+
+.legendColor {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.legendContent {
+    flex: 1;
+    min-width: 0;
+}
+
+.legendLabel {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-bottom: 2px;
+}
+
+.legendValue {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+@media (max-width: 768px) {
+    .legend {
+        grid-template-columns: 1fr;
+    }
+
+    .chartContainer {
+        margin-left: -var(--spacing-lg);
+        margin-right: -var(--spacing-lg);
+    }
+}

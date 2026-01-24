@@ -1,66 +1,168 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+// Main Expense Tracker Page
+
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import { Expense, ExpenseFormData, DateRangePreset } from '@/lib/types';
+import { useExpenses } from '@/lib/hooks/useExpenses';
+import { exportToCSV } from '@/lib/utils/export';
+import { filterExpensesByDateRange } from '@/lib/utils/dateFilters';
+import { getDateRangeLabel } from '@/lib/utils/monthFilters';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import ExpenseList from '@/components/expenses/ExpenseList';
+import ExpenseForm from '@/components/expenses/ExpenseForm';
+import SummaryCards from '@/components/dashboard/SummaryCards';
+import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown';
+import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
+import Modal from '@/components/ui/Modal';
+import Button from '@/components/ui/Button';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+import { Plus, Download, Wallet, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '@/lib/context/AuthContext';
+import Link from 'next/link';
+import styles from './page.module.css';
 
 export default function Home() {
+  const { expenses, addExpense, updateExpense, deleteExpense, isLoading } = useExpenses();
+  const { signOut } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<DateRangePreset>('all');
+
+  // Filter expenses based on date range
+  const filteredExpenses = useMemo(() => {
+    return filterExpensesByDateRange(expenses, dateRange);
+  }, [expenses, dateRange]);
+
+  const handleAddExpense = () => {
+    setEditingExpense(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (data: ExpenseFormData) => {
+    if (editingExpense) {
+      await updateExpense(editingExpense.id, data);
+    } else {
+      await addExpense(data);
+    }
+    setIsModalOpen(false);
+    setEditingExpense(undefined);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setEditingExpense(undefined);
+  };
+
+  const handleExport = () => {
+    exportToCSV(filteredExpenses);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  if (isLoading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.spinner}></div>
+        <p>Loading expenses...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <ProtectedRoute>
+      <div className={styles.page}>
+        <header className={styles.header}>
+          <div className={styles.headerContent}>
+            <div className={styles.branding}>
+              <Wallet size={32} className={styles.logo} />
+              <h1 className={styles.title}>Expense Tracker</h1>
+            </div>
+            <div className={styles.headerActions}>
+              <Link href="/settings">
+                <Button variant="ghost">
+                  <Settings size={20} />
+                  Settings
+                </Button>
+              </Link>
+              <ThemeToggle />
+              {expenses.length > 0 && (
+                <Button variant="ghost" onClick={handleExport}>
+                  <Download size={20} />
+                  Export
+                </Button>
+              )}
+              <Button variant="ghost" onClick={handleSignOut}>
+                <LogOut size={20} />
+                Sign Out
+              </Button>
+              <Button variant="primary" onClick={handleAddExpense}>
+                <Plus size={20} />
+                Add Expense
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className={styles.main}>
+          <div className={styles.container}>
+            {/* Date Range Filter */}
+            {expenses.length > 0 && (
+              <DateRangeFilter
+                selected={dateRange}
+                onSelect={setDateRange}
+                expenses={expenses}
+              />
+            )}
+
+            {/* Summary Cards */}
+            {filteredExpenses.length > 0 && (
+              <SummaryCards expenses={filteredExpenses} />
+            )}
+
+            {/* Dashboard Grid */}
+            {filteredExpenses.length > 0 && (
+              <div className={styles.dashboardGrid}>
+                <div className={styles.chartSection}>
+                  <CategoryBreakdown expenses={filteredExpenses} />
+                </div>
+              </div>
+            )}
+
+            <div className={styles.listSection}>
+              <h2 className={styles.sectionTitle}>
+                {getDateRangeLabel(dateRange)}
+              </h2>
+              <ExpenseList
+                expenses={filteredExpenses}
+                onEdit={handleEditExpense}
+                onDelete={deleteExpense}
+              />
+            </div>
+          </div>
+        </main>
+
+        {/* Add/Edit Modal */}
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleCancel}
+          title={editingExpense ? 'Edit Expense' : 'Add New Expense'}
+          size="md"
+        >
+          <ExpenseForm
+            expense={editingExpense}
+            onSubmit={handleSubmit}
+            onCancel={handleCancel}
+          />
+        </Modal>
+      </div>
+    </ProtectedRoute>
   );
 }

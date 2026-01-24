@@ -1,0 +1,95 @@
+.page {
+    min-height: 100vh;
+    background: var(--background);
+}
+
+.header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: var(--spacing-xl) 0;
+}
+
+.headerContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.backButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: var(--spacing-md);
+    transition: color var(--transition-fast);
+}
+
+.backButton:hover {
+    color: var(--primary-500);
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+}
+
+.subtitle {
+    color: var(--gray-500);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.main {
+    padding: var(--spacing-3xl) 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: var(--spacing-lg);
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary-500);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .main {
+        padding: var(--spacing-xl) 0;
+    }
+
+    .section {
+        margin-bottom: var(--spacing-xl);
+    }
+}

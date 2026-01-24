@@ -1,0 +1,46 @@
+.selectWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.fullWidth {
+    width: 100%;
+}
+
+.label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.select {
+    padding: var(--spacing-md);
+    font-size: 1rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-md);
+    background: var(--input-bg);
+    color: var(--foreground);
+    transition: all var(--transition-base);
+    outline: none;
+    cursor: pointer;
+}
+
+.select:focus {
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 3px hsla(220, 70%, 50%, 0.1);
+}
+
+.select.error {
+    border-color: var(--error);
+}
+
+.select.error:focus {
+    box-shadow: 0 0 0 3px hsla(0, 70%, 55%, 0.1);
+}
+
+.errorMessage {
+    font-size: 0.875rem;
+    color: var(--error);
+    margin-top: var(--spacing-xs);
+}

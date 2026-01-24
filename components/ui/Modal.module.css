@@ -1,0 +1,100 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--spacing-lg);
+    animation: fadeIn var(--transition-base);
+}
+
+.modal {
+    background: var(--card-bg);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp var(--transition-slow) ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sm {
+    width: 100%;
+    max-width: 400px;
+}
+
+.md {
+    width: 100%;
+    max-width: 600px;
+}
+
+.lg {
+    width: 100%;
+    max-width: 900px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--border);
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+    color: var(--gray-500);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton:hover {
+    background: var(--hover-bg);
+    color: var(--foreground);
+}
+
+.content {
+    padding: var(--spacing-xl);
+}
+
+@media (max-width: 768px) {
+    .overlay {
+        padding: 0;
+    }
+
+    .modal {
+        max-height: 100vh;
+        border-radius: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
