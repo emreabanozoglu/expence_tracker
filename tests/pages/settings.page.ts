@@ -71,11 +71,15 @@ export class SettingsPage {
     }
 
     async deleteCategory(name: string) {
-        const card = this.page.locator('[data-testid="category-card"]').filter({ hasText: name });
-        await card.locator('[data-testid="delete-category-button"]').click();
+        const card = this.page.locator('[data-testid="category-card"]').filter({ hasText: name }).first();
+        const deleteBtn = card.locator('[data-testid="delete-category-button"]');
 
-        // Wait a bit for deletion
-        await this.page.waitForTimeout(500);
+        // Ensure button is ready
+        await deleteBtn.waitFor({ state: 'visible' });
+        await deleteBtn.click();
+
+        // Wait for deletion to verify persistence
+        await card.waitFor({ state: 'hidden' });
     }
 
     async resetCategories() {
