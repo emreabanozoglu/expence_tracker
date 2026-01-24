@@ -80,9 +80,8 @@ test.describe('Settings', () => {
         await expensesPage.addExpenseButton.click();
 
         // Custom category should be available in dropdown
-        const options = await expensesPage.categorySelect.locator('option').allTextContents();
-        const found = options.some(opt => opt.includes(categoryName));
-        expect(found).toBe(true);
+        // Using toContainText on the select element checks if any option contains the text, with auto-retry
+        await expect(expensesPage.categorySelect).toContainText(categoryName);
     });
 
     test('should persist custom categories after logout', async ({ page }) => {

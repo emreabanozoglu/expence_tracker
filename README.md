@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Expense Tracker
 
-## Getting Started
+A modern, responsive expense tracking application built with Next.js 16, Supabase, and React 19. Manage your personal finances with ease, visualize spending habits, and customize your experience.
 
-First, run the development server:
+![Dashboard Preview](public/dashboard-preview.png)
 
+## Features
+
+- **📊 Interactive Dashboard**: Visual breakdown of expenses by category and comprehensive summary cards (Total Spending, Average, Transaction Count).
+- **💸 Expense Management**: 
+  - Add, edit, and delete expenses.
+  - Categorize spending with default or custom categories.
+  - Filter by date ranges (This Month, Last Month, All Time).
+- **🎨 Customization**:
+  - **Custom Categories**: Create, edit, and delete your own categories with colors and icons.
+  - **Currency Support**: Choose your preferred global currency (USD, GBP, EUR, TRY, etc.).
+- **🔐 Secure Authentication**: User registration and login powered by Supabase Auth.
+- **📂 Data Export**: Export your filtered expenses to CSV.
+- **📱 Responsive Design**: Optimized for desktop and mobile devices.
+
+## Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: TypeScript
+- **Database & Auth**: [Supabase](https://supabase.com/)
+- **Styling**: CSS Modules (Scoped, zero-runtime)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Charts**: [Recharts](https://recharts.org/)
+- **Testing**: [Playwright](https://playwright.dev/)
+
+## Prerequisites
+
+- Node.js 18.17+ 
+- NPM or Yarn
+- A Supabase project (for database and auth)
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/expence_tracker.git
+   cd expence_tracker
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables**
+   Create a `.env.local` file in the root directory and add your Supabase credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Database Setup**
+   Ensure your Supabase project has the required tables (`profiles`, `expenses`, `user_settings`). 
+   *(Refer to `database/schema.sql` if provided, or use the Supabase dashboard to create them).*
+
+## Running the Application
+
+Start the development server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Running Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project uses **Playwright** for End-to-End (E2E) testing.
 
-## Learn More
+**Run all tests:**
+```bash
+npm test
+```
 
-To learn more about Next.js, take a look at the following resources:
+**Run specific test file:**
+```bash
+npx playwright test tests/e2e/dashboard.spec.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Run with UI Mode (Interactive):**
+```bash
+npm run test:ui
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**View HTML Report:**
+```bash
+npm run test:report
+```
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+├── app/                  # Next.js App Router pages
+│   ├── auth/             # Login/Signup pages
+│   ├── settings/         # Settings page
+│   ├── layout.tsx        # Root layout with Providers
+│   └── page.tsx          # Main Dashboard
+├── components/           # Reusable UI components
+│   ├── auth/             # Auth forms
+│   ├── dashboard/        # Charts and Summary Cards
+│   ├── expenses/         # Expense List and Forms
+│   ├── settings/         # Category Manager, Currency Selector
+│   └── ui/               # Generic UI (Button, Modal, Input)
+├── lib/                  # Utilities and Hooks
+│   ├── context/          # React Context (Auth, Settings)
+│   ├── hooks/            # Custom Hooks (useExpenses, useSettings)
+│   ├── supabase/         # Supabase client config
+│   └── utils/            # Helper functions
+├── tests/                # Playwright E2E tests
+│   ├── e2e/              # Test specs
+│   ├── fixtures/         # Test fixtures (Auth)
+│   └── pages/            # Page Object Models
+└── public/               # Static assets
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+This project is licensed under the MIT License.
