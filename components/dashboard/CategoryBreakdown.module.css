@@ -88,12 +88,38 @@
 }
 
 @media (max-width: 768px) {
+    .card {
+        padding: var(--spacing-lg);
+    }
+
+    .title {
+        font-size: 1.125rem;
+    }
+
     .legend {
         grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
     }
 
     .chartContainer {
         margin-left: -var(--spacing-lg);
         margin-right: -var(--spacing-lg);
+        padding: 0 var(--spacing-md);
+    }
+
+    .legendItem {
+        padding: var(--spacing-md);
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .card {
+        padding: var(--spacing-md);
+    }
+
+    .chartContainer {
+        margin-left: -var(--spacing-md);
+        margin-right: -var(--spacing-md);
     }
 }

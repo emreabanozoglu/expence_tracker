@@ -123,15 +123,42 @@ export class AuthFixture {
             return;
         }
 
-        // This assumes a logout button exists on dashboard or header
-        // Since AuthPage doesn't have logout, we might need to add it or keep simplified logic here
-        // But for consistency let's look for known testid if possible
-        const logoutBtn = this.page.locator('button:has-text("Logout"), button:has-text("Sign Out"), [data-testid="logout-button"]');
-        if (await logoutBtn.count() > 0) {
-            await logoutBtn.first().click();
+        // Try desktop logout button first
+        const desktopLogoutBtn = this.page.locator('[data-testid="logout-button"]');
+        if (await desktopLogoutBtn.isVisible()) {
+            await desktopLogoutBtn.click();
+            await this.authPage.waitForRedirect('/auth');
+            return;
+        }
+
+        // If desktop button not visible, try mobile menu
+        const mobileLogoutBtn = this.page.locator('[data-testid="mobile-logout-button"]');
+        if (await mobileLogoutBtn.count() > 0) {
+            // Check if mobile logout button is visible
+            const isVisible = await mobileLogoutBtn.isVisible();
+
+            if (!isVisible) {
+                // Open mobile menu first
+                const menuToggle = this.page.locator('button:has-text("Toggle menu"), [aria-label="Toggle menu"]');
+                if (await menuToggle.count() > 0) {
+                    await menuToggle.click();
+                    // Wait for menu to open
+                    await this.page.waitForTimeout(300);
+                }
+            }
+
+            await mobileLogoutBtn.click();
+            await this.authPage.waitForRedirect('/auth');
+            return;
+        }
+
+        // Fallback: try any logout/sign out button
+        const anyLogoutBtn = this.page.locator('button:has-text("Logout"), button:has-text("Sign Out")');
+        if (await anyLogoutBtn.count() > 0) {
+            await anyLogoutBtn.first().click({ force: true });
             await this.authPage.waitForRedirect('/auth');
         } else {
-            // Fallback or explicit goto
+            // Last resort: navigate directly
             await this.page.goto('/auth');
         }
     }

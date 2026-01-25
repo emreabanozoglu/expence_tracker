@@ -2,11 +2,11 @@
 
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { DateRangePreset } from '@/lib/types';
 import { Expense } from '@/lib/types';
 import { getAvailableMonths } from '@/lib/utils/monthFilters';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from './DateRangeFilter.module.css';
 
 export interface DateRangeFilterProps {
@@ -16,6 +16,7 @@ export interface DateRangeFilterProps {
 }
 
 export default function DateRangeFilter({ selected, onSelect, expenses }: DateRangeFilterProps) {
+    const [isExpanded, setIsExpanded] = useState(false);
     const availableMonths = useMemo(() => getAvailableMonths(expenses), [expenses]);
 
     const quickFilters: { value: DateRangePreset; label: string }[] = [
@@ -30,47 +31,75 @@ export default function DateRangeFilter({ selected, onSelect, expenses }: DateRa
         ? availableMonths.find((m) => m.value === selected)
         : null;
 
-    return (
-        <div className={styles.filter}>
-            <Calendar size={20} className={styles.icon} />
+    // Get the label for the currently selected filter
+    const getSelectedLabel = () => {
+        if (selectedMonth) return selectedMonth.label;
+        const quickFilter = quickFilters.find((f) => f.value === selected);
+        return quickFilter?.label || 'All Time';
+    };
 
-            <div className={styles.buttons}>
-                {quickFilters.map((option) => (
-                    <button
-                        key={option.value}
-                        className={`${styles.button} ${selected === option.value ? styles.active : ''}`}
-                        onClick={() => onSelect(option.value)}
-                    >
-                        {option.label}
-                    </button>
-                ))}
+    const toggleExpanded = () => {
+        setIsExpanded(!isExpanded);
+    };
+
+    return (
+        <div className={`${styles.filter} ${isExpanded ? styles.expanded : styles.collapsed}`}>
+            {/* Collapsed Header - Always Visible */}
+            <div className={styles.filterHeader} onClick={toggleExpanded}>
+                <div className={styles.headerLeft}>
+                    <Calendar size={20} className={styles.icon} />
+                    <span className={styles.selectedLabel}>{getSelectedLabel()}</span>
+                </div>
+                <button className={styles.toggleButton} aria-label={isExpanded ? 'Collapse filters' : 'Expand filters'}>
+                    {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </button>
             </div>
 
-            {availableMonths.length > 0 && (
-                <div className={styles.divider} />
-            )}
-
-            {availableMonths.length > 0 && (
-                <div className={styles.dropdown}>
-                    <select
-                        className={styles.select}
-                        value={isMonthSelected ? selected : ''}
-                        onChange={(e) => {
-                            if (e.target.value) {
-                                onSelect(e.target.value);
-                            }
-                        }}
-                    >
-                        <option value="">Select Month</option>
-                        {availableMonths.map((month) => (
-                            <option key={month.value} value={month.value}>
-                                {month.label}
-                            </option>
-                        ))}
-                    </select>
-                    <ChevronDown size={16} className={styles.dropdownIcon} />
+            {/* Filter Content - Always rendered, visibility controlled by CSS */}
+            <div className={styles.filterContent}>
+                <Calendar size={20} className={styles.icon} />
+                <div className={styles.buttons}>
+                    {quickFilters.map((option) => (
+                        <button
+                            key={option.value}
+                            className={`${styles.button} ${selected === option.value ? styles.active : ''}`}
+                            onClick={() => {
+                                onSelect(option.value);
+                                setIsExpanded(false);
+                            }}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
                 </div>
-            )}
+
+                {availableMonths.length > 0 && (
+                    <div className={styles.divider} />
+                )}
+
+                {availableMonths.length > 0 && (
+                    <div className={styles.dropdown}>
+                        <select
+                            className={styles.select}
+                            value={isMonthSelected ? selected : ''}
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    onSelect(e.target.value);
+                                    setIsExpanded(false);
+                                }
+                            }}
+                        >
+                            <option value="">Select Month</option>
+                            {availableMonths.map((month) => (
+                                <option key={month.value} value={month.value}>
+                                    {month.label}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown size={16} className={styles.dropdownIcon} />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

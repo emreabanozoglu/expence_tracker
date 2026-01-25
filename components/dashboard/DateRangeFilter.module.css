@@ -9,6 +9,47 @@
     flex-wrap: wrap;
 }
 
+/* Hide header on desktop, show on mobile */
+.filterHeader {
+    display: none;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.selectedLabel {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.toggleButton {
+    background: transparent;
+    border: none;
+    padding: var(--spacing-xs);
+    color: var(--gray-500);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition-fast);
+}
+
+.toggleButton:hover {
+    color: var(--foreground);
+}
+
+/* Show content by default on desktop */
+.filterContent {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
 .icon {
     color: var(--gray-500);
     flex-shrink: 0;
@@ -99,22 +140,111 @@
     .filter {
         flex-direction: column;
         align-items: stretch;
+        padding: 0;
+        border: none;
+        background: transparent;
+        gap: 0;
+    }
+
+    /* Show expandable header on mobile */
+    .filterHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-lg);
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: background-color var(--transition-fast);
+    }
+
+    .filterHeader:hover {
+        background: var(--hover-bg);
+    }
+
+    .filterHeader:active {
+        transform: scale(0.98);
+    }
+
+    /* Hide content when collapsed on mobile */
+    .filter.collapsed .filterContent {
+        display: none;
+    }
+
+    /* Show content when expanded on mobile */
+    .filter.expanded .filterContent {
+        display: flex;
+        flex-direction: column;
+        padding: var(--spacing-lg);
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        margin-top: var(--spacing-sm);
+        animation: slideDown 0.2s ease-out;
+    }
+
+    /* Hide calendar icon in filterContent on mobile (shown in header) */
+    .filterContent .icon {
+        display: none;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .buttons {
         flex-direction: column;
+        gap: var(--spacing-sm);
+        width: 100%;
     }
 
     .button {
         width: 100%;
+        padding: var(--spacing-md) var(--spacing-lg);
+        min-height: 44px;
+        font-size: 0.9375rem;
     }
 
     .divider {
         width: 100%;
         height: 1px;
+        margin: var(--spacing-xs) 0;
     }
 
     .dropdown {
         width: 100%;
+    }
+
+    .select {
+        min-height: 44px;
+        font-size: 0.9375rem;
+    }
+
+    .icon {
+        color: var(--primary-500);
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .filterHeader {
+        padding: var(--spacing-md);
+    }
+
+    .filter.expanded .filterContent {
+        padding: var(--spacing-md);
+    }
+
+    .selectedLabel {
+        font-size: 0.875rem;
     }
 }

@@ -99,20 +99,63 @@
 
 @media (max-width: 768px) {
     .item {
-        flex-direction: column;
-        gap: var(--spacing-md);
+        padding: var(--spacing-lg);
+    }
+
+    .categoryBadge {
+        width: 56px;
+        height: 56px;
+        font-size: 1.75rem;
     }
 
     .header {
-        flex-direction: column;
-        gap: var(--spacing-xs);
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .category {
+        font-size: 1.0625rem;
     }
 
     .amount {
-        font-size: 1.5rem;
+        font-size: 1.375rem;
+    }
+
+    .date {
+        font-size: 0.8125rem;
+    }
+
+    .description {
+        font-size: 0.9375rem;
+        margin-top: var(--spacing-xs);
     }
 
     .actions {
+        margin-top: var(--spacing-md);
         align-self: flex-end;
+    }
+
+    .actionButton {
+        padding: var(--spacing-md);
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .item {
+        padding: var(--spacing-md);
+    }
+
+    .categoryBadge {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+    }
+
+    .amount {
+        font-size: 1.25rem;
     }
 }
