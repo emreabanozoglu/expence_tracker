@@ -22,17 +22,26 @@ export class DashboardPage {
     }
 
     async getTotalSpending(): Promise<string> {
-        const totalCard = this.page.locator('[data-testid="total-spending"]');
+        // Now maps to Total Expense
+        const totalCard = this.page.locator('[data-testid="total-expense"]');
         if (await totalCard.isVisible()) {
             return (await totalCard.textContent()) || '0';
         }
         return '0';
     }
 
-    async getAverageExpense(): Promise<string> {
-        const averageCard = this.page.locator('[data-testid="average-expense"]');
-        if (await averageCard.isVisible()) {
-            return (await averageCard.textContent()) || '0';
+    async getTotalIncome(): Promise<string> {
+        const totalCard = this.page.locator('[data-testid="total-income"]');
+        if (await totalCard.isVisible()) {
+            return (await totalCard.textContent()) || '0';
+        }
+        return '0';
+    }
+
+    async getNetBalance(): Promise<string> {
+        const totalCard = this.page.locator('[data-testid="net-balance"]');
+        if (await totalCard.isVisible()) {
+            return (await totalCard.textContent()) || '0';
         }
         return '0';
     }

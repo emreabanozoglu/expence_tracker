@@ -38,9 +38,6 @@ test.describe('Dashboard and Analytics', () => {
         // Check total spending (should be 100.00)
         // Check total spending (should be 100.00)
         await expect(dashboardPage.summaryCards).toContainText('100');
-
-        // Check average expense (should be around 33.33)
-        await expect(dashboardPage.summaryCards).toContainText('33');
     });
 
     test('should display category breakdown chart', async ({ page }) => {

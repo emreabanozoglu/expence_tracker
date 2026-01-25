@@ -97,3 +97,44 @@
         width: 100%;
     }
 }
+
+.typeToggle {
+    display: flex;
+    background: var(--surface-hover);
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+    gap: 0.25rem;
+    border: 1px solid var(--border);
+}
+
+.typeButton {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted-foreground);
+    transition: all 0.2s;
+}
+
+.typeButton:hover {
+    color: var(--foreground);
+    background: var(--surface);
+}
+
+.activeExpense {
+    background: var(--surface) !important;
+    color: var(--error) !important;
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+}
+
+.activeIncome {
+    background: var(--surface) !important;
+    color: var(--success) !important;
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+}

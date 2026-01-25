@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { SettingsProvider } from '@/lib/context/SettingsContext';
 import { AuthProvider } from '@/lib/context/AuthContext';
+import { ThemeProvider } from '@/lib/context/ThemeContext';
 
 export const metadata: Metadata = {
   title: "Expense Tracker - Manage Your Finances",
@@ -20,7 +21,9 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <SettingsProvider>
-            {children}
+            <ThemeProvider>
+              {children}
+            </ThemeProvider>
           </SettingsProvider>
         </AuthProvider>
       </body>

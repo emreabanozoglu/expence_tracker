@@ -3,7 +3,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CustomCategory } from '@/lib/types';
+import { CustomCategory, TransactionType } from '@/lib/types';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import styles from './CategoryForm.module.css';
@@ -32,6 +32,7 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
     const [name, setName] = useState(category?.name || '');
     const [color, setColor] = useState(category?.color || COLOR_OPTIONS[0]);
     const [icon, setIcon] = useState(category?.icon || EMOJI_OPTIONS[0]);
+    const [type, setType] = useState<TransactionType>(category?.type || 'expense');
     const [error, setError] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -47,11 +48,31 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
             color,
             icon,
             isDefault: false,
+            type,
         });
     };
 
     return (
         <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.field}>
+                <div className={styles.typeToggle}>
+                    <button
+                        type="button"
+                        className={`${styles.typeButton} ${type === 'expense' ? styles.activeExpense : ''}`}
+                        onClick={() => setType('expense')}
+                    >
+                        Expense
+                    </button>
+                    <button
+                        type="button"
+                        className={`${styles.typeButton} ${type === 'income' ? styles.activeIncome : ''}`}
+                        onClick={() => setType('income')}
+                    >
+                        Income
+                    </button>
+                </div>
+            </div>
+
             <div className={styles.field}>
                 <label htmlFor="category-name" className={styles.label}>
                     Category Name

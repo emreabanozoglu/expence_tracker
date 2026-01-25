@@ -22,9 +22,9 @@ export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListP
         return (
             <div className={styles.empty} data-testid="empty-state">
                 <div className={styles.emptyIcon}>💸</div>
-                <h3 className={styles.emptyTitle}>No expenses yet</h3>
+                <h3 className={styles.emptyTitle}>No transactions yet</h3>
                 <p className={styles.emptyText}>
-                    Start tracking your expenses by clicking the "Add Expense" button above.
+                    Start tracking your income and expenses by clicking the "Add Expense" button above.
                 </p>
             </div>
         );

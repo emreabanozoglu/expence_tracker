@@ -3,9 +3,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Expense, ExpenseFormData, Category } from '@/lib/types';
+import { Expense, ExpenseFormData, Category, TransactionType } from '@/lib/types';
 import { parseAmount } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
+import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import styles from './ExpenseForm.module.css';
@@ -18,15 +19,41 @@ export interface ExpenseFormProps {
 
 export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseFormProps) {
     const { settings } = useSettingsContext();
+
+    // Determine initial type
+    const initialType: TransactionType = expense?.type || 'expense';
+
+    // Get available categories based on type
+    const getCategories = (type: TransactionType) => {
+        if (type === 'income') return DEFAULT_INCOME_CATEGORIES;
+        // Filter settings.categories to ensuring we only show expense categories if mixed, 
+        // though currently they are likely all expense or untyped (legacy)
+        return settings.categories.filter(c => c.type === 'expense' || !c.type);
+    };
+
     const [formData, setFormData] = useState<ExpenseFormData>({
+        type: initialType,
         amount: expense?.amount.toString() || '',
-        category: expense?.category || (settings.categories[0]?.name as Category) || 'Food',
+        category: expense?.category || (getCategories(initialType)[0]?.name as Category) || 'Food',
         description: expense?.description || '',
         date: expense?.date.split('T')[0] || new Date().toISOString().split('T')[0],
     });
 
     const [errors, setErrors] = useState<Partial<Record<keyof ExpenseFormData, string>>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Update category when type changes if current category is not valid for new type
+    useEffect(() => {
+        const categories = getCategories(formData.type);
+        const currentCategoryValid = categories.some(c => c.name === formData.category);
+
+        if (!currentCategoryValid && categories.length > 0) {
+            setFormData(prev => ({
+                ...prev,
+                category: categories[0].name as Category
+            }));
+        }
+    }, [formData.type, settings.categories]);
 
     const validate = (): boolean => {
         const newErrors: Partial<Record<keyof ExpenseFormData, string>> = {};
@@ -95,6 +122,27 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
     return (
         <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGrid}>
+                <div className={styles.fullWidth} style={{ marginBottom: '1rem' }}>
+                    <div className={styles.typeToggle}>
+                        <button
+                            type="button"
+                            className={`${styles.typeButton} ${formData.type === 'expense' ? styles.activeExpense : ''}`}
+                            onClick={() => setFormData({ ...formData, type: 'expense' })}
+                            data-testid="type-expense"
+                        >
+                            Expense
+                        </button>
+                        <button
+                            type="button"
+                            className={`${styles.typeButton} ${formData.type === 'income' ? styles.activeIncome : ''}`}
+                            onClick={() => setFormData({ ...formData, type: 'income' })}
+                            data-testid="type-income"
+                        >
+                            Income
+                        </button>
+                    </div>
+                </div>
+
                 <Input
                     label="Amount *"
                     type="number"
@@ -120,7 +168,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
                         className={styles.select}
                         data-testid="expense-category"
                     >
-                        {settings.categories.map((cat) => (
+                        {getCategories(formData.type).map((cat) => (
                             <option key={cat.id} value={cat.name}>
                                 {cat.icon} {cat.name}
                             </option>
@@ -173,7 +221,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
                     Cancel
                 </Button>
                 <Button type="submit" variant="primary" disabled={isSubmitting} data-testid="submit-expense-button">
-                    {expense ? 'Update Expense' : 'Add Expense'}
+                    {expense ? 'Update Transaction' : 'Add Transaction'}
                 </Button>
             </div>
         </form>

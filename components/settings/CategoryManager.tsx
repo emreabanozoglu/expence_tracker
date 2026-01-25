@@ -2,8 +2,9 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { CustomCategory } from '@/lib/types';
+import React, { useState, useMemo } from 'react';
+import { CustomCategory, TransactionType } from '@/lib/types';
+import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 import Button from '@/components/ui/Button';
 import { Plus, Edit2, Trash2, RotateCcw } from 'lucide-react';
 import styles from './CategoryManager.module.css';
@@ -24,6 +25,7 @@ export default function CategoryManager({
     onResetCategories,
 }: CategoryManagerProps) {
     const [confirmReset, setConfirmReset] = useState(false);
+    const [activeTab, setActiveTab] = useState<TransactionType>('expense');
 
     const handleReset = () => {
         if (confirmReset) {
@@ -34,6 +36,34 @@ export default function CategoryManager({
             setTimeout(() => setConfirmReset(false), 3000);
         }
     };
+
+    // Filter categories based on active tab
+    // For Income: Include settings categories AND default income categories if not present
+    // For Expense: Include settings categories (defaults are already there usually)
+    const displayedCategories = useMemo(() => {
+        if (activeTab === 'expense') {
+            return categories.filter(c => c.type === 'expense' || !c.type);
+        } else {
+            // Get custom income categories
+            const customIncome = categories.filter(c => c.type === 'income');
+
+            // If we have custom income categories (or migrated defaults), use them.
+            // Otherwise, show the defaults + any customs. 
+            // Since we don't save defaults to DB for income yet (unless new user), 
+            // we might want to show defaults if we don't have a matching name/ID in custom list?
+            // Simpler approach for now: Show everything in settings + Defaults that aren't in settings?
+            // Actually, best UX: If settings has NO income categories, show defaults. 
+            // If it has SOME, assume user is managing them?
+            // But 'settings.categories' for separate types is tricky if they weren't seeded.
+
+            // Hybrid approach: Custom categories from DB + Defaults that are "missing" from DB?
+            // Or just display Defaults if the DB list for income is empty.
+            if (customIncome.length === 0) {
+                return DEFAULT_INCOME_CATEGORIES;
+            }
+            return customIncome;
+        }
+    }, [categories, activeTab]);
 
     return (
         <div className={styles.container}>
@@ -61,8 +91,23 @@ export default function CategoryManager({
                 </div>
             </div>
 
+            <div className={styles.tabs}>
+                <button
+                    className={`${styles.tab} ${activeTab === 'expense' ? styles.activeTab : ''}`}
+                    onClick={() => setActiveTab('expense')}
+                >
+                    Expense
+                </button>
+                <button
+                    className={`${styles.tab} ${activeTab === 'income' ? styles.activeTab : ''}`}
+                    onClick={() => setActiveTab('income')}
+                >
+                    Income
+                </button>
+            </div>
+
             <div className={styles.grid} data-testid="category-list">
-                {categories.map((category) => (
+                {displayedCategories.map((category) => (
                     <div key={category.id} className={styles.categoryCard} data-testid="category-card">
                         <div className={styles.categoryInfo}>
                             <div

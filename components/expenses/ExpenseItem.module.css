@@ -62,6 +62,14 @@
     white-space: nowrap;
 }
 
+.income {
+    color: var(--success);
+}
+
+.expense {
+    color: var(--foreground);
+}
+
 .description {
     font-size: 0.875rem;
     color: var(--gray-600);

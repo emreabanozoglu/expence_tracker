@@ -45,6 +45,7 @@ export function useExpenses(): UseExpensesReturn {
             // Transform database format to app format
             const transformedExpenses: Expense[] = (data || []).map((expense: Database['public']['Tables']['expenses']['Row']) => ({
                 id: expense.id,
+                type: expense.type,
                 amount: parseFloat(expense.amount.toString()),
                 category: expense.category as any,
                 description: expense.description || '',
@@ -106,6 +107,7 @@ export function useExpenses(): UseExpensesReturn {
                     .from('expenses') as any)
                     .insert({
                         user_id: user.id,
+                        type: data.type,
                         amount: parseFloat(data.amount),
                         category: data.category,
                         description: data.description || null,
@@ -120,6 +122,7 @@ export function useExpenses(): UseExpensesReturn {
 
                 const expense: Expense = {
                     id: newExpense.id,
+                    type: newExpense.type,
                     amount: parseFloat(newExpense.amount.toString()),
                     category: newExpense.category as any,
                     description: newExpense.description || '',
@@ -151,6 +154,7 @@ export function useExpenses(): UseExpensesReturn {
                 const { error } = await (supabase
                     .from('expenses') as any)
                     .update({
+                        type: data.type,
                         amount: parseFloat(data.amount),
                         category: data.category,
                         description: data.description || null,
@@ -166,6 +170,7 @@ export function useExpenses(): UseExpensesReturn {
                         expense.id === id
                             ? {
                                 ...expense,
+                                type: data.type,
                                 amount: parseFloat(data.amount),
                                 category: data.category,
                                 description: data.description,

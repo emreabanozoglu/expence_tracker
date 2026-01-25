@@ -77,7 +77,7 @@ export default function Home() {
     return (
       <div className={styles.loading}>
         <div className={styles.spinner}></div>
-        <p>Loading expenses...</p>
+        <p>Loading transactions...</p>
       </div>
     );
   }
@@ -123,7 +123,7 @@ export default function Home() {
               </Button>
               <Button variant="primary" onClick={handleAddExpense} data-testid="add-expense-button">
                 <Plus size={20} />
-                Add Expense
+                Add Transaction
               </Button>
             </div>
           </div>
@@ -134,7 +134,7 @@ export default function Home() {
           className={styles.fab}
           onClick={handleAddExpense}
           data-testid="fab-add-expense-button"
-          aria-label="Add Expense"
+          aria-label="Add Transaction"
         >
           <Plus size={24} />
         </button>
@@ -183,7 +183,7 @@ export default function Home() {
         <Modal
           isOpen={isModalOpen}
           onClose={handleCancel}
-          title={editingExpense ? 'Edit Expense' : 'Add New Expense'}
+          title={editingExpense ? 'Edit Transaction' : 'Add New Transaction'}
           size="md"
         >
           <ExpenseForm

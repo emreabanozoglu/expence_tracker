@@ -19,6 +19,10 @@ export class ExpensesPage {
     readonly submitButton: Locator;
     readonly cancelButton: Locator;
 
+    // Type toggles
+    readonly typeExpenseButton: Locator;
+    readonly typeIncomeButton: Locator;
+
     // Expense item actions
     readonly editButton: Locator;
     readonly deleteButton: Locator;
@@ -37,6 +41,9 @@ export class ExpensesPage {
         this.submitButton = page.locator('[data-testid="submit-expense-button"]');
         this.cancelButton = page.locator('[data-testid="cancel-button"]');
 
+        this.typeExpenseButton = page.locator('[data-testid="type-expense"]');
+        this.typeIncomeButton = page.locator('[data-testid="type-income"]');
+
         // Expense item actions (these will match the first item)
         this.editButton = page.locator('[data-testid="edit-expense-button"]').first();
         this.deleteButton = page.locator('[data-testid="delete-expense-button"]').first();
@@ -46,12 +53,19 @@ export class ExpensesPage {
         await this.page.goto('/');
     }
 
-    async addExpense(data: { amount: string; category?: string; description?: string; date?: string }) {
+    async addExpense(data: { amount: string; category?: string; description?: string; date?: string; type?: 'income' | 'expense' }) {
         // Click add expense button
         await this.addExpenseButton.click();
 
         // Wait for modal to open
         await this.amountInput.waitFor({ state: 'visible' });
+
+        // Select type if provided
+        if (data.type === 'income') {
+            await this.typeIncomeButton.click();
+        } else if (data.type === 'expense') {
+            await this.typeExpenseButton.click();
+        }
 
         // Fill in the form
         await this.amountInput.fill(data.amount);
@@ -77,6 +91,11 @@ export class ExpensesPage {
 
     getExpenseByDescription(description: string): Locator {
         return this.page.locator('[data-testid="expense-list-section"]').getByText(description);
+    }
+
+    getExpenseItemByDescription(description: string): Locator {
+        // Find the expense-item that contains the description text
+        return this.page.locator('[data-testid="expense-item"]').filter({ hasText: description });
     }
 
     async editExpense(targetDescription: string, data: { amount?: string; category?: string; description?: string }) {

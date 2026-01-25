@@ -16,39 +16,52 @@ export interface SummaryCardsProps {
 
 export default function SummaryCards({ expenses }: SummaryCardsProps) {
     const { settings } = useSettingsContext();
-    const total = calculateTotalSpending(expenses);
-    const average = calculateAverageExpense(expenses);
-    const topCategory = getTopCategory(expenses);
+
+    const income = expenses
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const expense = expenses
+        .filter(t => t.type === 'expense' || !t.type)
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const balance = income - expense;
 
     return (
         <div className={styles.grid}>
             <div className={styles.card}>
-                <div className={styles.iconWrapper} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                <div className={styles.iconWrapper} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
                     <DollarSign size={24} />
                 </div>
                 <div className={styles.content}>
-                    <div className={styles.label}>Total Spending</div>
-                    <div className={styles.value} data-testid="total-spending">{formatCurrency(total, settings.currencySymbol)}</div>
+                    <div className={styles.label}>Total Income</div>
+                    <div className={styles.value} style={{ color: 'var(--success)' }} data-testid="total-income">
+                        {formatCurrency(income, settings.currencySymbol)}
+                    </div>
                 </div>
             </div>
 
             <div className={styles.card}>
-                <div className={styles.iconWrapper} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+                <div className={styles.iconWrapper} style={{ background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' }}>
                     <TrendingUp size={24} />
                 </div>
                 <div className={styles.content}>
-                    <div className={styles.label}>Average Expense</div>
-                    <div className={styles.value} data-testid="average-expense">{formatCurrency(average, settings.currencySymbol)}</div>
+                    <div className={styles.label}>Total Expense</div>
+                    <div className={styles.value} style={{ color: 'var(--error)' }} data-testid="total-expense">
+                        {formatCurrency(expense, settings.currencySymbol)}
+                    </div>
                 </div>
             </div>
 
             <div className={styles.card}>
-                <div className={styles.iconWrapper} style={{ background: 'linear-gradient(135deg, #fad961 0%, #f76b1c 100%)' }}>
+                <div className={styles.iconWrapper} style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' }}>
                     <Award size={24} />
                 </div>
                 <div className={styles.content}>
-                    <div className={styles.label}>Top Category</div>
-                    <div className={styles.value} data-testid="top-category">{topCategory || 'N/A'}</div>
+                    <div className={styles.label}>Net Balance</div>
+                    <div className={styles.value} style={{ color: balance >= 0 ? 'var(--success)' : 'var(--error)' }} data-testid="net-balance">
+                        {formatCurrency(balance, settings.currencySymbol)}
+                    </div>
                 </div>
             </div>
         </div>

@@ -16,13 +16,21 @@ export interface ExpenseItemProps {
     onDelete: (id: string) => void;
 }
 
+import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
+
 export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemProps) {
     const { settings } = useSettingsContext();
 
-    // Find category from settings to support custom categories
-    const categoryObj = settings.categories.find(c => c.name === expense.category);
-    const categoryColor = categoryObj?.color || CATEGORY_COLORS[expense.category] || CATEGORY_COLORS.Other;
-    const categoryIcon = categoryObj?.icon || CATEGORY_ICONS[expense.category] || CATEGORY_ICONS.Other;
+    // Determine type (default to expense if missing)
+    const isIncome = expense.type === 'income';
+
+    // Find category from settings or default income categories
+    const categoryObj =
+        settings.categories.find(c => c.name === expense.category) ||
+        DEFAULT_INCOME_CATEGORIES.find(c => c.name === expense.category);
+
+    const categoryColor = categoryObj?.color || CATEGORY_COLORS[expense.category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.Other;
+    const categoryIcon = categoryObj?.icon || CATEGORY_ICONS[expense.category as keyof typeof CATEGORY_ICONS] || CATEGORY_ICONS.Other;
 
     const handleDelete = () => {
         onDelete(expense.id);
@@ -40,7 +48,9 @@ export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemPr
                         <h3 className={styles.category}>{expense.category}</h3>
                         <p className={styles.date}>{formatDate(expense.date)}</p>
                     </div>
-                    <div className={styles.amount}>{formatCurrency(expense.amount, settings.currencySymbol)}</div>
+                    <div className={`${styles.amount} ${isIncome ? styles.income : styles.expense}`}>
+                        {isIncome ? '+' : '-'}{formatCurrency(expense.amount, settings.currencySymbol)}
+                    </div>
                 </div>
 
                 {expense.description && (

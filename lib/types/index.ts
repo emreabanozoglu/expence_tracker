@@ -1,6 +1,8 @@
 // Core type definitions for the Expense Tracker application
 
-export type Category =
+export type TransactionType = 'income' | 'expense';
+
+export type ExpenseCategory =
   | 'Food'
   | 'Transport'
   | 'Entertainment'
@@ -10,8 +12,18 @@ export type Category =
   | 'Education'
   | 'Other';
 
-export interface Expense {
+export type IncomeCategory =
+  | 'Salary'
+  | 'Freelance'
+  | 'Investments'
+  | 'Gift'
+  | 'Other';
+
+export type Category = ExpenseCategory | IncomeCategory;
+
+export interface Transaction {
   id: string;
+  type: TransactionType;
   amount: number;
   category: Category;
   description: string;
@@ -20,7 +32,11 @@ export interface Expense {
   updatedAt: string;
 }
 
+// Alias for backward compatibility during refactor, strictly deprecated
+export type Expense = Transaction;
+
 export interface ExpenseFormData {
+  type: TransactionType;
   amount: string;
   category: Category;
   description: string;
@@ -49,6 +65,7 @@ export interface MonthOption {
 }
 
 export interface FilterOptions {
+  type?: TransactionType | 'all';
   category?: Category | 'all';
   dateRange: DateRangePreset;
   customRange?: DateRange;
@@ -61,6 +78,7 @@ export interface CustomCategory {
   color: string;
   icon: string;
   isDefault: boolean;
+  type: TransactionType;
 }
 
 export interface AppSettings {

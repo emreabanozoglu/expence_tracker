@@ -15,6 +15,7 @@ export interface Database {
                 Row: {
                     id: string
                     user_id: string
+                    type: 'income' | 'expense'
                     amount: number
                     category: string
                     description: string | null
@@ -25,6 +26,7 @@ export interface Database {
                 Insert: {
                     id?: string
                     user_id: string
+                    type?: 'income' | 'expense'
                     amount: number
                     category: string
                     description?: string | null
@@ -35,6 +37,7 @@ export interface Database {
                 Update: {
                     id?: string
                     user_id?: string
+                    type?: 'income' | 'expense'
                     amount?: number
                     category?: string
                     description?: string | null

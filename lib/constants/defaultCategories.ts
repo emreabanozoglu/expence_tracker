@@ -2,6 +2,49 @@
 
 import { CustomCategory } from '../types';
 
+export const DEFAULT_INCOME_CATEGORIES: CustomCategory[] = [
+    {
+        id: 'salary',
+        name: 'Salary',
+        color: 'hsl(140, 60%, 45%)',
+        icon: '💰',
+        isDefault: true,
+        type: 'income',
+    },
+    {
+        id: 'freelance',
+        name: 'Freelance',
+        color: 'hsl(180, 60%, 45%)',
+        icon: '💻',
+        isDefault: true,
+        type: 'income',
+    },
+    {
+        id: 'investments',
+        name: 'Investments',
+        color: 'hsl(210, 60%, 50%)',
+        icon: '📈',
+        isDefault: true,
+        type: 'income',
+    },
+    {
+        id: 'gift',
+        name: 'Gift',
+        color: 'hsl(300, 60%, 60%)',
+        icon: '🎁',
+        isDefault: true,
+        type: 'income',
+    },
+    {
+        id: 'income_other',
+        name: 'Other',
+        color: 'hsl(0, 0%, 50%)',
+        icon: '📦',
+        isDefault: true,
+        type: 'income',
+    },
+];
+
 export const DEFAULT_CATEGORIES: CustomCategory[] = [
     {
         id: 'food',
@@ -9,6 +52,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(25, 85%, 55%)',
         icon: '🍔',
         isDefault: true,
+        type: 'expense',
     },
     {
         id: 'transport',
@@ -16,6 +60,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(200, 85%, 55%)',
         icon: '🚗',
         isDefault: true,
+        type: 'expense',
     },
     {
         id: 'entertainment',
@@ -23,6 +68,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(280, 85%, 60%)',
         icon: '🎬',
         isDefault: true,
+        type: 'expense',
     },
     {
         id: 'bills',
@@ -30,6 +76,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(0, 70%, 55%)',
         icon: '📄',
         isDefault: true,
+        type: 'expense',
     },
     {
         id: 'shopping',
@@ -37,6 +84,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(340, 85%, 60%)',
         icon: '🛍️',
         isDefault: true,
+        type: 'expense',
     },
     {
         id: 'health',
@@ -44,6 +92,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(140, 70%, 50%)',
         icon: '⚕️',
         isDefault: true,
+        type: 'expense',
     },
     {
         id: 'education',
@@ -51,6 +100,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(45, 85%, 55%)',
         icon: '📚',
         isDefault: true,
+        type: 'expense',
     },
     {
         id: 'other',
@@ -58,5 +108,7 @@ export const DEFAULT_CATEGORIES: CustomCategory[] = [
         color: 'hsl(0, 0%, 50%)',
         icon: '📦',
         isDefault: true,
+        type: 'expense',
     },
+    ...DEFAULT_INCOME_CATEGORIES
 ];
