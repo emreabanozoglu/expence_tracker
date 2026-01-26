@@ -1,0 +1,145 @@
+.wizardContainer {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.stepContainer {
+    animation: slideIn 0.4s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.stepHeader {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.stepTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--foreground);
+}
+
+.stepDescription {
+    color: var(--gray-400);
+    font-size: 0.95rem;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.backButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.backButton:hover {
+    background: var(--input-bg);
+    color: var(--foreground);
+}
+
+.nextButton {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nextButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.nextButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.progressBarContainer {
+    margin-bottom: 2.5rem;
+    position: relative;
+    padding: 0 10px;
+}
+
+.progressBar {
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: 2px;
+    width: 100%;
+}
+
+.progressFill {
+    height: 100%;
+    background: var(--primary-500);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+.stepsIndicator {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.stepDot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 2px solid var(--gray-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+}
+
+.activeDot {
+    border-color: var(--primary-500);
+    color: var(--primary-500);
+    background: var(--card-bg);
+}
+
+.completedDot {
+    background: var(--primary-500);
+    border-color: var(--primary-500);
+    color: white;
+}

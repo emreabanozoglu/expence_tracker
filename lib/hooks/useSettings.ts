@@ -8,6 +8,8 @@ import { DEFAULT_CATEGORIES } from '../constants/defaultCategories';
 import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
 
+import { getCurrencyByCode } from '../utils/currency';
+
 const DEFAULT_SETTINGS: AppSettings = {
     currency: 'USD',
     currencySymbol: '$',
@@ -38,14 +40,31 @@ export function useSettings() {
             if (error) {
                 // If no settings exist, create default settings
                 if (error.code === 'PGRST116') {
+                    // Check if user has currency in metadata (from registration)
+                    const metaCurrency = user.user_metadata?.currency;
+                    const currencyCode = metaCurrency || 'USD';
+                    let currencySymbol = '$';
+
+                    // improved simple symbol lookup if not USD
+                    if (currencyCode !== 'USD') {
+                        try {
+                            const c = getCurrencyByCode(currencyCode);
+                            if (c) currencySymbol = c.symbol;
+                        } catch (e) {
+                            console.error('Error getting currency symbol', e);
+                        }
+                    }
+
+                    const insertPayload = {
+                        user_id: user.id,
+                        currency_code: currencyCode,
+                        currency_symbol: currencySymbol,
+                        categories: DEFAULT_CATEGORIES,
+                    };
+
                     const { data: newSettings, error: insertError } = await (supabase
                         .from('user_settings') as any)
-                        .insert({
-                            user_id: user.id,
-                            currency_code: 'USD',
-                            currency_symbol: '$',
-                            categories: DEFAULT_CATEGORIES,
-                        })
+                        .insert(insertPayload)
                         .select()
                         .single();
 
@@ -57,12 +76,49 @@ export function useSettings() {
                         categories: newSettings.categories as CustomCategory[],
                     });
                 } else {
+                    console.error('Fetch error (not PGRST116):', error);
                     throw error;
                 }
             } else {
+                let finalCurrency = data.currency_code;
+                let finalSymbol = data.currency_symbol;
+
+                // Fix for race condition/trigger: If settings exist but are default USD, 
+                // and user has different metadata currency, and account is new (< 5 mins), update it.
+                if (data.currency_code === 'USD' && user.user_metadata?.currency) {
+                    const metaCurrency = user.user_metadata.currency;
+
+                    if (metaCurrency !== 'USD') {
+                        // Check if row is recent (created within last 5 minutes)
+                        const createdAt = data.created_at ? new Date(data.created_at).getTime() : Date.now();
+                        const isRecent = (Date.now() - createdAt) < 5 * 60 * 1000; // 5 mins
+
+                        if (isRecent) {
+                            try {
+                                const c = getCurrencyByCode(metaCurrency);
+                                const newSymbol = c ? c.symbol : '$';
+
+                                // Update database
+                                await (supabase
+                                    .from('user_settings') as any)
+                                    .update({
+                                        currency_code: metaCurrency,
+                                        currency_symbol: newSymbol
+                                    })
+                                    .eq('user_id', user.id);
+
+                                finalCurrency = metaCurrency;
+                                finalSymbol = newSymbol;
+                            } catch (updateError) {
+                                console.error('Failed to auto-correct currency:', updateError);
+                            }
+                        }
+                    }
+                }
+
                 setSettings({
-                    currency: data.currency_code,
-                    currencySymbol: data.currency_symbol,
+                    currency: finalCurrency,
+                    currencySymbol: finalSymbol,
                     categories: (data.categories && Array.isArray(data.categories) && data.categories.length > 0)
                         ? (data.categories as CustomCategory[])
                         : DEFAULT_CATEGORIES,

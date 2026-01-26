@@ -4,6 +4,7 @@
 
 import React, { useState } from 'react';
 import { useSettings } from '@/lib/hooks/useSettings';
+import { useAuth } from '@/lib/context/AuthContext';
 import { CustomCategory } from '@/lib/types';
 import CurrencySelector from '@/components/settings/CurrencySelector';
 import CategoryManager from '@/components/settings/CategoryManager';
@@ -11,7 +12,7 @@ import CategoryForm from '@/components/settings/CategoryForm';
 import RecurringTransactionsList from '@/components/settings/RecurringTransactionsList';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 import Link from 'next/link';
 import styles from './page.module.css';
 
@@ -25,6 +26,7 @@ export default function SettingsPage() {
         deleteCategory,
         resetCategories,
     } = useSettings();
+    const { user } = useAuth();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState<CustomCategory | undefined>();
@@ -80,6 +82,23 @@ export default function SettingsPage() {
 
             <main className={styles.main}>
                 <div className={styles.container}>
+                    {/* Profile Section */}
+                    {user && (
+                        <div className={styles.section} data-testid="profile-section">
+                            <div className={styles.sectionHeader} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
+                                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-500), var(--primary-700))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                                    <User size={24} />
+                                </div>
+                                <div>
+                                    <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--foreground)' }}>
+                                        {user.user_metadata?.first_name} {user.user_metadata?.last_name}
+                                    </h2>
+                                    <p style={{ margin: 0, color: 'var(--gray-500)', fontSize: '0.9rem' }}>{user.email}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <div className={styles.section} data-testid="currency-section">
                         <CurrencySelector
                             selectedCurrency={settings.currency}

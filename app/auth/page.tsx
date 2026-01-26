@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import TermsOfService from '@/components/auth/TermsOfService';
+import MultiStepRegister from '@/components/auth/MultiStepRegister';
 import styles from './auth.module.css';
 
 export default function AuthPage() {
@@ -17,33 +19,49 @@ export default function AuthPage() {
     const { signIn, signUp } = useAuth();
     const router = useRouter();
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
         try {
-            const result = isSignUp
-                ? await signUp(email, password)
-                : await signIn(email, password);
+            const result = await signIn(email, password);
+            if (result.error) {
+                setError(result.error.message);
+            } else {
+                router.push('/');
+            }
+        } catch (err) {
+            setError('An unexpected error occurred');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRegister = async (data: any) => {
+        setError('');
+        setLoading(true);
+
+        try {
+            const result = await signUp(data.email, data.password, {
+                data: {
+                    currency: data.currency,
+                    first_name: data.firstName,
+                    last_name: data.lastName
+                },
+            });
 
             if (result.error) {
                 setError(result.error.message);
             } else {
-                if (isSignUp) {
-                    // Check if user is already logged in (email confirmation disabled)
-                    // or if they need to confirm email
-                    const { data: { session } } = await supabase.auth.getSession();
+                // Check if user is already logged in (email confirmation disabled)
+                // or if they need to confirm email
+                const { data: { session } } = await supabase.auth.getSession();
 
-                    if (session) {
-                        // User is logged in - email confirmation is disabled
-                        router.push('/');
-                    } else {
-                        // User needs to confirm email
-                        setError('Check your email to confirm your account!');
-                    }
-                } else {
+                if (session) {
                     router.push('/');
+                } else {
+                    setError('Check your email to confirm your account!');
                 }
             }
         } catch (err) {
@@ -55,83 +73,119 @@ export default function AuthPage() {
 
     return (
         <div className={styles.container}>
-            <div className={styles.card}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>💰 Expense Tracker</h1>
-                    <p className={styles.subtitle}>
-                        {isSignUp ? 'Create your account' : 'Welcome back'}
+            {/* Left Side: Brand Section */}
+            <div className={styles.brandSection}>
+                <div className={styles.brandContent}>
+                    <h1 className={styles.brandTitle}>Master your<br />Finances today.</h1>
+                    <p className={styles.brandSubtitle}>
+                        Track expenses, manage budgets, and achieve your financial goals with ease.
+                        Join thousands of users taking control of their money.
                     </p>
-                </div>
 
-                <form onSubmit={handleSubmit} className={styles.form}>
-                    <div className={styles.field}>
-                        <label htmlFor="email" className={styles.label}>
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className={styles.input}
-                            placeholder="you@example.com"
-                            required
-                            autoComplete="email"
-                            data-testid="email-input"
-                        />
-                    </div>
-
-                    <div className={styles.field}>
-                        <label htmlFor="password" className={styles.label}>
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={styles.input}
-                            placeholder="••••••••"
-                            required
-                            minLength={6}
-                            autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                            data-testid="password-input"
-                        />
-                    </div>
-
-                    {error && (
-                        <div
-                            className={error.includes('Check your email') ? styles.success : styles.error}
-                            data-testid="auth-error-message"
-                        >
-                            {error}
+                    {!isSignUp && (
+                        <div className={styles.featureGrid}>
+                            <div className={styles.featureItem} style={{ animationDelay: '0.1s' }}>
+                                <h3>📊 Smart Analytics</h3>
+                                <p>Visualize your spending habits with intuitive charts.</p>
+                            </div>
+                            <div className={styles.featureItem} style={{ animationDelay: '0.2s' }}>
+                                <h3>🌍 Multi-Currency</h3>
+                                <p>Support for all major world currencies.</p>
+                            </div>
                         </div>
                     )}
+                </div>
+            </div>
 
-                    <button
-                        type="submit"
-                        className={styles.button}
-                        disabled={loading}
-                        data-testid="auth-submit-button"
-                    >
-                        {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
-                    </button>
-                </form>
+            {/* Right Side: Form Section */}
+            <div className={styles.formSection}>
+                <div className={`${styles.card} ${styles.fadeIn}`}>
+                    <div className={styles.header}>
+                        <h2 className={styles.title}>
+                            {isSignUp ? 'Create an account' : 'Welcome back'}
+                        </h2>
+                        <p className={styles.subtitle}>
+                            {isSignUp
+                                ? 'Enter your details to get started.'
+                                : 'Please enter your details to sign in.'}
+                        </p>
+                    </div>
 
-                <div className={styles.footer}>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setIsSignUp(!isSignUp);
-                            setError('');
-                        }}
-                        className={styles.toggleButton}
-                        data-testid="auth-toggle-button"
-                    >
-                        {isSignUp
-                            ? 'Already have an account? Sign in'
-                            : "Don't have an account? Sign up"}
-                    </button>
+                    {isSignUp ? (
+                        <MultiStepRegister
+                            onComplete={handleRegister}
+                            onLoginClick={() => setIsSignUp(false)}
+                            loading={loading}
+                            error={error}
+                        />
+                    ) : (
+                        <form onSubmit={handleLogin} className={styles.form}>
+                            <div className={styles.field}>
+                                <label htmlFor="email" className={styles.label}>
+                                    Email
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className={styles.input}
+                                    placeholder="Enter your email"
+                                    required
+                                    autoComplete="email"
+                                    data-testid="email-input"
+                                />
+                            </div>
+
+                            <div className={styles.field}>
+                                <label htmlFor="password" className={styles.label}>
+                                    Password
+                                </label>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className={styles.input}
+                                    placeholder="••••••••"
+                                    required
+                                    minLength={6}
+                                    autoComplete="current-password"
+                                    data-testid="password-input"
+                                />
+                            </div>
+
+                            {error && (
+                                <div
+                                    className={error.includes('Check your email') ? styles.success : styles.error}
+                                    data-testid="auth-error-message"
+                                >
+                                    {error}
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                className={styles.button}
+                                disabled={loading}
+                                data-testid="auth-submit-button"
+                            >
+                                {loading ? 'Signing in...' : 'Sign In'}
+                            </button>
+
+                            <div className={styles.footer}>
+                                Don't have an account?
+                                <button
+                                    type="button"
+                                    onClick={() => setIsSignUp(true)}
+                                    className={styles.toggleButton}
+                                    data-testid="auth-toggle-button"
+                                >
+                                    Sign up for free
+                                </button>
+                            </div>
+                        </form>
+                    )}
                 </div>
             </div>
         </div>

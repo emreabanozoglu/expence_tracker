@@ -10,7 +10,7 @@ interface AuthContextType {
     user: User | null;
     session: Session | null;
     loading: boolean;
-    signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;
+    signUp: (email: string, password: string, options?: { data: { [key: string]: any } }) => Promise<{ error: AuthError | null }>;
     signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
     signOut: () => Promise<void>;
 }
@@ -42,10 +42,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => subscription.unsubscribe();
     }, []);
 
-    const signUp = async (email: string, password: string) => {
+    const signUp = async (email: string, password: string, options?: { data: { [key: string]: any } }) => {
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
+            options,
         });
 
         // Log detailed error information for debugging
