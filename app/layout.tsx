@@ -5,6 +5,8 @@ import "./globals.css";
 import { SettingsProvider } from '@/lib/context/SettingsContext';
 import { AuthProvider } from '@/lib/context/AuthContext';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
+import RecurringTransactionManager from '@/components/RecurringTransactionManager';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: "Expense Tracker - Manage Your Finances",
@@ -20,9 +22,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
+          <RecurringTransactionManager />
           <SettingsProvider>
             <ThemeProvider>
               {children}
+              <Toaster position="bottom-right" />
             </ThemeProvider>
           </SettingsProvider>
         </AuthProvider>

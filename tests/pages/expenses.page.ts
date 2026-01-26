@@ -23,6 +23,9 @@ export class ExpensesPage {
     readonly typeExpenseButton: Locator;
     readonly typeIncomeButton: Locator;
 
+    readonly isRecurringToggle: Locator;
+    readonly frequencySelect: Locator;
+
     // Expense item actions
     readonly editButton: Locator;
     readonly deleteButton: Locator;
@@ -44,6 +47,9 @@ export class ExpensesPage {
         this.typeExpenseButton = page.locator('[data-testid="type-expense"]');
         this.typeIncomeButton = page.locator('[data-testid="type-income"]');
 
+        this.isRecurringToggle = page.locator('[data-testid="expense-is-recurring"]');
+        this.frequencySelect = page.locator('[data-testid="expense-frequency"]');
+
         // Expense item actions (these will match the first item)
         this.editButton = page.locator('[data-testid="edit-expense-button"]').first();
         this.deleteButton = page.locator('[data-testid="delete-expense-button"]').first();
@@ -53,7 +59,7 @@ export class ExpensesPage {
         await this.page.goto('/');
     }
 
-    async addExpense(data: { amount: string; category?: string; description?: string; date?: string; type?: 'income' | 'expense' }) {
+    async addExpense(data: { amount: string; category?: string; description?: string; date?: string; type?: 'income' | 'expense', isRecurring?: boolean, frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly' }) {
         // Click add expense button
         await this.addExpenseButton.click();
 
@@ -80,6 +86,19 @@ export class ExpensesPage {
 
         if (data.description) {
             await this.descriptionInput.fill(data.description);
+        }
+
+        if (data.isRecurring) {
+            // Check if not already checked (it shouldn't be by default, but good practice)
+            if (!(await this.isRecurringToggle.isChecked())) {
+                // Click the wrapper to toggle
+                await this.page.locator('[data-testid="recurring-toggle-wrapper"]').click();
+            }
+
+            if (data.frequency) {
+                await this.frequencySelect.waitFor({ state: 'visible' });
+                await this.frequencySelect.selectOption(data.frequency);
+            }
         }
 
         // Submit the form

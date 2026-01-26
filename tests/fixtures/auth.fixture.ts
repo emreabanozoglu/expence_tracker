@@ -55,8 +55,7 @@ export class AuthFixture {
         const projectId = projectIdResult ? projectIdResult[1] : 'supabase-token';
         const storageKey = `sb-${projectId}-auth-token`;
 
-        await this.page.goto('/'); // Need to be on the domain to set localStorage? 
-        // Actually best to goto '/' first, but if protected it redirects to /auth.
+        await this.page.goto('/auth'); // Need to be on the domain to set localStorage. Using public page avoids redirects.
         // It's fine to set it then goto '/' again or reload.
 
         await this.page.evaluate(({ key, value }) => {

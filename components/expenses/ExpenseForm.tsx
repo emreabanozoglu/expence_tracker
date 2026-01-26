@@ -3,21 +3,28 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Expense, ExpenseFormData, Category, TransactionType } from '@/lib/types';
+import { Expense, ExpenseFormData, Category, TransactionType, RecurrenceFrequency } from '@/lib/types';
 import { parseAmount } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import styles from './ExpenseForm.module.css';
+import { Info } from 'lucide-react';
+import Tooltip from '../ui/Tooltip';
 
 export interface ExpenseFormProps {
     expense?: Expense;
+    initialRecurringState?: {
+        isRecurring: boolean;
+        frequency: RecurrenceFrequency;
+    };
+    showRecurringToggle?: boolean;
     onSubmit: (data: ExpenseFormData) => void;
     onCancel: () => void;
 }
 
-export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseFormProps) {
+export default function ExpenseForm({ expense, initialRecurringState, showRecurringToggle = true, onSubmit, onCancel }: ExpenseFormProps) {
     const { settings } = useSettingsContext();
 
     // Determine initial type
@@ -37,7 +44,20 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
         category: expense?.category || (getCategories(initialType)[0]?.name as Category) || 'Food',
         description: expense?.description || '',
         date: expense?.date.split('T')[0] || new Date().toISOString().split('T')[0],
+        isRecurring: initialRecurringState?.isRecurring ?? false,
+        frequency: initialRecurringState?.frequency ?? 'monthly',
     });
+
+    // ... existing code ...
+
+    // Find the toggle rendering and wrap it
+    // Logic: If showRecurringToggle is false, we don't render the toggle.
+    // However, if we don't render the toggle, we should still render the frequency if it IS recurring.
+    // The frequency block is below the toggle block.
+
+    // ... inside return ...
+
+
 
     const [errors, setErrors] = useState<Partial<Record<keyof ExpenseFormData, string>>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -214,6 +234,62 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }: ExpenseForm
                     {errors.description && <span className={styles.error}>{errors.description}</span>}
                     <span className={styles.charCount}>{formData.description.length}/200</span>
                 </div>
+
+                {showRecurringToggle && (
+                    <div className={styles.fullWidth}>
+                        <div
+                            className={styles.toggleWrapper}
+                            onClick={() => !expense && setFormData({ ...formData, isRecurring: !formData.isRecurring })}
+                            data-testid="recurring-toggle-wrapper"
+                        >
+                            <div className={styles.toggleLabel}>
+                                Recurring Transaction
+                                <span className={styles.toggleSubLabel}>Repeat this transaction automatically</span>
+                            </div>
+                            <div className={styles.switchGroup}>
+                                <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    className={styles.infoIcon}
+                                >
+                                    <Tooltip content="Automatically creates a new transaction based on the selected frequency (e.g., monthly subscription).">
+                                        <Info size={16} />
+                                    </Tooltip>
+                                </div>
+                                <label className={styles.switch} onClick={(e) => e.stopPropagation()}>
+                                    <input
+                                        type="checkbox"
+                                        id="isRecurring"
+                                        checked={formData.isRecurring}
+                                        onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
+                                        disabled={!!expense}
+                                        data-testid="expense-is-recurring"
+                                    />
+                                    <span className={styles.slider}></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {formData.isRecurring && (
+                    <div className={styles.field}>
+                        <label htmlFor="frequency" className={styles.label}>
+                            Frequency *
+                        </label>
+                        <select
+                            id="frequency"
+                            value={formData.frequency}
+                            onChange={(e) => setFormData({ ...formData, frequency: e.target.value as RecurrenceFrequency })}
+                            className={styles.select}
+                            data-testid="expense-frequency"
+                        >
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                )}
             </div>
 
             <div className={styles.actions}>

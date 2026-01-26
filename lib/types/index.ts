@@ -35,12 +35,16 @@ export interface Transaction {
 // Alias for backward compatibility during refactor, strictly deprecated
 export type Expense = Transaction;
 
+export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
 export interface ExpenseFormData {
   type: TransactionType;
   amount: string;
   category: Category;
   description: string;
   date: string;
+  isRecurring: boolean;
+  frequency: RecurrenceFrequency;
 }
 
 export interface CategoryTotal {

@@ -8,6 +8,7 @@ import { CustomCategory } from '@/lib/types';
 import CurrencySelector from '@/components/settings/CurrencySelector';
 import CategoryManager from '@/components/settings/CategoryManager';
 import CategoryForm from '@/components/settings/CategoryForm';
+import RecurringTransactionsList from '@/components/settings/RecurringTransactionsList';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { ArrowLeft } from 'lucide-react';
@@ -94,6 +95,11 @@ export default function SettingsPage() {
                             onDeleteCategory={deleteCategory}
                             onResetCategories={resetCategories}
                         />
+                    </div>
+
+                    <div className={styles.section} data-testid="recurring-section">
+                        <h2 className={styles.categoryTitle} style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 600 }}>Recurring Transactions</h2>
+                        <RecurringTransactionsList />
                     </div>
                 </div>
             </main>

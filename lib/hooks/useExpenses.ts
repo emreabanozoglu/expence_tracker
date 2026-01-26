@@ -11,6 +11,7 @@ import type { Database } from '../supabase/types';
 export interface UseExpensesReturn {
     expenses: Expense[];
     addExpense: (data: ExpenseFormData) => Promise<Expense | null>;
+    addRecurringTransaction: (data: ExpenseFormData) => Promise<void>;
     updateExpense: (id: string, data: ExpenseFormData) => Promise<void>;
     deleteExpense: (id: string) => Promise<void>;
     getExpenseById: (id: string) => Expense | undefined;
@@ -122,13 +123,13 @@ export function useExpenses(): UseExpensesReturn {
 
                 const expense: Expense = {
                     id: newExpense.id,
-                    type: newExpense.type,
+                    type: newExpense.type as any, // Cast to any to avoid strict enum check or TransactionType
                     amount: parseFloat(newExpense.amount.toString()),
                     category: newExpense.category as any,
                     description: newExpense.description || '',
                     date: newExpense.date,
-                    createdAt: newExpense.created_at,
-                    updatedAt: newExpense.updated_at,
+                    createdAt: newExpense.created_at || new Date().toISOString(),
+                    updatedAt: newExpense.updated_at || new Date().toISOString(),
                 };
 
                 setExpenses((prev) => [expense, ...prev]);
@@ -189,6 +190,43 @@ export function useExpenses(): UseExpensesReturn {
         [user]
     );
 
+    const addRecurringTransaction = useCallback(
+        async (data: ExpenseFormData) => {
+            if (!user) {
+                setError('User not authenticated');
+                return;
+            }
+
+            if (!data.isRecurring || !data.frequency) {
+                setError('Invalid recurrence data');
+                return;
+            }
+
+            try {
+                const { error } = await (supabase
+                    .from('recurring_transactions') as any)
+                    .insert({
+                        user_id: user.id,
+                        amount: parseFloat(data.amount),
+                        category: data.category,
+                        description: data.description || null,
+                        type: data.type,
+                        frequency: data.frequency,
+                        start_date: data.date,
+                        next_run: data.date,
+                        active: true
+                    } as any);
+
+                if (error) throw error;
+                setError(null);
+            } catch (err) {
+                setError('Failed to add recurring transaction');
+                console.error('Error adding recurring transaction:', err);
+            }
+        },
+        [user]
+    );
+
     const deleteExpense = useCallback(
         async (id: string) => {
             if (!user) {
@@ -225,6 +263,7 @@ export function useExpenses(): UseExpensesReturn {
     return {
         expenses,
         addExpense,
+        addRecurringTransaction,
         updateExpense,
         deleteExpense,
         getExpenseById,

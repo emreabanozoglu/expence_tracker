@@ -24,7 +24,7 @@ import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function Home() {
-  const { expenses, addExpense, updateExpense, deleteExpense, isLoading } = useExpenses();
+  const { expenses, addExpense, addRecurringTransaction, updateExpense, deleteExpense, isLoading } = useExpenses();
   const { signOut } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
@@ -48,6 +48,8 @@ export default function Home() {
   const handleSubmit = async (data: ExpenseFormData) => {
     if (editingExpense) {
       await updateExpense(editingExpense.id, data);
+    } else if (data.isRecurring) {
+      await addRecurringTransaction(data);
     } else {
       await addExpense(data);
     }

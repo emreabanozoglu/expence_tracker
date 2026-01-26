@@ -28,6 +28,39 @@ export class SettingsPage {
         this.deleteCategoryButton = page.locator('[data-testid="delete-category-button"]').first();
     }
 
+    // Recurring Transaction Locators
+    get recurringList() { return this.page.locator('.RecurringTransactionsList_list__Z1h_1'); } // Or better selector if available
+
+    getRecurringTransactionByDescription(description: string): Locator {
+        // Use the specific test ID and filter by text description
+        return this.page.locator('[data-testid="recurring-item"]').filter({ hasText: description });
+    }
+
+    async editRecurringTransaction(description: string, updates: { amount?: string, frequency?: string }) {
+        const item = this.getRecurringTransactionByDescription(description);
+        await item.getByLabel('Edit recurring transaction').click();
+
+        // Wait for modal
+        const modal = this.page.locator('div[class*="Modal_modal"]'); // or by title
+        await this.page.getByText('Edit Recurring Transaction').waitFor({ state: 'visible' });
+
+        if (updates.amount) {
+            await this.page.locator('[data-testid="expense-amount"]').fill(updates.amount);
+        }
+
+        if (updates.frequency) {
+            await this.page.locator('[data-testid="expense-frequency"]').selectOption(updates.frequency);
+        }
+
+        await this.page.locator('[data-testid="submit-expense-button"]').click();
+        await this.page.getByText('Edit Recurring Transaction').waitFor({ state: 'hidden' });
+    }
+
+    async deleteRecurringTransaction(description: string) {
+        const item = this.getRecurringTransactionByDescription(description);
+        await item.getByLabel('Delete recurring transaction').click();
+    }
+
     async goto() {
         await this.page.goto('/settings');
     }

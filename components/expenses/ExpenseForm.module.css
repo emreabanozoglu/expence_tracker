@@ -138,3 +138,103 @@
     box-shadow: var(--shadow-sm);
     font-weight: 600;
 }
+
+/* New Toggle Switch Styles */
+.toggleWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: var(--surface-hover);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border);
+}
+
+.toggleWrapper:hover {
+    background-color: var(--surface-active);
+}
+
+.toggleLabel {
+    font-weight: 600;
+    color: var(--foreground);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.switchGroup {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.infoIcon {
+    display: flex;
+    align-items: center;
+    color: var(--text-tertiary);
+    cursor: default;
+    transition: color 0.2s;
+}
+
+.infoIcon:hover {
+    color: var(--primary-500);
+}
+
+.toggleSubLabel {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+    font-weight: 400;
+    margin-top: 2px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--input-bg);
+    transition: .4s;
+    border-radius: 34px;
+    border: 1px solid var(--border);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+}
+
+input:checked+.slider {
+    background-color: var(--primary-500);
+    border-color: var(--primary-500);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
