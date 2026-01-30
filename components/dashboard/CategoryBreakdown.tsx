@@ -15,48 +15,75 @@ import styles from './CategoryBreakdown.module.css';
 
 export interface CategoryBreakdownProps {
     expenses: Expense[];
+    filterType: 'all' | 'expense' | 'income';
 }
 
-export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) {
+export default function CategoryBreakdown({ expenses, filterType }: CategoryBreakdownProps) {
     const { settings } = useSettingsContext();
-    const [activeType, setActiveType] = useState<TransactionType>('expense');
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
-    // Filter transactions by active type
-    const activeTransactions = useMemo(() => {
-        return expenses.filter(e => {
-            if (activeType === 'expense') return e.type === 'expense' || !e.type;
-            return e.type === 'income';
-        });
-    }, [expenses, activeType]);
+    // Calculate data based on filter type
+    const chartData = useMemo(() => {
+        if (filterType === 'all') {
+            // Compare Total Income vs Total Expense
+            const income = expenses
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
 
-    // Calculate totals
-    const categoryTotals = useMemo(() => {
-        return calculateCategoryTotals(activeTransactions);
-    }, [activeTransactions]);
+            const expense = expenses
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
 
-    // Active categories (non-zero)
-    const activeCategories = useMemo(() => {
-        return categoryTotals.filter(cat => cat.total > 0);
-    }, [categoryTotals]);
+            // Filter out zero values
+            const data = [];
+            if (expense > 0) data.push({ name: 'Expense', value: expense, percentage: 0, count: 0, type: 'expense' }); // Percentage calc later if needed, or ignored for simple logic
+            if (income > 0) data.push({ name: 'Income', value: income, percentage: 0, count: 0, type: 'income' });
 
-    const totalAmount = activeTransactions.reduce((sum, t) => sum + t.amount, 0);
+            // Calculate percentages for legend
+            const total = income + expense;
+            return data.map(item => ({
+                ...item,
+                percentage: total > 0 ? (item.value / total) * 100 : 0,
+                // Count isn't strictly necessary for this high level view but let's keep shape
+                count: expenses.filter(t => t.type === item.type).length
+            }));
 
-    // Prepare chart data
-    const chartData = useMemo(() => activeCategories.map(cat => ({
-        name: cat.category,
-        value: cat.total,
-        percentage: cat.percentage,
-        count: cat.count,
-    })), [activeCategories]);
+        } else {
+            // Standard Category Breakdown (Income OR Expense)
+            // Filter is already applied by parent to 'expenses' prop for this case? 
+            // WAIT: The plan said "Pass filterType and finalDisplayedExpenses".
+            // If parent passes ALL expenses + filterType='expense', we still need to filter here?
+            // OR parent filters 'expenses' to ONLY be expenses?
+            // Let's assume parent passes filtered list for 'income'/'expense' case, but passes ALL for 'all' case.
+            // Actually, if parent passes filtered list, then expenses contains only that type.
+            // So if filterType is 'expense', expenses is just expenses.
+
+            const categoryTotals = calculateCategoryTotals(expenses);
+            return categoryTotals
+                .filter(cat => cat.total > 0)
+                .map(cat => ({
+                    name: cat.category,
+                    value: cat.total,
+                    percentage: cat.percentage,
+                    count: cat.count,
+                }));
+        }
+    }, [expenses, filterType]);
+
+    const totalAmount = useMemo(() => chartData.reduce((sum, item) => sum + item.value, 0), [chartData]);
 
     // Helper to get Icon and Color safely
-    const getCategoryStyles = (categoryName: string) => {
-        const customCat = settings.categories.find(c => c.name === categoryName) ||
-            DEFAULT_INCOME_CATEGORIES.find(c => c.name === categoryName);
+    const getCategoryStyles = (name: string) => {
+        if (filterType === 'all') {
+            if (name === 'Income') return { color: 'var(--success)', icon: '💰' };
+            if (name === 'Expense') return { color: 'var(--error)', icon: '💸' };
+        }
 
-        const color = customCat?.color || CATEGORY_COLORS[categoryName as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.Other;
-        const icon = customCat?.icon || CATEGORY_ICONS[categoryName as keyof typeof CATEGORY_ICONS] || CATEGORY_ICONS.Other;
+        const customCat = settings.categories.find(c => c.name === name) ||
+            DEFAULT_INCOME_CATEGORIES.find(c => c.name === name);
+
+        const color = customCat?.color || CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.Other;
+        const icon = customCat?.icon || CATEGORY_ICONS[name as keyof typeof CATEGORY_ICONS] || CATEGORY_ICONS.Other;
 
         return { color, icon };
     };
@@ -71,35 +98,22 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
             };
         }
         return {
-            label: 'Total',
+            label: filterType === 'all' ? 'Volume' : 'Total',
             value: formatCurrency(totalAmount, settings.currencySymbol)
         };
-    }, [focusedIndex, chartData, totalAmount, settings.currencySymbol]);
+    }, [focusedIndex, chartData, totalAmount, settings.currencySymbol, filterType]);
 
     return (
         <Card className={styles.card}>
             <div className={styles.header}>
-                <h3 className={styles.title}>Breakdown</h3>
-
-                <div className={styles.typeToggle}>
-                    <button
-                        className={`${styles.typeButton} ${activeType === 'expense' ? styles.activeType : ''}`}
-                        onClick={() => setActiveType('expense')}
-                    >
-                        Expense
-                    </button>
-                    <button
-                        className={`${styles.typeButton} ${activeType === 'income' ? styles.activeType : ''}`}
-                        onClick={() => setActiveType('income')}
-                    >
-                        Income
-                    </button>
-                </div>
+                <h3 className={styles.title}>
+                    {filterType === 'all' ? 'Income vs Expense' : 'Breakdown'}
+                </h3>
             </div>
 
-            {activeCategories.length === 0 ? (
+            {chartData.length === 0 ? (
                 <div className={styles.empty}>
-                    <p>No {activeType} data to display</p>
+                    <p>No data to display</p>
                 </div>
             ) : (
                 <div className={styles.content}>
@@ -147,17 +161,17 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
 
                     {/* Interactive Legend List */}
                     <div className={styles.legend}>
-                        {activeCategories.map((cat, index) => {
-                            const { color, icon } = getCategoryStyles(cat.category);
+                        {chartData.map((item, index) => {
+                            const { color, icon } = getCategoryStyles(item.name);
                             const isFocused = focusedIndex === index;
 
                             // Find the max percentage to scale the progress bars relative to the biggest item
-                            const maxPercentage = Math.max(...activeCategories.map(c => c.percentage));
-                            const relativeWidth = (cat.percentage / maxPercentage) * 100;
+                            const maxPercentage = Math.max(...chartData.map(c => c.percentage));
+                            const relativeWidth = (item.percentage / maxPercentage) * 100;
 
                             return (
                                 <div
-                                    key={cat.category}
+                                    key={item.name}
                                     className={styles.legendItem}
                                     onMouseEnter={() => setFocusedIndex(index)}
                                     onMouseLeave={() => setFocusedIndex(null)}
@@ -182,12 +196,13 @@ export default function CategoryBreakdown({ expenses }: CategoryBreakdownProps) 
 
                                     <div className={styles.itemContent}>
                                         <div className={styles.itemHeader}>
-                                            <span className={styles.itemName}>{cat.category}</span>
-                                            <span className={styles.itemValue}>{formatCurrency(cat.total, settings.currencySymbol)}</span>
+                                            <span className={styles.itemName}>{item.name}</span>
+                                            <span className={styles.itemValue}>{formatCurrency(item.value, settings.currencySymbol)}</span>
                                         </div>
                                         <div className={styles.itemHeader} style={{ marginBottom: 0 }}>
                                             <span className={styles.itemPercentage}>
-                                                {formatPercentage(cat.percentage)} • {cat.count} txns
+                                                {formatPercentage(item.percentage)}
+                                                {filterType !== 'all' && ` • ${item.count} txns`}
                                             </span>
                                         </div>
                                     </div>

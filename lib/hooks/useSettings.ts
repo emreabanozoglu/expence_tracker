@@ -13,6 +13,7 @@ import { getCurrencyByCode } from '../utils/currency';
 const DEFAULT_SETTINGS: AppSettings = {
     currency: 'USD',
     currencySymbol: '$',
+    dateFormat: 'MM/dd/yyyy',
     categories: DEFAULT_CATEGORIES,
 };
 
@@ -59,6 +60,7 @@ export function useSettings() {
                         user_id: user.id,
                         currency_code: currencyCode,
                         currency_symbol: currencySymbol,
+                        date_format: 'MM/dd/yyyy',
                         categories: DEFAULT_CATEGORIES,
                     };
 
@@ -73,6 +75,7 @@ export function useSettings() {
                     setSettings({
                         currency: newSettings.currency_code,
                         currencySymbol: newSettings.currency_symbol,
+                        dateFormat: newSettings.date_format || 'MM/dd/yyyy',
                         categories: newSettings.categories as CustomCategory[],
                     });
                 } else {
@@ -119,6 +122,9 @@ export function useSettings() {
                 setSettings({
                     currency: finalCurrency,
                     currencySymbol: finalSymbol,
+                    dateFormat: data.date_format || 'MM/dd/yyyy',
+                    expenseTarget: data.expense_target,
+                    savingTarget: data.saving_target,
                     categories: (data.categories && Array.isArray(data.categories) && data.categories.length > 0)
                         ? (data.categories as CustomCategory[])
                         : DEFAULT_CATEGORIES,
@@ -146,6 +152,9 @@ export function useSettings() {
                     .update({
                         currency_code: newSettings.currency,
                         currency_symbol: newSettings.currencySymbol,
+                        expense_target: newSettings.expenseTarget,
+                        saving_target: newSettings.savingTarget,
+                        date_format: newSettings.dateFormat,
                         categories: newSettings.categories,
                     })
                     .eq('user_id', user.id);
@@ -160,12 +169,35 @@ export function useSettings() {
         [user]
     );
 
+    const updateBudgetTargets = useCallback(
+        (expenseTarget: number | undefined, savingTarget: number | undefined) => {
+            const newSettings = {
+                ...settings,
+                expenseTarget,
+                savingTarget,
+            };
+            saveSettings(newSettings);
+        },
+        [settings, saveSettings]
+    );
+
     const updateCurrency = useCallback(
         (currencyCode: string, currencySymbol: string) => {
             const newSettings = {
                 ...settings,
                 currency: currencyCode,
                 currencySymbol,
+            };
+            saveSettings(newSettings);
+        },
+        [settings, saveSettings]
+    );
+
+    const updateDateFormat = useCallback(
+        (dateFormat: string) => {
+            const newSettings = {
+                ...settings,
+                dateFormat,
             };
             saveSettings(newSettings);
         },
@@ -223,6 +255,8 @@ export function useSettings() {
         settings,
         isLoading,
         updateCurrency,
+        updateDateFormat,
+        updateBudgetTargets,
         addCategory,
         updateCategory,
         deleteCategory,

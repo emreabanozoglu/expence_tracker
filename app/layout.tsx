@@ -9,8 +9,8 @@ import RecurringTransactionManager from '@/components/RecurringTransactionManage
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: "Expense Tracker - Manage Your Finances",
-  description: "Track your expenses, visualize spending patterns, and manage your budget effectively.",
+  title: "BiBudget - Manage Your Finances",
+  description: "Track your expenses, visualize spending patterns, and manage your budget effectively with BiBudget.",
 };
 
 export default function RootLayout({

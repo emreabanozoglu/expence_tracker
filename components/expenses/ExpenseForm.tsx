@@ -31,8 +31,24 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
     const initialType: TransactionType = expense?.type || 'expense';
 
     // Get available categories based on type
+    // Get available categories based on type
     const getCategories = (type: TransactionType) => {
-        if (type === 'income') return DEFAULT_INCOME_CATEGORIES;
+        if (type === 'income') {
+            const customIncome = settings.categories.filter(c => c.type === 'income');
+            // Filter out any default categories that might be in settings to avoid duplicates if we merge
+            // But simpler: Combine defaults + custom. 
+            // Note: settings.categories are 'CustomCategory' objects (id, name, color, icon...).
+            // DEFAULT_INCOME_CATEGORIES are likely simple objects or similar.
+            // Let's map defaults to CustomCategory shape if needed, or just return mix.
+            // The Select below uses 'cat.name', 'cat.icon'.
+
+            // Create a map by name to ensure uniqueness if a custom category overrides a default name
+            const allIncome = [...DEFAULT_INCOME_CATEGORIES, ...customIncome];
+
+            // Deduplicate by name
+            const uniqueIncome = Array.from(new Map(allIncome.map(item => [item.name, item])).values());
+            return uniqueIncome;
+        }
         // Filter settings.categories to ensuring we only show expense categories if mixed, 
         // though currently they are likely all expense or untyped (legacy)
         return settings.categories.filter(c => c.type === 'expense' || !c.type);
@@ -99,7 +115,7 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
             const today = new Date();
             today.setHours(23, 59, 59, 999);
 
-            if (selectedDate > today) {
+            if (!formData.isRecurring && selectedDate > today) {
                 newErrors.date = 'Date cannot be in the future';
             }
         }
@@ -197,20 +213,55 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                     {errors.category && <span className={styles.error}>{errors.category}</span>}
                 </div>
 
-                <Input
-                    label="Date *"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => {
-                        setFormData({ ...formData, date: e.target.value });
-                        if (errors.date) {
-                            setErrors({ ...errors, date: undefined });
-                        }
-                    }}
-                    error={errors.date}
-                    fullWidth
-                    data-testid="expense-date"
-                />
+                {(formData.isRecurring && formData.frequency === 'monthly') ? (
+                    <div className={styles.field}>
+                        <label htmlFor="dayOfMonth" className={styles.label}>
+                            Day of Month *
+                        </label>
+                        <select
+                            id="dayOfMonth"
+                            value={parseInt(formData.date.split('-')[2])}
+                            onChange={(e) => {
+                                const day = parseInt(e.target.value);
+                                const [yStr, mStr] = formData.date.split('-');
+                                // Create specific date object to handle month overflow correctly (e.g. Feb 30 -> Mar 2)
+                                const newDate = new Date(parseInt(yStr), parseInt(mStr) - 1, day);
+
+                                const y = newDate.getFullYear();
+                                const m = String(newDate.getMonth() + 1).padStart(2, '0');
+                                const d = String(newDate.getDate()).padStart(2, '0');
+
+                                setFormData({ ...formData, date: `${y}-${m}-${d}` });
+                            }}
+                            className={styles.select}
+                            data-testid="expense-day-of-month"
+                        >
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                <option key={day} value={day}>
+                                    {day}{[1, 21, 31].includes(day) ? 'st' : [2, 22].includes(day) ? 'nd' : [3, 23].includes(day) ? 'rd' : 'th'}
+                                </option>
+                            ))}
+                        </select>
+                        <p className={styles.helperText} style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--gray-500)' }}>
+                            Transaction will repeat on this day every month.
+                        </p>
+                    </div>
+                ) : (
+                    <Input
+                        label={formData.isRecurring ? "Start Date *" : "Date *"}
+                        type="date"
+                        value={formData.date}
+                        onChange={(e) => {
+                            setFormData({ ...formData, date: e.target.value });
+                            if (errors.date) {
+                                setErrors({ ...errors, date: undefined });
+                            }
+                        }}
+                        error={errors.date}
+                        fullWidth
+                        data-testid="expense-date"
+                    />
+                )}
 
                 <div className={styles.fullWidth}>
                     <label htmlFor="description" className={styles.label}>

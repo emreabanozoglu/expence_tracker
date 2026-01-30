@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRecurringTransactions, RecurringTransaction } from '@/lib/hooks/useRecurringTransactions';
 import styles from './RecurringTransactionsList.module.css';
 import { Trash2, Calendar, Repeat, Edit2 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils/formatting';
+import { formatCurrency, formatDateDynamic } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import Modal from '@/components/ui/Modal';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
@@ -70,7 +70,7 @@ export default function RecurringTransactionsList() {
                                     <Repeat size={14} /> {transaction.frequency}
                                 </span>
                                 <span className={styles.detail}>
-                                    <Calendar size={14} /> Next: {new Date(transaction.next_run).toLocaleDateString()}
+                                    <Calendar size={14} /> Next: {formatDateDynamic(transaction.next_run, settings.dateFormat)}
                                 </span>
                             </div>
                             {transaction.description && (

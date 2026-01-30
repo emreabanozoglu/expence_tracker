@@ -10,6 +10,8 @@ interface SettingsContextType {
     settings: AppSettings;
     isLoading: boolean;
     updateCurrency: (currencyCode: string, currencySymbol: string) => void;
+    updateDateFormat: (dateFormat: string) => void;
+    updateBudgetTargets: (expense: number | undefined, saving: number | undefined) => void;
     addCategory: (category: Omit<CustomCategory, 'id'>) => void;
     updateCategory: (id: string, updates: Partial<CustomCategory>) => void;
     deleteCategory: (id: string) => void;

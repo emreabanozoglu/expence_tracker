@@ -3,57 +3,31 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSettings } from '@/lib/hooks/useSettings';
-import { useAuth } from '@/lib/context/AuthContext';
-import { CustomCategory } from '@/lib/types';
-import CurrencySelector from '@/components/settings/CurrencySelector';
-import CategoryManager from '@/components/settings/CategoryManager';
-import CategoryForm from '@/components/settings/CategoryForm';
-import RecurringTransactionsList from '@/components/settings/RecurringTransactionsList';
-import Modal from '@/components/ui/Modal';
-import Button from '@/components/ui/Button';
-import { ArrowLeft, User } from 'lucide-react';
+import { useSettingsContext } from '@/lib/context/SettingsContext';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import styles from './page.module.css';
 
+// Components
+import SettingsSidebar from '@/components/settings/SettingsSidebar';
+import GeneralSettings from '@/components/settings/GeneralSettings';
+import BudgetSettings from '@/components/settings/BudgetSettings';
+import CategoriesSettings from '@/components/settings/CategoriesSettings';
+import RecurringTransactionsList from '@/components/settings/RecurringTransactionsList';
+import ExportSettings from '@/components/settings/ExportSettings';
+
 export default function SettingsPage() {
-    const {
-        settings,
-        isLoading,
-        updateCurrency,
-        addCategory,
-        updateCategory,
-        deleteCategory,
-        resetCategories,
-    } = useSettings();
-    const { user } = useAuth();
+    const { isLoading } = useSettingsContext();
+    const [activeTab, setActiveTab] = useState('general');
+    const [isMobileListOpen, setIsMobileListOpen] = useState(true);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingCategory, setEditingCategory] = useState<CustomCategory | undefined>();
-
-    const handleAddCategory = () => {
-        setEditingCategory(undefined);
-        setIsModalOpen(true);
+    const handleTabChange = (tabId: string) => {
+        setActiveTab(tabId);
+        setIsMobileListOpen(false);
     };
 
-    const handleEditCategory = (category: CustomCategory) => {
-        setEditingCategory(category);
-        setIsModalOpen(true);
-    };
-
-    const handleSubmitCategory = (categoryData: Omit<CustomCategory, 'id'>) => {
-        if (editingCategory) {
-            updateCategory(editingCategory.id, categoryData);
-        } else {
-            addCategory(categoryData);
-        }
-        setIsModalOpen(false);
-        setEditingCategory(undefined);
-    };
-
-    const handleCancelCategory = () => {
-        setIsModalOpen(false);
-        setEditingCategory(undefined);
+    const handleBackToMenu = () => {
+        setIsMobileListOpen(true);
     };
 
     if (isLoading) {
@@ -64,6 +38,29 @@ export default function SettingsPage() {
             </div>
         );
     }
+
+    const renderContent = () => {
+        // ... (switch case same as before)
+        switch (activeTab) {
+            case 'general':
+                return <GeneralSettings />;
+            case 'budget':
+                return <BudgetSettings />;
+            case 'categories':
+                return <CategoriesSettings />;
+            case 'recurring':
+                return (
+                    <div>
+                        <h2 className={styles.sectionTitle}>Recurring Transactions</h2>
+                        <RecurringTransactionsList />
+                    </div>
+                );
+            case 'export':
+                return <ExportSettings />;
+            default:
+                return <GeneralSettings />;
+        }
+    };
 
     return (
         <div className={styles.page}>
@@ -81,60 +78,22 @@ export default function SettingsPage() {
             </header>
 
             <main className={styles.main}>
-                <div className={styles.container}>
-                    {/* Profile Section */}
-                    {user && (
-                        <div className={styles.section} data-testid="profile-section">
-                            <div className={styles.sectionHeader} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border)' }}>
-                                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-500), var(--primary-700))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                                    <User size={24} />
-                                </div>
-                                <div>
-                                    <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--foreground)' }}>
-                                        {user.user_metadata?.first_name} {user.user_metadata?.last_name}
-                                    </h2>
-                                    <p style={{ margin: 0, color: 'var(--gray-500)', fontSize: '0.9rem' }}>{user.email}</p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className={styles.section} data-testid="currency-section">
-                        <CurrencySelector
-                            selectedCurrency={settings.currency}
-                            onCurrencyChange={updateCurrency}
-                        />
-                    </div>
-
-                    <div className={styles.section} data-testid="category-section">
-                        <CategoryManager
-                            categories={settings.categories}
-                            onAddCategory={handleAddCategory}
-                            onEditCategory={handleEditCategory}
-                            onDeleteCategory={deleteCategory}
-                            onResetCategories={resetCategories}
-                        />
-                    </div>
-
-                    <div className={styles.section} data-testid="recurring-section">
-                        <h2 className={styles.categoryTitle} style={{ marginBottom: '1rem', fontSize: '1.25rem', fontWeight: 600 }}>Recurring Transactions</h2>
-                        <RecurringTransactionsList />
-                    </div>
+                <div className={`${styles.layout} ${isMobileListOpen ? styles.mobileListOpen : styles.mobileDetailOpen}`}>
+                    <aside className={styles.sidebar}>
+                        <SettingsSidebar activeTab={activeTab} onTabChange={handleTabChange} />
+                    </aside>
+                    <section className={styles.content}>
+                        <button
+                            className={styles.mobileBackButton}
+                            onClick={handleBackToMenu}
+                        >
+                            <ArrowLeft size={16} />
+                            Back to Settings
+                        </button>
+                        {renderContent()}
+                    </section>
                 </div>
             </main>
-
-            <Modal
-                isOpen={isModalOpen}
-                onClose={handleCancelCategory}
-                title={editingCategory ? 'Edit Category' : 'Add New Category'}
-                size="md"
-            >
-                <CategoryForm
-                    category={editingCategory}
-                    onSubmit={handleSubmitCategory}
-                    onCancel={handleCancelCategory}
-                />
-            </Modal>
         </div>
     );
 }

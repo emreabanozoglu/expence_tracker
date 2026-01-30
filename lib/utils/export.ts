@@ -1,9 +1,9 @@
 // Export utility for downloading expense data
 
 import { Expense } from '../types';
-import { formatDate, formatCurrency } from './formatting';
+import { formatDateDynamic, formatCurrency } from './formatting';
 
-export function exportToCSV(expenses: Expense[]): void {
+export function exportToCSV(expenses: Expense[], dateFormat: string = 'MM/dd/yyyy'): void {
     if (expenses.length === 0) {
         alert('No expenses to export');
         return;
@@ -14,7 +14,7 @@ export function exportToCSV(expenses: Expense[]): void {
 
     // CSV rows
     const rows = expenses.map(expense => [
-        expense.date,
+        formatDateDynamic(expense.date, dateFormat),
         expense.category,
         `"${expense.description.replace(/"/g, '""')}"`, // Escape quotes
         expense.amount.toFixed(2),

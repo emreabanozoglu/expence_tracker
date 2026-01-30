@@ -88,5 +88,8 @@ export interface CustomCategory {
 export interface AppSettings {
   currency: string;
   currencySymbol: string;
+  expenseTarget?: number;
+  savingTarget?: number;
+  dateFormat: string;
   categories: CustomCategory[];
 }

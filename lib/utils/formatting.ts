@@ -52,3 +52,29 @@ export function parseAmount(value: string): number | null {
     // Round to 2 decimal places
     return Math.round(parsed * 100) / 100;
 }
+
+/**
+ * Format a date object or string according to the specified format string
+ * Supported formats: 'MM/dd/yyyy', 'dd/MM/yyyy', 'yyyy-MM-dd'
+ */
+export function formatDateDynamic(dateInput: string | Date, formatStr: string): string {
+    const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+
+    // Handle invalid dates
+    if (isNaN(date.getTime())) return dateInput.toString();
+
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+
+    if (formatStr === 'dd/MM/yyyy') {
+        return `${d}/${m}/${y}`;
+    }
+
+    if (formatStr === 'yyyy-MM-dd') {
+        return `${y}-${m}-${d}`;
+    }
+
+    // Default to MM/dd/yyyy
+    return `${m}/${d}/${y}`;
+}

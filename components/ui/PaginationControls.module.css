@@ -1,0 +1,92 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+    padding: 16px 0;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border);
+    margin-top: 16px;
+}
+
+.rowsPerPage {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.label {
+    white-space: nowrap;
+}
+
+.select {
+    background: transparent;
+    border: none;
+    color: var(--foreground);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.select:hover {
+    background: var(--gray-100);
+}
+
+.info {
+    white-space: nowrap;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--gray-500);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.button:hover:not(:disabled) {
+    background: var(--gray-100);
+    color: var(--foreground);
+}
+
+.button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .container {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .rowsPerPage {
+        order: 1;
+    }
+
+    .info {
+        order: 2;
+    }
+
+    .actions {
+        order: 3;
+        margin-left: auto;
+    }
+}

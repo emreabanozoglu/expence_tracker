@@ -1,0 +1,50 @@
+.filter {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    flex-wrap: wrap;
+    min-height: 70px;
+}
+
+.button {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.button:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-500);
+}
+
+.button.active {
+    background: var(--primary-500);
+    color: white;
+    border-color: var(--primary-500);
+}
+
+@media (max-width: 768px) {
+    .filter {
+        width: 100%;
+        padding: var(--spacing-md);
+        justify-content: space-between;
+        gap: var(--spacing-sm);
+    }
+
+    .button {
+        flex: 1;
+        text-align: center;
+        padding: var(--spacing-sm);
+        font-size: 0.875rem;
+    }
+}

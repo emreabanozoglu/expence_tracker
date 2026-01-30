@@ -1,6 +1,9 @@
+/* Main Page Structure */
 .page {
     min-height: 100vh;
     background: var(--background);
+    display: flex;
+    flex-direction: column;
 }
 
 .header {
@@ -13,6 +16,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--spacing-lg);
+    width: 100%;
 }
 
 .backButton {
@@ -34,6 +38,7 @@
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
+    color: var(--foreground);
 }
 
 .subtitle {
@@ -42,20 +47,55 @@
     margin: 0;
 }
 
+/* Layout */
 .main {
-    padding: var(--spacing-3xl) 0;
-}
-
-.container {
+    flex: 1;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
+    width: 100%;
+    padding: 2rem;
 }
 
-.section {
-    margin-bottom: var(--spacing-3xl);
+.layout {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
 }
 
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 2rem;
+}
+
+.content {
+    flex: 1;
+    min-width: 0;
+    /* Prevent overflow */
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--foreground);
+}
+
+/* Loading State */
 .loading {
     display: flex;
     flex-direction: column;
@@ -80,16 +120,62 @@
     }
 }
 
+/* Mobile visibility classes - Desktop defaults */
+.mobileBackButton {
+    display: none;
+    /* Hidden on desktop */
+}
+
+/* Responsive */
 @media (max-width: 768px) {
+    .main {
+        padding: 1rem;
+    }
+
+    .layout {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    /* Toggle logic */
+    .mobileListOpen .content {
+        display: none;
+    }
+
+    .mobileDetailOpen .sidebar {
+        display: none;
+    }
+
+    .mobileBackButton {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        border: none;
+        color: var(--gray-500);
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+    }
+
+    .mobileBackButton:hover {
+        color: var(--primary-500);
+    }
+
+    .sidebar {
+        width: 100%;
+        position: static;
+        /* Remove sticky on mobile */
+        z-index: 10;
+        background: var(--background);
+        margin: 0;
+        padding: 0;
+        border-bottom: none;
+    }
+
     .title {
         font-size: 1.5rem;
-    }
-
-    .main {
-        padding: var(--spacing-xl) 0;
-    }
-
-    .section {
-        margin-bottom: var(--spacing-xl);
     }
 }

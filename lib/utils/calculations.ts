@@ -12,18 +12,20 @@ export function calculateCategoryTotals(expenses: Expense[]): CategoryTotal[] {
 
     const categoryMap = new Map<Category, { total: number; count: number }>();
 
-    // Initialize all categories
+    // Initialize all default categories
     CATEGORIES.forEach(category => {
         categoryMap.set(category, { total: 0, count: 0 });
     });
 
-    // Calculate totals
+    // Calculate totals and handle custom categories
     expenses.forEach(expense => {
-        const current = categoryMap.get(expense.category);
-        if (current) {
-            current.total += expense.amount;
-            current.count += 1;
+        if (!categoryMap.has(expense.category)) {
+            categoryMap.set(expense.category, { total: 0, count: 0 });
         }
+
+        const current = categoryMap.get(expense.category)!;
+        current.total += expense.amount;
+        current.count += 1;
     });
 
     // Convert to array with percentages

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Expense } from '@/lib/types';
-import { formatCurrency, formatDate } from '@/lib/utils/formatting';
+import { formatCurrency, formatDateDynamic } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '@/lib/constants';
 import { Edit2, Trash2 } from 'lucide-react';
@@ -46,7 +46,7 @@ export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemPr
                 <div className={styles.header}>
                     <div>
                         <h3 className={styles.category}>{expense.category}</h3>
-                        <p className={styles.date}>{formatDate(expense.date)}</p>
+                        <p className={styles.date}>{formatDateDynamic(expense.date, settings.dateFormat)}</p>
                     </div>
                     <div className={`${styles.amount} ${isIncome ? styles.income : styles.expense}`}>
                         {isIncome ? '+' : '-'}{formatCurrency(expense.amount, settings.currencySymbol)}

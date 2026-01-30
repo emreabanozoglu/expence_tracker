@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Expense, ExpenseFormData, DateRangePreset } from '@/lib/types';
 import { useExpenses } from '@/lib/hooks/useExpenses';
 import { exportToCSV } from '@/lib/utils/export';
@@ -14,6 +14,7 @@ import ExpenseForm from '@/components/expenses/ExpenseForm';
 import SummaryCards from '@/components/dashboard/SummaryCards';
 import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown';
 import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
+import PaginationControls from '@/components/ui/PaginationControls';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import ThemeToggle from '@/components/ui/ThemeToggle';
@@ -21,19 +22,62 @@ import MobileNav from '@/components/ui/MobileNav';
 import { Plus, Download, Wallet, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useSettingsContext } from '@/lib/context/SettingsContext';
+import BudgetProgress from '@/components/dashboard/BudgetProgress';
+import TypeFilter from '@/components/dashboard/TypeFilter';
 import styles from './page.module.css';
 
 export default function Home() {
   const { expenses, addExpense, addRecurringTransaction, updateExpense, deleteExpense, isLoading } = useExpenses();
+  const { settings } = useSettingsContext();
   const { signOut } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
   const [dateRange, setDateRange] = useState<DateRangePreset>('thisMonth');
+  const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
 
-  // Filter expenses based on date range
-  const filteredExpenses = useMemo(() => {
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // 1. Filter by Date (Base for everything)
+  const dateFilteredExpenses = useMemo(() => {
     return filterExpensesByDateRange(expenses, dateRange);
   }, [expenses, dateRange]);
+
+  // 2. Filter by Type (For Breakdown and List only)
+  const typeFilteredExpenses = useMemo(() => {
+    if (filterType === 'all') {
+      return dateFilteredExpenses;
+    }
+    return dateFilteredExpenses.filter(t => t.type === filterType);
+  }, [dateFilteredExpenses, filterType]);
+
+  // 3. Pagination Logic
+  const totalItems = typeFilteredExpenses.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedExpenses = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return typeFilteredExpenses.slice(startIndex, startIndex + itemsPerPage);
+  }, [typeFilteredExpenses, currentPage, itemsPerPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [dateRange, filterType]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Optional: Scroll to list top if needed, but smooth behavior might be annoying if list is short.
+    // window.scrollTo({ top: 0, behavior: 'smooth' }); 
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
 
   const handleAddExpense = () => {
     setEditingExpense(undefined);
@@ -63,7 +107,7 @@ export default function Home() {
   };
 
   const handleExport = () => {
-    exportToCSV(filteredExpenses);
+    exportToCSV(typeFilteredExpenses, settings.dateFormat);
   };
 
   const handleSignOut = async () => {
@@ -90,8 +134,8 @@ export default function Home() {
         <header className={styles.header}>
           <div className={styles.headerContent}>
             <div className={styles.branding}>
-              <Wallet size={32} className={styles.logo} />
-              <h1 className={styles.title}>Expense Tracker</h1>
+              <Image src="/logo.png" alt="BiBudget Logo" width={32} height={32} className={styles.logo} priority />
+              <h1 className={styles.title}>BiBudget</h1>
             </div>
 
             {/* Mobile Navigation */}
@@ -143,41 +187,70 @@ export default function Home() {
 
         <main className={styles.main}>
           <div className={styles.container}>
-            {/* Date Range Filter */}
+            {/* Filter Section */}
             {expenses.length > 0 && (
-              <DateRangeFilter
-                selected={dateRange}
-                onSelect={setDateRange}
-                expenses={expenses}
-              />
+              <div style={{ marginBottom: '16px' }}>
+                <DateRangeFilter
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  expenses={expenses}
+                />
+              </div>
             )}
 
-            {/* Summary Cards */}
-            {filteredExpenses.length > 0 && (
+            {/* Summary Cards - Always filters by Date only */}
+            {dateFilteredExpenses.length > 0 && (
               <div data-testid="summary-cards">
-                <SummaryCards expenses={filteredExpenses} />
+                <SummaryCards expenses={dateFilteredExpenses} />
               </div>
             )}
 
-            {/* Dashboard Grid */}
-            {filteredExpenses.length > 0 && (
-              <div className={styles.dashboardGrid}>
-                <div className={styles.chartSection} data-testid="category-chart">
-                  <CategoryBreakdown expenses={filteredExpenses} />
-                </div>
-              </div>
-            )}
-
-            <div className={styles.listSection} data-testid="expense-list-section">
-              <h2 className={styles.sectionTitle}>
-                {getDateRangeLabel(dateRange)}
-              </h2>
-              <ExpenseList
-                expenses={filteredExpenses}
-                onEdit={handleEditExpense}
-                onDelete={deleteExpense}
+            {/* Budget Progress - Always filters by Date only */}
+            <div data-testid="budget-progress">
+              <BudgetProgress
+                expenses={dateFilteredExpenses}
+                expenseTarget={settings.expenseTarget}
+                savingTarget={settings.savingTarget}
+                currencySymbol={settings.currencySymbol}
               />
             </div>
+
+            {/* Type Filter & Breakdown Section */}
+            {dateFilteredExpenses.length > 0 && (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+                  <TypeFilter
+                    selected={filterType}
+                    onSelect={setFilterType}
+                  />
+                </div>
+
+                <div className={styles.dashboardGrid}>
+                  <div className={styles.chartSection} data-testid="category-chart">
+                    <CategoryBreakdown expenses={typeFilteredExpenses} filterType={filterType} />
+                  </div>
+                </div>
+
+                <div className={styles.listSection} data-testid="expense-list-section">
+                  <h2 className={styles.sectionTitle}>
+                    {getDateRangeLabel(dateRange)}
+                  </h2>
+                  <ExpenseList
+                    expenses={paginatedExpenses}
+                    onEdit={handleEditExpense}
+                    onDelete={deleteExpense}
+                  />
+                  <PaginationControls
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    itemsPerPage={itemsPerPage}
+                    totalItems={totalItems}
+                    onPageChange={handlePageChange}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </main>
 

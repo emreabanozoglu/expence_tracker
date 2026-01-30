@@ -7,6 +7,8 @@
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
     flex-wrap: wrap;
+    min-height: 70px;
+    /* Enforce minimum height for alignment */
 }
 
 /* Hide header on desktop, show on mobile */
@@ -182,6 +184,9 @@
         border: 1px solid var(--border);
         margin-top: var(--spacing-sm);
         animation: slideDown 0.2s ease-out;
+        z-index: 10;
+        position: relative;
+        box-shadow: var(--shadow-md);
     }
 
     /* Hide calendar icon in filterContent on mobile (shown in header) */
