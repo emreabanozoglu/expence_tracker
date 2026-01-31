@@ -16,9 +16,16 @@ import styles from './CategoryBreakdown.module.css';
 export interface CategoryBreakdownProps {
     expenses: Expense[];
     filterType: 'all' | 'expense' | 'income';
+    selectedCategory?: string | null;
+    onCategorySelect?: (category: string | null) => void;
 }
 
-export default function CategoryBreakdown({ expenses, filterType }: CategoryBreakdownProps) {
+export default function CategoryBreakdown({
+    expenses,
+    filterType,
+    selectedCategory,
+    onCategorySelect
+}: CategoryBreakdownProps) {
     const { settings } = useSettingsContext();
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
@@ -36,7 +43,7 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
 
             // Filter out zero values
             const data = [];
-            if (expense > 0) data.push({ name: 'Expense', value: expense, percentage: 0, count: 0, type: 'expense' }); // Percentage calc later if needed, or ignored for simple logic
+            if (expense > 0) data.push({ name: 'Expense', value: expense, percentage: 0, count: 0, type: 'expense' });
             if (income > 0) data.push({ name: 'Income', value: income, percentage: 0, count: 0, type: 'income' });
 
             // Calculate percentages for legend
@@ -44,20 +51,10 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
             return data.map(item => ({
                 ...item,
                 percentage: total > 0 ? (item.value / total) * 100 : 0,
-                // Count isn't strictly necessary for this high level view but let's keep shape
                 count: expenses.filter(t => t.type === item.type).length
             }));
 
         } else {
-            // Standard Category Breakdown (Income OR Expense)
-            // Filter is already applied by parent to 'expenses' prop for this case? 
-            // WAIT: The plan said "Pass filterType and finalDisplayedExpenses".
-            // If parent passes ALL expenses + filterType='expense', we still need to filter here?
-            // OR parent filters 'expenses' to ONLY be expenses?
-            // Let's assume parent passes filtered list for 'income'/'expense' case, but passes ALL for 'all' case.
-            // Actually, if parent passes filtered list, then expenses contains only that type.
-            // So if filterType is 'expense', expenses is just expenses.
-
             const categoryTotals = calculateCategoryTotals(expenses);
             return categoryTotals
                 .filter(cat => cat.total > 0)
@@ -71,6 +68,16 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
     }, [expenses, filterType]);
 
     const totalAmount = useMemo(() => chartData.reduce((sum, item) => sum + item.value, 0), [chartData]);
+
+    const handleCategoryClick = (categoryName: string) => {
+        if (!onCategorySelect) return;
+
+        if (selectedCategory === categoryName) {
+            onCategorySelect(null); // Deselect
+        } else {
+            onCategorySelect(categoryName); // Select
+        }
+    };
 
     // Helper to get Icon and Color safely
     const getCategoryStyles = (name: string) => {
@@ -97,11 +104,36 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
                 value: formatCurrency(item.value, settings.currencySymbol)
             };
         }
+
+        if (filterType === 'all') {
+            const income = expenses
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            const expense = expenses
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+            return {
+                label: 'Net Balance',
+                value: formatCurrency(income - expense, settings.currencySymbol)
+            };
+        }
+
         return {
-            label: filterType === 'all' ? 'Volume' : 'Total',
+            label: 'Total',
             value: formatCurrency(totalAmount, settings.currencySymbol)
         };
-    }, [focusedIndex, chartData, totalAmount, settings.currencySymbol, filterType]);
+    }, [focusedIndex, chartData, totalAmount, settings.currencySymbol, filterType, expenses]);
+
+    // Determine opacity/highlight
+    const getOpacity = (entryName: string, index: number) => {
+        if (selectedCategory) {
+            return selectedCategory === entryName ? 1 : 0.3;
+        }
+        if (focusedIndex !== null) {
+            return focusedIndex === index ? 1 : 0.6;
+        }
+        return 1;
+    };
 
     return (
         <Card className={styles.card}>
@@ -109,6 +141,14 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
                 <h3 className={styles.title}>
                     {filterType === 'all' ? 'Income vs Expense' : 'Breakdown'}
                 </h3>
+                {selectedCategory && (
+                    <button
+                        className={styles.clearButton}
+                        onClick={() => onCategorySelect?.(null)}
+                    >
+                        Clear Filter
+                    </button>
+                )}
             </div>
 
             {chartData.length === 0 ? (
@@ -134,19 +174,22 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
                                 >
                                     {chartData.map((entry, index) => {
                                         const { color } = getCategoryStyles(entry.name);
+                                        const opacity = getOpacity(entry.name, index);
                                         return (
                                             <Cell
                                                 key={`cell-${index}`}
                                                 fill={color}
-                                                strokeWidth={focusedIndex === index ? 2 : 0}
+                                                strokeWidth={selectedCategory === entry.name || focusedIndex === index ? 2 : 0}
                                                 stroke="#fff"
-                                                opacity={focusedIndex !== null && focusedIndex !== index ? 0.6 : 1}
+                                                opacity={opacity}
+                                                onClick={() => handleCategoryClick(entry.name)}
+                                                style={{ cursor: 'pointer' }}
                                             />
                                         );
                                     })}
                                 </Pie>
                                 <Tooltip
-                                    content={() => null} // Disable default tooltip to use center text
+                                    content={() => null}
                                     cursor={false}
                                 />
                             </PieChart>
@@ -164,6 +207,8 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
                         {chartData.map((item, index) => {
                             const { color, icon } = getCategoryStyles(item.name);
                             const isFocused = focusedIndex === index;
+                            const isSelected = selectedCategory === item.name;
+                            const isDimmed = selectedCategory && !isSelected;
 
                             // Find the max percentage to scale the progress bars relative to the biggest item
                             const maxPercentage = Math.max(...chartData.map(c => c.percentage));
@@ -172,12 +217,14 @@ export default function CategoryBreakdown({ expenses, filterType }: CategoryBrea
                             return (
                                 <div
                                     key={item.name}
-                                    className={styles.legendItem}
+                                    className={`${styles.legendItem} ${isSelected ? styles.selected : ''}`}
                                     onMouseEnter={() => setFocusedIndex(index)}
                                     onMouseLeave={() => setFocusedIndex(null)}
+                                    onClick={() => handleCategoryClick(item.name)}
                                     style={{
-                                        borderColor: isFocused ? 'var(--border)' : 'transparent',
-                                        background: isFocused ? 'var(--hover-bg)' : 'transparent'
+                                        borderColor: isFocused || isSelected ? 'var(--border)' : 'transparent',
+                                        background: isFocused || isSelected ? 'var(--hover-bg)' : 'transparent',
+                                        opacity: isDimmed ? 0.5 : 1,
                                     }}
                                 >
                                     {/* Background Progress Bar */}

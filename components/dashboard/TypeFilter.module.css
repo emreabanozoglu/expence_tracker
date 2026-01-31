@@ -1,50 +1,79 @@
-.filter {
+/* Wrapper matching DateRangeFilter style for alignment */
+.filterWrapper {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-md);
     padding: var(--spacing-md);
     background: var(--card-bg);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
-    flex-wrap: wrap;
     min-height: 70px;
+    /* Matching DateRangeFilter height */
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.icon {
+    color: var(--gray-500);
+    flex-shrink: 0;
+}
+
+/* Button Container (Segmented Control) */
+.buttonContainer {
+    display: flex;
+    gap: 4px;
+    background: var(--gray-100);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    align-items: stretch;
+    border: 1px solid var(--border);
+    height: 44px;
+    flex: 1;
+    /* Take remaining space */
 }
 
 .button {
-    padding: var(--spacing-sm) var(--spacing-lg);
+    padding: var(--spacing-xs) var(--spacing-md);
     font-size: 0.875rem;
     font-weight: 500;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border: none;
+    border-radius: var(--radius-sm);
     background: transparent;
-    color: var(--foreground);
+    color: var(--gray-500);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.2s ease;
+    flex: 1;
+    /* Equal width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
 }
 
 .button:hover {
-    background: var(--hover-bg);
-    border-color: var(--primary-500);
+    color: var(--foreground);
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .button.active {
-    background: var(--primary-500);
-    color: white;
-    border-color: var(--primary-500);
+    background: white;
+    color: var(--primary-500);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
 }
 
-@media (max-width: 768px) {
-    .filter {
-        width: 100%;
-        padding: var(--spacing-md);
-        justify-content: space-between;
-        gap: var(--spacing-sm);
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .buttonContainer {
+        background: var(--gray-800);
     }
 
-    .button {
-        flex: 1;
-        text-align: center;
-        padding: var(--spacing-sm);
-        font-size: 0.875rem;
+    .button:hover {
+        background: var(--gray-700);
+    }
+
+    .button.active {
+        background: var(--gray-700);
+        color: white;
     }
 }

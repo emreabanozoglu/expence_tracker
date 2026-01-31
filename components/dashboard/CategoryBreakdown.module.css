@@ -115,6 +115,8 @@
     transition: all var(--transition-fast);
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
+    /* Prevent squashing when list is long */
 }
 
 .legendItem:hover {
@@ -133,12 +135,16 @@
     font-size: 1.25rem;
     background: var(--surface);
     flex-shrink: 0;
-    z-index: 1;
+    position: relative;
+    /* Ensure z-index works */
+    z-index: 2;
 }
 
 .itemContent {
     flex: 1;
-    z-index: 1;
+    position: relative;
+    /* Ensure z-index works */
+    z-index: 2;
 }
 
 .itemHeader {
@@ -192,6 +198,28 @@
     flex: 1;
     border: 2px dashed var(--border);
     border-radius: var(--radius-lg);
+}
+
+.clearButton {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clearButton:hover {
+    background: var(--gray-100);
+    color: var(--foreground);
+    border-color: var(--gray-400);
+}
+
+.selected {
+    border-color: var(--primary-500) !important;
+    background: var(--primary-50) !important;
 }
 
 @media (max-width: 900px) {

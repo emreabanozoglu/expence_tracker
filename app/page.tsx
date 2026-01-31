@@ -11,21 +11,20 @@ import { getDateRangeLabel } from '@/lib/utils/monthFilters';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
-import SummaryCards from '@/components/dashboard/SummaryCards';
 import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown';
 import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
+import TypeFilter from '@/components/dashboard/TypeFilter';
 import PaginationControls from '@/components/ui/PaginationControls';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import MobileNav from '@/components/ui/MobileNav';
-import { Plus, Download, Wallet, Settings, LogOut } from 'lucide-react';
+import { Plus, Download, Wallet, Settings, LogOut, Inbox, X } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import BudgetProgress from '@/components/dashboard/BudgetProgress';
-import TypeFilter from '@/components/dashboard/TypeFilter';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -36,6 +35,7 @@ export default function Home() {
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
   const [dateRange, setDateRange] = useState<DateRangePreset>('thisMonth');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,32 +46,61 @@ export default function Home() {
     return filterExpensesByDateRange(expenses, dateRange);
   }, [expenses, dateRange]);
 
-  // 2. Filter by Type (For Breakdown and List only)
+  // 2. Filter by Type
   const typeFilteredExpenses = useMemo(() => {
+    // ... same as before ...
     if (filterType === 'all') {
       return dateFilteredExpenses;
     }
     return dateFilteredExpenses.filter(t => t.type === filterType);
   }, [dateFilteredExpenses, filterType]);
 
-  // 3. Pagination Logic
-  const totalItems = typeFilteredExpenses.length;
+  // 3. Filter by Category (NEW)
+  const categoryFilteredExpenses = useMemo(() => {
+    if (!selectedCategory) return typeFilteredExpenses;
+
+    // For "Expense"/"Income" pseudo-categories in "All" view
+    if (filterType === 'all') {
+      if (selectedCategory === 'Expense') return typeFilteredExpenses.filter(t => t.type === 'expense');
+      if (selectedCategory === 'Income') return typeFilteredExpenses.filter(t => t.type === 'income');
+    }
+
+    return typeFilteredExpenses.filter(t => t.category === selectedCategory);
+  }, [typeFilteredExpenses, selectedCategory, filterType]);
+
+  // 4. Pagination Logic
+  const totalItems = categoryFilteredExpenses.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const paginatedExpenses = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return typeFilteredExpenses.slice(startIndex, startIndex + itemsPerPage);
-  }, [typeFilteredExpenses, currentPage, itemsPerPage]);
+    return categoryFilteredExpenses.slice(startIndex, startIndex + itemsPerPage);
+  }, [categoryFilteredExpenses, currentPage, itemsPerPage]);
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
+  }, [dateRange, filterType, selectedCategory]);
+
+  // Reset category when main filters change
+  useEffect(() => {
+    setSelectedCategory(null);
   }, [dateRange, filterType]);
+
+  // ... handlers ...
+
+  const handleCategorySelect = (category: string | null) => {
+    setSelectedCategory(category);
+  };
+
+  const clearCategoryFilter = () => setSelectedCategory(null);
+
+  // ... render ...
+
+
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Optional: Scroll to list top if needed, but smooth behavior might be annoying if list is short.
-    // window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
   const handleItemsPerPageChange = (items: number) => {
@@ -187,24 +216,6 @@ export default function Home() {
 
         <main className={styles.main}>
           <div className={styles.container}>
-            {/* Filter Section */}
-            {expenses.length > 0 && (
-              <div style={{ marginBottom: '16px' }}>
-                <DateRangeFilter
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                  expenses={expenses}
-                />
-              </div>
-            )}
-
-            {/* Summary Cards - Always filters by Date only */}
-            {dateFilteredExpenses.length > 0 && (
-              <div data-testid="summary-cards">
-                <SummaryCards expenses={dateFilteredExpenses} />
-              </div>
-            )}
-
             {/* Budget Progress - Always filters by Date only */}
             <div data-testid="budget-progress">
               <BudgetProgress
@@ -215,26 +226,99 @@ export default function Home() {
               />
             </div>
 
-            {/* Type Filter & Breakdown Section */}
+            {/* Filter Section */}
+            {expenses.length > 0 && (
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1, minWidth: '300px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                      Transaction Type
+                    </label>
+                    <TypeFilter
+                      selected={filterType}
+                      onSelect={setFilterType}
+                    />
+                  </div>
+                  <div style={{ flex: 1, minWidth: '300px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                      Date Period
+                    </label>
+                    <DateRangeFilter
+                      selected={dateRange}
+                      onSelect={setDateRange}
+                      expenses={expenses}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {dateFilteredExpenses.length === 0 && (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '48px 24px',
+                textAlign: 'center',
+                color: 'var(--gray-500)',
+                backgroundColor: 'var(--card-bg)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--border)',
+                marginTop: '12px'
+              }}>
+                <div style={{
+                  backgroundColor: 'var(--gray-100)',
+                  padding: '16px',
+                  borderRadius: '50%',
+                  marginBottom: '16px'
+                }}>
+                  <Inbox size={32} strokeWidth={1.5} />
+                </div>
+                <h3 style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  color: 'var(--foreground)',
+                  marginBottom: '8px'
+                }}>
+                  No transactions found
+                </h3>
+                <p style={{ maxWidth: '300px', margin: '0 0 24px 0' }}>
+                  There are no transactions for this period. Try selecting a different date range or add a new transaction.
+                </p>
+                <Button variant="primary" onClick={handleAddExpense}>
+                  <Plus size={18} style={{ marginRight: '8px' }} />
+                  Add Transaction
+                </Button>
+              </div>
+            )}
+
+            {/* Breakdown Section */}
             {dateFilteredExpenses.length > 0 && (
               <>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
-                  <TypeFilter
-                    selected={filterType}
-                    onSelect={setFilterType}
-                  />
-                </div>
-
                 <div className={styles.dashboardGrid}>
                   <div className={styles.chartSection} data-testid="category-chart">
-                    <CategoryBreakdown expenses={typeFilteredExpenses} filterType={filterType} />
+                    <CategoryBreakdown
+                      expenses={typeFilteredExpenses}
+                      filterType={filterType}
+                      selectedCategory={selectedCategory}
+                      onCategorySelect={handleCategorySelect}
+                    />
                   </div>
                 </div>
 
                 <div className={styles.listSection} data-testid="expense-list-section">
-                  <h2 className={styles.sectionTitle}>
-                    {getDateRangeLabel(dateRange)}
-                  </h2>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <h2 className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+                      {getDateRangeLabel(dateRange)}
+                    </h2>
+                    {selectedCategory && (
+                      <Button variant="ghost" size="sm" onClick={clearCategoryFilter} style={{ fontSize: '0.8rem', height: '32px' }}>
+                        {selectedCategory} <X size={14} style={{ marginLeft: 6 }} />
+                      </Button>
+                    )}
+                  </div>
                   <ExpenseList
                     expenses={paginatedExpenses}
                     onEdit={handleEditExpense}
@@ -250,7 +334,8 @@ export default function Home() {
                   />
                 </div>
               </>
-            )}
+            )
+            }
           </div>
         </main>
 

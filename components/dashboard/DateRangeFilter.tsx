@@ -55,7 +55,7 @@ export default function DateRangeFilter({ selected, onSelect, expenses }: DateRa
                 </button>
             </div>
 
-            {/* Filter Content - Always rendered, visibility controlled by CSS */}
+            {/* Filter Content (Date Controls) - Hidden when collapsed on mobile */}
             <div className={styles.filterContent}>
                 <Calendar size={20} className={styles.icon} />
                 <div className={styles.buttons}>
@@ -72,10 +72,6 @@ export default function DateRangeFilter({ selected, onSelect, expenses }: DateRa
                         </button>
                     ))}
                 </div>
-
-                {availableMonths.length > 0 && (
-                    <div className={styles.divider} />
-                )}
 
                 {availableMonths.length > 0 && (
                     <div className={styles.dropdown}>
