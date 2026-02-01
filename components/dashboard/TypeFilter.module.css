@@ -11,6 +11,7 @@
     /* Matching DateRangeFilter height */
     flex-wrap: wrap;
     flex: 1;
+    height: 100%;
 }
 
 .icon {
@@ -62,18 +63,17 @@
     font-weight: 600;
 }
 
-/* Dark mode adjustments */
-@media (prefers-color-scheme: dark) {
-    .buttonContainer {
-        background: var(--gray-800);
-    }
+/* Dark mode adjustments using data-theme attribute */
+:global([data-theme="dark"]) .buttonContainer {
+    background: var(--gray-100);
+    /* Use gray-100 which is redefined as dark in globals */
+}
 
-    .button:hover {
-        background: var(--gray-700);
-    }
+:global([data-theme="dark"]) .button:hover {
+    background: var(--gray-200);
+}
 
-    .button.active {
-        background: var(--gray-700);
-        color: white;
-    }
+:global([data-theme="dark"]) .button.active {
+    background: var(--primary-500);
+    color: white;
 }

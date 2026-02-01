@@ -2,10 +2,8 @@
  * Test data generators for creating unique test data
  */
 
-export function generateUniqueEmail(): string {
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(7);
-    return `test-${timestamp}-${random}@playwright-test.com`;
+export function generateUniqueEmail() {
+    return `test.user.${Date.now()}.${Math.floor(Math.random() * 10000)}@example.com`;
 }
 
 export function generatePassword(): string {

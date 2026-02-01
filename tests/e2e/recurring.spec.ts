@@ -41,6 +41,9 @@ test.describe('Recurring Transactions', () => {
         // 2. Go to Settings
         await settingsPage.goto();
 
+        // Switch to recurring tab
+        await settingsPage.switchToTab('Recurring');
+
         // 3. Verify it appears
         const recurringItem = settingsPage.getRecurringTransactionByDescription('Netflix Subscription');
         await expect(recurringItem).toBeVisible();
@@ -82,6 +85,7 @@ test.describe('Recurring Transactions', () => {
 
         // Go to Settings
         await settingsPage.goto();
+        await settingsPage.switchToTab('Recurring');
 
         // Verify exists
         const recurringItem = settingsPage.getRecurringTransactionByDescription('Spotify');

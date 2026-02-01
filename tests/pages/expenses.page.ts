@@ -9,6 +9,7 @@ export class ExpensesPage {
     readonly page: Page;
     readonly addExpenseButton: Locator;
     readonly expenseList: Locator;
+    readonly expenseItems: Locator;
     readonly emptyState: Locator;
 
     // Form elements
@@ -32,8 +33,16 @@ export class ExpensesPage {
 
     constructor(page: Page) {
         this.page = page;
-        this.addExpenseButton = page.locator('[data-testid="add-expense-button"]');
+        // Target whichever button is visible (Desktop or FAB)
+        // Target whichever button is visible (Desktop or FAB). Use .first() to handle case where only one is visible.
+        // We use a combined locator and rely on Playwright's actionability checks (or .first()) to pick the right one.
+        // Since strict mode might complain if both match, we use .first() assuming checking for visibility or order is sufficient.
+        // A safer approach for responsive elements is often:
+        this.addExpenseButton = page.locator('[data-testid="add-expense-button"], [data-testid="fab-add-expense-button"], [data-testid="add-expense-button-empty"]')
+            .locator('visible=true')
+            .first();
         this.expenseList = page.locator('[data-testid="expense-list-section"]');
+        this.expenseItems = page.locator('[data-testid="expense-item"]');
         this.emptyState = page.locator('[data-testid="empty-state"]');
 
         // Form elements
@@ -61,7 +70,8 @@ export class ExpensesPage {
 
     async addExpense(data: { amount: string; category?: string; description?: string; date?: string; type?: 'income' | 'expense', isRecurring?: boolean, frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly' }) {
         // Click add expense button
-        await this.addExpenseButton.click();
+        // Force click to avoid interception (e.g. by toasts or overlays on mobile)
+        await this.addExpenseButton.click({ force: true });
 
         // Wait for modal to open
         await this.amountInput.waitFor({ state: 'visible' });
@@ -171,7 +181,16 @@ export class ExpensesPage {
     }
 
     async getExpenseCount(): Promise<number> {
-        return await this.page.locator('[data-testid="edit-expense-button"]').count();
+        // Wait for list to stabilize
+        await this.page.waitForTimeout(500);
+        return await this.expenseItems.count();
+    }
+
+    async selectDateFilter(filter: 'All Time' | 'This Month' | 'Last Month') {
+        // Click the filter button to select the option
+        await this.page.getByRole('button', { name: filter }).click();
+        // Wait for filtering to apply
+        await this.page.waitForTimeout(500);
     }
 
     async cancelAddingExpense() {

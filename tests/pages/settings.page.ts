@@ -2,7 +2,7 @@
  * Page Object Model for Settings
  */
 
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class SettingsPage {
     readonly page: Page;
@@ -26,6 +26,18 @@ export class SettingsPage {
 
         this.editCategoryButton = page.locator('[data-testid="edit-category-button"]').first();
         this.deleteCategoryButton = page.locator('[data-testid="delete-category-button"]').first();
+    }
+
+    async switchToTab(tabName: 'General' | 'Budget' | 'Categories' | 'Recurring' | 'Export') {
+        // Check for mobile back button (if we are in a tab on mobile, sidebar is hidden)
+        const backButton = this.page.getByRole('button', { name: 'Back to Settings' });
+        if (await backButton.isVisible()) {
+            await backButton.click();
+        }
+
+        await this.page.getByRole('button', { name: tabName }).click();
+        // Wait for potential content change / loading
+        await this.page.waitForTimeout(500);
     }
 
     // Recurring Transaction Locators
@@ -66,7 +78,11 @@ export class SettingsPage {
     }
 
     async changeCurrency(currencyCode: string) {
-        await this.currencySelector.selectOption(currencyCode);
+        // Handle potential DOM detachment (re-renders) by retrying
+        // Use a polling approach or simple retry since the element might be replaced
+        await expect(async () => {
+            await this.currencySelector.selectOption(currencyCode);
+        }).toPass({ timeout: 10000 });
     }
 
     async getSelectedCurrency(): Promise<string> {
@@ -83,7 +99,8 @@ export class SettingsPage {
     }
 
     async addCategory(name: string, color: string = '#FF5733') {
-        await this.addCategoryButton.click();
+        await this.addCategoryButton.click({ force: true });
+
 
         // Wait for modal
         const nameInput = this.page.locator('[data-testid="category-name-input"]');

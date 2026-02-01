@@ -143,6 +143,9 @@ test.describe('Expense Management', () => {
             date: lastWeek.toISOString().split('T')[0]
         }));
 
+        // Select 'All Time' to see all created expenses
+        await expensesPage.selectDateFilter('All Time');
+
         // All should be visible
         const count = await expensesPage.getExpenseCount();
         expect(count).toBe(3);

@@ -9,6 +9,7 @@
     flex-wrap: wrap;
     min-height: 70px;
     /* Enforce minimum height for alignment */
+    height: 100%;
 }
 
 /* Hide header on desktop, show on mobile */
@@ -49,7 +50,8 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    width: 100%;
 }
 
 .icon {
@@ -60,7 +62,7 @@
 .buttons {
     display: flex;
     gap: var(--spacing-xs);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .button {

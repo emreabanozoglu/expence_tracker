@@ -5,6 +5,7 @@ import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { useAuth } from '@/lib/context/AuthContext';
 import CurrencySelector from './CurrencySelector';
 import DateFormatSelector from './DateFormatSelector';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import { User } from 'lucide-react';
 import styles from './GeneralSettings.module.css';
 
@@ -34,6 +35,20 @@ export default function GeneralSettings() {
                         </div>
                     </div>
                 )}
+
+                <div className={styles.divider} />
+
+                {/* Appearance Section */}
+                <div className={styles.section} data-testid="appearance-section">
+                    <label className={styles.sectionLabel}>Appearance</label>
+                    <div className={styles.profileCard} style={{ justifyContent: 'space-between' }}>
+                        <div>
+                            <h3 className={styles.name}>Theme</h3>
+                            <p className={styles.email}>Toggle between light and dark mode</p>
+                        </div>
+                        <ThemeToggle />
+                    </div>
+                </div>
 
                 <div className={styles.divider} />
 

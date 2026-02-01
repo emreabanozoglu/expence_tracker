@@ -62,18 +62,39 @@ export class DashboardPage {
     }
 
     async filterByDateRange(range: string) {
-        // The date range filter implementation might vary
-        // If it's a select or a set of buttons
-        try {
-            // Try to find a button with the range text
-            const button = this.page.locator(`button:has-text("${range}")`);
-            if (await button.isVisible()) {
-                await button.click();
-                return;
-            }
+        // Handle mobile view where filters might be collapsed
+        // Check if we are in mobile view by checking for the collapsing header
+        // Note: We don't have a direct selector for the header class in POM without importing styles or using test-id
+        // But we can check if the button we want is visible.
 
-            // Or look for it in a dropdown/select if implemented that way
-            // For now, let's assume it works via text match on buttons or list items
+        let targetButton = this.page.locator(`button:has-text("${range}")`);
+        // If exact match doesn't work (e.g. casing), try getByText
+        if (await targetButton.count() === 0) {
+            targetButton = this.page.getByRole('button', { name: range });
+        }
+
+        if (!await targetButton.isVisible()) {
+            // Might be collapsed on mobile. Try clicking the header.
+            const header = this.page.locator('[data-testid="date-filter-header"]');
+            if (await header.isVisible()) {
+                await header.click({ force: true }); // Force click to ensure it triggers despite any overlays
+                // Wait for the target button to become visible after expansion
+                try {
+                    await targetButton.waitFor({ state: 'visible', timeout: 2000 });
+                } catch (e) {
+                    console.log('Target button did not become visible after header click');
+                }
+            }
+        }
+
+        // Try to find a button with the range text
+        if (await targetButton.isVisible()) {
+            await targetButton.click();
+            return;
+        }
+
+        // Or look for it in a dropdown/select if implemented that way
+        try {
             await this.page.getByText(range).click();
         } catch (e) {
             console.log(`Could not filter by ${range}`);

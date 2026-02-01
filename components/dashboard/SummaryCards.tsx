@@ -28,7 +28,7 @@ export default function SummaryCards({ expenses }: SummaryCardsProps) {
     const balance = income - expense;
 
     return (
-        <div className={styles.grid}>
+        <div className={styles.grid} data-testid="summary-cards">
             <div className={styles.card}>
                 <div className={styles.iconWrapper} style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
                     <DollarSign size={24} />

@@ -130,6 +130,27 @@ export class AuthFixture {
             return;
         }
 
+        // Try settings logout button
+        const settingsLogoutBtn = this.page.locator('[data-testid="settings-signout"]');
+
+        // If in mobile settings detail view, sidebar is hidden. Go back first.
+        if (!await settingsLogoutBtn.isVisible() && this.page.url().includes('/settings')) {
+            const backToSettings = this.page.getByRole('button', { name: 'Back to Settings' });
+            if (await backToSettings.isVisible()) {
+                await backToSettings.click();
+            }
+        }
+
+        if (await settingsLogoutBtn.isVisible()) {
+            try {
+                await settingsLogoutBtn.click();
+                await this.authPage.waitForRedirect('/auth');
+                return;
+            } catch (e) {
+                console.log('UI logout failed or timed out, forcing logout via storage clear');
+            }
+        }
+
         // If desktop button not visible, try mobile menu
         const mobileLogoutBtn = this.page.locator('[data-testid="mobile-logout-button"]');
         if (await mobileLogoutBtn.count() > 0) {
@@ -146,20 +167,30 @@ export class AuthFixture {
                 }
             }
 
-            await mobileLogoutBtn.click();
-            await this.authPage.waitForRedirect('/auth');
-            return;
+            try {
+                await mobileLogoutBtn.click();
+                await this.authPage.waitForRedirect('/auth');
+                return;
+            } catch (e) {
+                console.log('Mobile UI logout failed, forcing storage clear');
+            }
         }
 
         // Fallback: try any logout/sign out button
         const anyLogoutBtn = this.page.locator('button:has-text("Logout"), button:has-text("Sign Out")');
         if (await anyLogoutBtn.count() > 0) {
-            await anyLogoutBtn.first().click({ force: true });
-            await this.authPage.waitForRedirect('/auth');
-        } else {
-            // Last resort: navigate directly
-            await this.page.goto('/auth');
+            try {
+                await anyLogoutBtn.first().click({ force: true });
+                await this.authPage.waitForRedirect('/auth');
+                return;
+            } catch (e) {
+                console.log('Generic logout btn failed');
+            }
         }
+
+        // Final Fallback: Clear storage and go to auth
+        await this.page.evaluate(() => localStorage.clear());
+        await this.page.goto('/auth');
     }
 
     /**

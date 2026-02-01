@@ -60,27 +60,30 @@ test.describe('Data Persistence', () => {
         await expect(expensesPage.getExpenseByDescription('Logout Test Expense')).toBeVisible();
     });
 
-    test('should isolate data between different users', async ({ page, context }) => {
+    test('should isolate data between different users', async ({ page, browser }) => {
         // User 1 adds an expense
         const user1ExpenseData = generateExpenseData({ description: 'User 1 Expense' });
         await expensesPage.goto();
         await expensesPage.addExpense(user1ExpenseData);
 
-        // Logout user 1
-        await authFixture.logout();
-
-        // Create and login user 2 in a new page
-        const page2 = await context.newPage();
+        // User 1 is logged in on 'page'.
+        // We create a completely new browser context for User 2 to ensure full isolation
+        const context2 = await browser.newContext();
+        const page2 = await context2.newPage();
         const authFixture2 = new AuthFixture(page2);
         await authFixture2.createAndLoginUserViaApi();
 
         const expensesPage2 = new ExpensesPage(page2);
         await expensesPage2.goto();
 
-        // User 2 should not see User 1's expense
+        // Ensure we are on dashboard and not loading
+        await expect(page2).toHaveURL('/');
+        await expect(page2.locator('[data-testid="loading-page"]')).not.toBeVisible();
+
+        // User 2 should NOT see User 1's expense
         await expect(expensesPage2.getExpenseByDescription('User 1 Expense')).not.toBeVisible();
 
-        // User 2 should see empty state
+        // User 2 should see empty state (because they have no data)
         await expect(expensesPage2.emptyState).toBeVisible();
 
         // Add User 2's expense
@@ -91,7 +94,7 @@ test.describe('Data Persistence', () => {
         await expect(expensesPage2.getExpenseByDescription('User 2 Expense')).toBeVisible();
 
         await authFixture2.cleanup();
-        await page2.close();
+        await context2.close();
     });
 
     test('should persist multiple expenses correctly', async ({ page }) => {

@@ -45,7 +45,7 @@ export default function DateRangeFilter({ selected, onSelect, expenses }: DateRa
     return (
         <div className={`${styles.filter} ${isExpanded ? styles.expanded : styles.collapsed}`}>
             {/* Collapsed Header - Always Visible */}
-            <div className={styles.filterHeader} onClick={toggleExpanded}>
+            <div className={styles.filterHeader} onClick={toggleExpanded} data-testid="date-filter-header">
                 <div className={styles.headerLeft}>
                     <Calendar size={20} className={styles.icon} />
                     <span className={styles.selectedLabel}>{getSelectedLabel()}</span>

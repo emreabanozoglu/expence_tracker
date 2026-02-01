@@ -26,7 +26,7 @@ export default function RootLayout({
           <SettingsProvider>
             <ThemeProvider>
               {children}
-              <Toaster position="bottom-right" />
+              <Toaster position="top-center" />
             </ThemeProvider>
           </SettingsProvider>
         </AuthProvider>

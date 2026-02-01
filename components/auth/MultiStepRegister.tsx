@@ -45,6 +45,7 @@ const CredentialsStep = ({ data, updateData }: { data: RegisterData, updateData:
                             fontSize: '1rem'
                         }}
                         required
+                        data-testid="signup-firstname-input"
                     />
                 </div>
                 <div style={{ flex: 1 }}>
@@ -62,6 +63,7 @@ const CredentialsStep = ({ data, updateData }: { data: RegisterData, updateData:
                             fontSize: '1rem'
                         }}
                         required
+                        data-testid="signup-lastname-input"
                     />
                 </div>
             </div>
@@ -80,6 +82,7 @@ const CredentialsStep = ({ data, updateData }: { data: RegisterData, updateData:
                         fontSize: '1rem'
                     }}
                     required
+                    data-testid="signup-email-input"
                 />
             </div>
             <div>
@@ -98,6 +101,7 @@ const CredentialsStep = ({ data, updateData }: { data: RegisterData, updateData:
                     }}
                     required
                     minLength={6}
+                    data-testid="signup-password-input"
                 />
             </div>
         </div>
@@ -131,6 +135,7 @@ const CurrencyStep = ({ data, updateData }: { data: RegisterData, updateData: (d
                     backgroundColor: 'white',
                     color: '#1f2937'
                 }}
+                data-testid="signup-currency-select"
             >
                 {CURRENCIES.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -176,6 +181,7 @@ const ReviewStep = ({ data, updateData, onShowTerms }: { data: RegisterData, upd
                 checked={data.termsAccepted}
                 onChange={(e) => updateData({ termsAccepted: e.target.checked })}
                 style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+                data-testid="signup-terms-checkbox"
             />
             <label htmlFor="terms" style={{ fontSize: '0.95rem', color: '#374151', lineHeight: 1.4 }}>
                 I agree to the{' '}
@@ -258,7 +264,7 @@ export default function MultiStepRegister({ onComplete, onLoginClick, loading, e
                         Back
                     </button>
                 ) : (
-                    <button onClick={onLoginClick} className={styles.backButton} type="button" style={{ border: 'none', paddingLeft: 0, color: '#3b82f6' }}>
+                    <button onClick={onLoginClick} className={styles.backButton} type="button" style={{ border: 'none', paddingLeft: 0, color: '#3b82f6' }} data-testid="auth-toggle-button">
                         Login instead
                     </button>
                 )}
@@ -268,6 +274,7 @@ export default function MultiStepRegister({ onComplete, onLoginClick, loading, e
                     className={styles.nextButton}
                     disabled={!isStepValid() || loading}
                     type="button"
+                    data-testid="signup-submit-button"
                 >
                     {loading ? 'Processing...' : (step === 3 ? 'Create Account' : 'Continue')}
                 </button>

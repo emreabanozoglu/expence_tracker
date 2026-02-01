@@ -28,25 +28,34 @@ test.describe('Authentication', () => {
     });
 
     test('should show error for invalid email', async ({ page }) => {
-        await authPage.signUp('invalid-email', generatePassword());
+        // Switch to sign up mode
+        await authPage.switchToSignUp();
 
-        // Browser validation should fail (form not submitted)
-        const isInvalid = await authPage.emailInput.evaluate((e: HTMLInputElement) => !e.checkValidity());
-        expect(isInvalid).toBe(true);
+        // With the new MultiStepRegister, the "Continue" button should be disabled for invalid emails
+        await authPage.page.fill('[data-testid="signup-firstname-input"]', 'Test');
+        await authPage.page.fill('[data-testid="signup-lastname-input"]', 'User');
+        await authPage.signupPasswordInput.fill(generatePassword());
 
-        // Error message should NOT be visible (because submission was blocked)
-        await expect(authPage.errorMessage).not.toBeVisible();
+        await authPage.signupEmailInput.fill('invalid-email');
+        await expect(authPage.signupSubmitButton).toBeDisabled();
+
+        // Since we can't submit, we don't check for error message visibility in the same way,
+        // but checking the button is disabled confirms validation is working.
     });
 
     test('should show error for short password', async ({ page }) => {
-        await authPage.signUp(generateUniqueEmail(), '12345');
+        // Switch to sign up mode
+        await authPage.switchToSignUp();
 
-        // Password should be at least 6 characters - browser validation
-        const isInvalid = await authPage.passwordInput.evaluate((e: HTMLInputElement) => !e.checkValidity());
-        expect(isInvalid).toBe(true);
+        // Password should be at least 6 characters
+        // The MultiStepRegister disables the button if requirements aren't met
+        await authPage.page.fill('[data-testid="signup-firstname-input"]', 'Test');
+        await authPage.page.fill('[data-testid="signup-lastname-input"]', 'User');
+        await authPage.signupEmailInput.fill(generateUniqueEmail()); // Valid email
 
-        // Error message should NOT be visible
-        await expect(authPage.errorMessage).not.toBeVisible();
+        await authPage.signupPasswordInput.fill('12345'); // Short password
+
+        await expect(authPage.signupSubmitButton).toBeDisabled();
     });
 
     test('should sign in with existing user', async ({ page }) => {
@@ -89,7 +98,7 @@ test.describe('Authentication', () => {
 
         // Click toggle to sign up
         await authPage.toggleButton.click();
-        await expect(authPage.signUpButton).toBeVisible();
+        await expect(authPage.signupSubmitButton).toBeVisible();
 
         // Click toggle back to sign in
         await authPage.toggleButton.click();

@@ -24,6 +24,9 @@ test.describe('Settings', () => {
     });
 
     test('should change currency', async ({ page }) => {
+        // Ensure we are on General tab (needed for mobile where menu is default)
+        await settingsPage.switchToTab('General');
+
         // Change to EUR
         await settingsPage.changeCurrency('EUR');
 
@@ -33,6 +36,9 @@ test.describe('Settings', () => {
     });
 
     test('should persist currency after page refresh', async ({ page }) => {
+        // Ensure we are on General tab
+        await settingsPage.switchToTab('General');
+
         // Change to GBP
         await settingsPage.changeCurrency('GBP');
 
@@ -42,6 +48,9 @@ test.describe('Settings', () => {
         // Refresh page
         await page.reload();
 
+        // On mobile, reload resets to menu view, so we need to navigate back
+        await settingsPage.switchToTab('General');
+
         // Currency should still be GBP
         // Currency should still be GBP
         await expect(settingsPage.currencySelector).toHaveValue('GBP');
@@ -49,6 +58,9 @@ test.describe('Settings', () => {
 
     test('should add a custom category', async () => {
         const categoryName = `Test Category ${Date.now()}`;
+
+        // Switch to categories tab
+        await settingsPage.switchToTab('Categories');
 
         await settingsPage.addCategory(categoryName);
 
@@ -58,6 +70,9 @@ test.describe('Settings', () => {
 
     test('should delete a custom category', async () => {
         const categoryName = `Delete Me ${Date.now()}`;
+
+        // Switch to categories tab
+        await settingsPage.switchToTab('Categories');
 
         // Add category
         await settingsPage.addCategory(categoryName);
@@ -72,6 +87,9 @@ test.describe('Settings', () => {
 
     test('should show custom category in expense form', async ({ page }) => {
         const categoryName = `Expense Category ${Date.now()}`;
+
+        // Switch to categories tab
+        await settingsPage.switchToTab('Categories');
 
         // Add custom category
         await settingsPage.addCategory(categoryName);
@@ -91,6 +109,9 @@ test.describe('Settings', () => {
     test('should persist custom categories after logout', async ({ page }) => {
         const categoryName = `Persistent Category ${Date.now()}`;
 
+        // Switch to categories tab
+        await settingsPage.switchToTab('Categories');
+
         // Add category
         await settingsPage.addCategory(categoryName);
 
@@ -105,12 +126,16 @@ test.describe('Settings', () => {
 
         // Go to settings
         await settingsPage.goto();
+        await settingsPage.switchToTab('Categories');
 
         // Category should still be there
         await expect(settingsPage.getCategoryByName(categoryName)).toBeVisible();
     });
 
     test('should handle multiple currency changes', async ({ page }) => {
+        // Ensure we are on General tab
+        await settingsPage.switchToTab('General');
+
         // Change currency multiple times
         await settingsPage.changeCurrency('EUR');
         await expect(settingsPage.currencySelector).toHaveValue('EUR');
@@ -129,6 +154,9 @@ test.describe('Settings', () => {
             `Category 3 ${Date.now()}`,
         ];
 
+        // Switch to categories tab
+        await settingsPage.switchToTab('Categories');
+
         for (const category of categories) {
             await settingsPage.addCategory(category);
         }
@@ -137,5 +165,32 @@ test.describe('Settings', () => {
         for (const category of categories) {
             await expect(settingsPage.getCategoryByName(category)).toBeVisible();
         }
+    });
+
+    test('should trigger export csv download', async ({ page }) => {
+        // We need data to export, otherwise button might be disabled
+        const expensesPage = new ExpensesPage(page);
+        await expensesPage.goto();
+        await expensesPage.addExpense({
+            description: 'Export Test Expense',
+            amount: '123.45',
+            category: 'Food',
+            date: new Date().toISOString().split('T')[0],
+            isRecurring: false
+        });
+
+        await settingsPage.goto();
+        await settingsPage.switchToTab('Export');
+
+        // Start waiting for download before clicking
+        const downloadPromise = page.waitForEvent('download');
+
+        // Click download button
+        await page.getByRole('button', { name: /download csv/i }).click();
+
+        const download = await downloadPromise;
+
+        // Verify filename
+        expect(download.suggestedFilename()).toMatch(/expenses_.*\.csv/);
     });
 });

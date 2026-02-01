@@ -54,6 +54,12 @@ export class DatabaseCleanup {
         }
 
         try {
+            // Delete user's recurring transactions
+            await this.supabase
+                .from('recurring_transactions')
+                .delete()
+                .eq('user_id', userId);
+
             // Delete user's expenses (will cascade due to foreign key)
             await this.supabase
                 .from('expenses')

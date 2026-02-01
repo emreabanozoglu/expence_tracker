@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Settings, PieChart, Tag, RefreshCw, Download } from 'lucide-react';
+import { Settings, PieChart, Tag, RefreshCw, Download, LogOut } from 'lucide-react';
+import { useAuth } from '@/lib/context/AuthContext';
 import styles from './SettingsSidebar.module.css';
 
 interface SettingsSidebarProps {
@@ -18,6 +19,8 @@ const TABS = [
 ];
 
 export default function SettingsSidebar({ activeTab, onTabChange }: SettingsSidebarProps) {
+    const { signOut } = useAuth();
+
     return (
         <nav className={styles.nav}>
             {TABS.map((tab) => (
@@ -31,6 +34,18 @@ export default function SettingsSidebar({ activeTab, onTabChange }: SettingsSide
                     <span className={styles.label}>{tab.label}</span>
                 </button>
             ))}
+
+            <div style={{ height: '1px', background: 'var(--border)', margin: '8px 0' }} />
+
+            <button
+                className={styles.tab}
+                onClick={() => signOut()}
+                style={{ color: 'var(--error)' }}
+                data-testid="settings-signout"
+            >
+                <span className={styles.icon}><LogOut size={18} /></span>
+                <span className={styles.label}>Sign Out</span>
+            </button>
         </nav>
     );
 }

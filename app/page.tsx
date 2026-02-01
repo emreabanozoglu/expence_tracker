@@ -11,6 +11,7 @@ import { getDateRangeLabel } from '@/lib/utils/monthFilters';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
+import SummaryCards from '@/components/dashboard/SummaryCards';
 import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown';
 import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
 import TypeFilter from '@/components/dashboard/TypeFilter';
@@ -19,12 +20,12 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import MobileNav from '@/components/ui/MobileNav';
-import { Plus, Download, Wallet, Settings, LogOut, Inbox, X } from 'lucide-react';
+import BudgetGoalsModal from '@/components/dashboard/BudgetGoalsModal';
+import { Plus, Download, Wallet, Settings, LogOut, Inbox, X, Target } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
-import BudgetProgress from '@/components/dashboard/BudgetProgress';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -32,6 +33,7 @@ export default function Home() {
   const { settings } = useSettingsContext();
   const { signOut } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
   const [dateRange, setDateRange] = useState<DateRangePreset>('thisMonth');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
@@ -48,7 +50,6 @@ export default function Home() {
 
   // 2. Filter by Type
   const typeFilteredExpenses = useMemo(() => {
-    // ... same as before ...
     if (filterType === 'all') {
       return dateFilteredExpenses;
     }
@@ -87,17 +88,11 @@ export default function Home() {
     setSelectedCategory(null);
   }, [dateRange, filterType]);
 
-  // ... handlers ...
-
   const handleCategorySelect = (category: string | null) => {
     setSelectedCategory(category);
   };
 
   const clearCategoryFilter = () => setSelectedCategory(null);
-
-  // ... render ...
-
-
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -144,13 +139,12 @@ export default function Home() {
   };
 
   const handleSettingsClick = () => {
-    // Navigation handled by Link component in MobileNav
     window.location.href = '/settings';
   };
 
   if (isLoading) {
     return (
-      <div className={styles.loading}>
+      <div className={styles.loading} data-testid="loading-page">
         <div className={styles.spinner}></div>
         <p>Loading transactions...</p>
       </div>
@@ -179,24 +173,21 @@ export default function Home() {
 
             {/* Desktop Navigation */}
             <div className={styles.headerActions}>
+              <Button variant="ghost" onClick={() => setIsBudgetModalOpen(true)}>
+                <Target size={20} />
+                Budget
+              </Button>
               <Link href="/settings">
                 <Button variant="ghost">
                   <Settings size={20} />
                   Settings
                 </Button>
               </Link>
-              <ThemeToggle />
-              {expenses.length > 0 && (
-                <Button variant="ghost" onClick={handleExport}>
-                  <Download size={20} />
-                  Export
-                </Button>
-              )}
-              <Button variant="ghost" onClick={handleSignOut} data-testid="logout-button">
+              <Button onClick={signOut} variant="ghost" data-testid="logout-button">
                 <LogOut size={20} />
-                Sign Out
+                Logout
               </Button>
-              <Button variant="primary" onClick={handleAddExpense} data-testid="add-expense-button">
+              <Button onClick={handleAddExpense} variant="primary" data-testid="add-expense-button">
                 <Plus size={20} />
                 Add Transaction
               </Button>
@@ -204,58 +195,48 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Floating Action Button - Always visible */}
-        <button
-          className={styles.fab}
-          onClick={handleAddExpense}
-          data-testid="fab-add-expense-button"
-          aria-label="Add Transaction"
-        >
-          <Plus size={24} />
-        </button>
+
 
         <main className={styles.main}>
           <div className={styles.container}>
-            {/* Budget Progress - Always filters by Date only */}
-            <div data-testid="budget-progress">
-              <BudgetProgress
-                expenses={dateFilteredExpenses}
-                expenseTarget={settings.expenseTarget}
-                savingTarget={settings.savingTarget}
-                currencySymbol={settings.currencySymbol}
-              />
-            </div>
 
             {/* Filter Section */}
             {expenses.length > 0 && (
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1, minWidth: '300px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
-                      Transaction Type
-                    </label>
-                    <TypeFilter
-                      selected={filterType}
-                      onSelect={setFilterType}
-                    />
-                  </div>
-                  <div style={{ flex: 1, minWidth: '300px' }}>
-                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
-                      Date Period
-                    </label>
-                    <DateRangeFilter
-                      selected={dateRange}
-                      onSelect={setDateRange}
-                      expenses={expenses}
-                    />
+              <>
+                <div style={{ marginBottom: '24px' }}>
+                  <SummaryCards expenses={dateFilteredExpenses} />
+                </div>
+
+                <div style={{ marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+                    <div style={{ flex: 1, minWidth: '300px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                        Transaction Type
+                      </label>
+                      <TypeFilter
+                        selected={filterType}
+                        onSelect={setFilterType}
+                      />
+                    </div>
+                    <div style={{ flex: 1, minWidth: '300px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                        Date Period
+                      </label>
+                      <DateRangeFilter
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        expenses={expenses}
+                      />
+                    </div>
+
                   </div>
                 </div>
-              </div>
+              </>
             )}
 
             {/* Empty State */}
             {dateFilteredExpenses.length === 0 && (
-              <div style={{
+              <div data-testid="empty-state" style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -287,7 +268,7 @@ export default function Home() {
                 <p style={{ maxWidth: '300px', margin: '0 0 24px 0' }}>
                   There are no transactions for this period. Try selecting a different date range or add a new transaction.
                 </p>
-                <Button variant="primary" onClick={handleAddExpense}>
+                <Button variant="primary" onClick={handleAddExpense} data-testid="add-expense-button-empty">
                   <Plus size={18} style={{ marginRight: '8px' }} />
                   Add Transaction
                 </Button>
@@ -334,10 +315,29 @@ export default function Home() {
                   />
                 </div>
               </>
-            )
-            }
+            )}
           </div>
         </main>
+
+        {/* Floating Action Button - Always visible */}
+        <button
+          className={styles.fab}
+          onClick={handleAddExpense}
+          data-testid="fab-add-expense-button"
+          aria-label="Add Transaction"
+        >
+          <Plus size={24} />
+        </button>
+
+        {/* Budget Goals Modal */}
+        <BudgetGoalsModal
+          isOpen={isBudgetModalOpen}
+          onClose={() => setIsBudgetModalOpen(false)}
+          expenses={dateFilteredExpenses}
+          expenseTarget={settings.expenseTarget}
+          savingTarget={settings.savingTarget}
+          currencySymbol={settings.currencySymbol}
+        />
 
         {/* Add/Edit Modal */}
         <Modal
