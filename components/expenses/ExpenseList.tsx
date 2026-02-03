@@ -15,9 +15,10 @@ export interface ExpenseListProps {
     expenses: Expense[];
     onEdit: (expense: Expense) => void;
     onDelete: (id: string) => void;
+    onItemClick?: (expense: Expense) => void;
 }
 
-export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
+export default function ExpenseList({ expenses, onEdit, onDelete, onItemClick }: ExpenseListProps) {
     if (expenses.length === 0) {
         return (
             <div className={styles.empty} data-testid="empty-state">
@@ -38,6 +39,7 @@ export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListP
                     expense={expense}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    onClick={onItemClick}
                 />
             ))}
         </div>

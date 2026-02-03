@@ -1,15 +1,13 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import { Settings, Download, LogOut, X, Menu } from 'lucide-react';
+import { Settings, Download, LogOut, X, Menu, Target } from 'lucide-react';
 import Button from './Button';
-import ThemeToggle from './ThemeToggle';
 import styles from './MobileNav.module.css';
 
 interface MobileNavProps {
     onSettingsClick: () => void;
     onExportClick: () => void;
     onSignOutClick: () => void;
+    onBudgetClick: () => void;
     showExport?: boolean;
 }
 
@@ -17,6 +15,7 @@ export default function MobileNav({
     onSettingsClick,
     onExportClick,
     onSignOutClick,
+    onBudgetClick,
     showExport = false,
 }: MobileNavProps) {
     const [isOpen, setIsOpen] = useState(false);
@@ -43,6 +42,11 @@ export default function MobileNav({
 
     const handleSettingsClick = () => {
         onSettingsClick();
+        handleClose();
+    };
+
+    const handleBudgetClick = () => {
+        onBudgetClick();
         handleClose();
     };
 
@@ -94,19 +98,23 @@ export default function MobileNav({
                     <div className={styles.navItem}>
                         <Button
                             variant="ghost"
+                            onClick={handleBudgetClick}
+                            className={styles.navButton}
+                        >
+                            <Target size={20} />
+                            Budget
+                        </Button>
+                    </div>
+
+                    <div className={styles.navItem}>
+                        <Button
+                            variant="ghost"
                             onClick={handleSettingsClick}
                             className={styles.navButton}
                         >
                             <Settings size={20} />
                             Settings
                         </Button>
-                    </div>
-
-                    <div className={styles.navItem}>
-                        <div className={styles.themeToggleWrapper}>
-                            <span className={styles.themeLabel}>Theme</span>
-                            <ThemeToggle />
-                        </div>
                     </div>
 
                     {showExport && (

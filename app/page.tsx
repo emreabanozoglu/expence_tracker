@@ -11,16 +11,18 @@ import { getDateRangeLabel } from '@/lib/utils/monthFilters';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
-import SummaryCards from '@/components/dashboard/SummaryCards';
+
 import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown';
 import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
 import TypeFilter from '@/components/dashboard/TypeFilter';
 import PaginationControls from '@/components/ui/PaginationControls';
 import Modal from '@/components/ui/Modal';
+import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import MobileNav from '@/components/ui/MobileNav';
 import BudgetGoalsModal from '@/components/dashboard/BudgetGoalsModal';
+import TransactionDetailsModal from '@/components/dashboard/TransactionDetailsModal';
 import { Plus, Download, Wallet, Settings, LogOut, Inbox, X, Target } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
@@ -34,6 +36,7 @@ export default function Home() {
   const { signOut } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [viewingExpense, setViewingExpense] = useState<Expense | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
   const [dateRange, setDateRange] = useState<DateRangePreset>('thisMonth');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
@@ -130,6 +133,10 @@ export default function Home() {
     setEditingExpense(undefined);
   };
 
+  const handleViewExpense = (expense: Expense) => {
+    setViewingExpense(expense);
+  };
+
   const handleExport = () => {
     exportToCSV(typeFilteredExpenses, settings.dateFormat);
   };
@@ -167,6 +174,7 @@ export default function Home() {
                 onSettingsClick={handleSettingsClick}
                 onExportClick={handleExport}
                 onSignOutClick={handleSignOut}
+                onBudgetClick={() => setIsBudgetModalOpen(true)}
                 showExport={expenses.length > 0}
               />
             </div>
@@ -203,9 +211,7 @@ export default function Home() {
             {/* Filter Section */}
             {expenses.length > 0 && (
               <>
-                <div style={{ marginBottom: '24px' }}>
-                  <SummaryCards expenses={dateFilteredExpenses} />
-                </div>
+
 
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'stretch' }}>
@@ -228,7 +234,6 @@ export default function Home() {
                         expenses={expenses}
                       />
                     </div>
-
                   </div>
                 </div>
               </>
@@ -304,6 +309,7 @@ export default function Home() {
                     expenses={paginatedExpenses}
                     onEdit={handleEditExpense}
                     onDelete={deleteExpense}
+                    onItemClick={handleViewExpense}
                   />
                   <PaginationControls
                     currentPage={currentPage}
@@ -337,6 +343,13 @@ export default function Home() {
           expenseTarget={settings.expenseTarget}
           savingTarget={settings.savingTarget}
           currencySymbol={settings.currencySymbol}
+        />
+
+        {/* Transaction Details Modal */}
+        <TransactionDetailsModal
+          isOpen={!!viewingExpense}
+          onClose={() => setViewingExpense(null)}
+          expense={viewingExpense}
         />
 
         {/* Add/Edit Modal */}

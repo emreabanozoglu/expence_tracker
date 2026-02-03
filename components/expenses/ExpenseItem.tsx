@@ -14,11 +14,12 @@ export interface ExpenseItemProps {
     expense: Expense;
     onEdit: (expense: Expense) => void;
     onDelete: (id: string) => void;
+    onClick?: (expense: Expense) => void;
 }
 
 import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 
-export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemProps) {
+export default function ExpenseItem({ expense, onEdit, onDelete, onClick }: ExpenseItemProps) {
     const { settings } = useSettingsContext();
 
     // Determine type (default to expense if missing)
@@ -32,12 +33,23 @@ export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemPr
     const categoryColor = categoryObj?.color || CATEGORY_COLORS[expense.category as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.Other;
     const categoryIcon = categoryObj?.icon || CATEGORY_ICONS[expense.category as keyof typeof CATEGORY_ICONS] || CATEGORY_ICONS.Other;
 
-    const handleDelete = () => {
+    const handleDelete = (e: React.MouseEvent) => {
+        e.stopPropagation();
         onDelete(expense.id);
     };
 
+    const handleEdit = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onEdit(expense);
+    };
+
     return (
-        <div className={styles.item} data-testid="expense-item">
+        <div
+            className={styles.item}
+            data-testid="expense-item"
+            onClick={() => onClick && onClick(expense)}
+            style={{ cursor: onClick ? 'pointer' : 'default' }}
+        >
             <div className={styles.categoryBadge} style={{ backgroundColor: categoryColor }}>
                 <span className={styles.icon}>{categoryIcon}</span>
             </div>
@@ -61,7 +73,7 @@ export default function ExpenseItem({ expense, onEdit, onDelete }: ExpenseItemPr
             <div className={styles.actions}>
                 <button
                     className={styles.actionButton}
-                    onClick={() => onEdit(expense)}
+                    onClick={handleEdit}
                     aria-label="Edit expense"
                     title="Edit"
                     data-testid="edit-expense-button"

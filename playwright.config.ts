@@ -25,10 +25,7 @@ export default defineConfig({
     workers: process.env.CI ? 5 : undefined,
 
     /* Reporter to use */
-    reporter: [
-        ['html'],
-        ['list']
-    ],
+    reporter: [['html', { open: 'never' }]],
 
     /* Shared settings for all the projects below */
     use: {
@@ -53,7 +50,7 @@ export default defineConfig({
         },
         {
             name: 'mobile-chrome',
-            use: { ...devices['Pixel 5'] },
+            use: { ...devices['Pixel 10'] },
         },
 
         // Uncomment to test on other browsers
