@@ -1,3 +1,51 @@
+.summary {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.summaryItem {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.summaryValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: var(--spacing-xs);
+    display: block;
+    /* Ensure they stack if separate spans */
+}
+
+/* Specific color overrides if needed, assuming reusing existing classes or adding new ones */
+.summaryValue.income {
+    color: var(--success);
+    font-size: 1.1rem;
+    /* Slightly smaller for the value if stacked */
+}
+
+.summaryValue.expense {
+    color: var(--error);
+    font-size: 1.1rem;
+}
+
+.summaryLabel {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    font-weight: 500;
+}
+
 .list {
     display: flex;
     flex-direction: column;

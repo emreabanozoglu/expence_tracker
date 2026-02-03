@@ -15,6 +15,9 @@ export interface ExpenseData {
     category: string;
     description: string;
     date: string;
+    type?: 'income' | 'expense';
+    isRecurring?: boolean;
+    frequency?: 'daily' | 'weekly' | 'monthly' | 'yearly';
 }
 
 export function generateExpenseData(overrides?: Partial<ExpenseData>): ExpenseData {

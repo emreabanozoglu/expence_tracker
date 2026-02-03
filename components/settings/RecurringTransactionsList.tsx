@@ -52,8 +52,36 @@ export default function RecurringTransactionsList() {
         );
     }
 
+    const totalIncome = recurringTransactions.filter(t => t.type === 'income').length;
+    const totalExpense = recurringTransactions.filter(t => t.type === 'expense').length;
+
+    const totalIncomeValue = recurringTransactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const totalExpenseValue = recurringTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + t.amount, 0);
+
     return (
         <>
+            <div className={styles.summary}>
+                <div className={styles.summaryItem}>
+                    <span className={styles.summaryValue}>{totalIncome}</span>
+                    <span className={`${styles.summaryValue} ${styles.income}`}>
+                        {formatCurrency(totalIncomeValue, settings.currencySymbol)}
+                    </span>
+                    <span className={styles.summaryLabel}>Total Recurring Incomes</span>
+                </div>
+                <div className={styles.summaryItem}>
+                    <span className={styles.summaryValue}>{totalExpense}</span>
+                    <span className={`${styles.summaryValue} ${styles.expense}`}>
+                        {formatCurrency(totalExpenseValue, settings.currencySymbol)}
+                    </span>
+                    <span className={styles.summaryLabel}>Total Recurring Expenses</span>
+                </div>
+            </div>
+
             <div className={styles.list}>
                 {recurringTransactions.map(transaction => (
                     <div key={transaction.id} className={styles.item} data-testid="recurring-item">

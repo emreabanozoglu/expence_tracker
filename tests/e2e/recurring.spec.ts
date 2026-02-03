@@ -97,4 +97,50 @@ test.describe('Recurring Transactions', () => {
         // Verify gone
         await expect(recurringItem).not.toBeVisible();
     });
+    test('should display correct total recurring income and expense counts', async ({ page }) => {
+        // 1. Add Recurring Expense
+        await expensesPage.addExpense(generateExpenseData({
+            type: 'expense',
+            amount: '50.00',
+            description: 'Monthly Sub',
+            isRecurring: true,
+            frequency: 'monthly'
+        }));
+
+        // 2. Add Recurring Income
+        await expensesPage.addExpense(generateExpenseData({
+            type: 'income',
+            amount: '1000.00',
+            description: 'Monthly Salary',
+            isRecurring: true,
+            frequency: 'monthly'
+        }));
+
+        // 3. Go to Settings > Recurring
+        await settingsPage.goto();
+        await settingsPage.switchToTab('Recurring');
+
+        // 4. Verify Totals
+        // Assuming we added the summary with specific text
+        await expect(page.getByText('Total Recurring Incomes')).toBeVisible();
+        await expect(page.getByText('Total Recurring Expenses')).toBeVisible();
+
+        // Check values - finding the value associated with the label might need structural locator
+        // We put value and label in a flex column, value is above label.
+        // We can check by text content of the summary item container or specific locator if we add test ids.
+        // Let's use text containment for the specific item block or basic proximity if possible, 
+        // For now, looking for the number "1" might be ambiguous.
+        // Better to check: "1" followed by "Total Recurring Incomes" in the DOM or container textual match.
+
+        // Since we didn't add data-testids to the summary values specifically, let's look for text "1" near "Total Recurring Incomes"
+        // Or simpler: The whole page should contain "1" near the label?
+        // Let's rely on the structure:
+        // .summaryItem > .summaryValue(1) + .summaryLabel(Total Recurring Incomes)
+
+        const incomeSummary = page.locator('div', { hasText: 'Total Recurring Incomes' }).filter({ hasText: '1' });
+        await expect(incomeSummary).toBeVisible();
+
+        const expenseSummary = page.locator('div', { hasText: 'Total Recurring Expenses' }).filter({ hasText: '1' });
+        await expect(expenseSummary).toBeVisible();
+    });
 });
