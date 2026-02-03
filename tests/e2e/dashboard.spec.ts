@@ -215,4 +215,54 @@ test.describe('Dashboard and Analytics', () => {
 
         await expect(page.getByRole('heading', { name: 'Transaction Details' })).not.toBeVisible();
     });
+
+    test('should filter expenses by recurring status', async ({ page }) => {
+        const today = new Date().toISOString().split('T')[0];
+
+        // 1. Add One-time Expense
+        await expensesPage.goto();
+        await expensesPage.addExpense(generateExpenseData({
+            description: 'One-time Payment',
+            amount: '50.00',
+            date: today,
+            isRecurring: false
+        }));
+
+        // 2. Add Recurring Expense
+        await expensesPage.addExpense(generateExpenseData({
+            description: 'Monthly Subscription',
+            amount: '15.00',
+            date: today,
+            isRecurring: true,
+            frequency: 'monthly'
+        }));
+
+        await dashboardPage.goto();
+        await dashboardPage.waitForDataToLoad();
+
+        // Initial state: Both visible
+        await expect(page.getByText('One-time Payment')).toBeVisible();
+        await expect(page.getByText('Monthly Subscription')).toBeVisible();
+
+        // Switch to "Expense" type to see the recurring filter
+        await page.getByRole('button', { name: 'Expense', exact: true }).click();
+
+        // 3. Filter by "Recurring"
+        await page.getByRole('button', { name: 'Recurring' }).click();
+
+        await expect(page.getByText('Monthly Subscription')).toBeVisible();
+        await expect(page.getByText('One-time Payment')).not.toBeVisible();
+
+        // 4. Filter by "One-time"
+        await page.getByRole('button', { name: 'One-time' }).click();
+
+        await expect(page.getByText('One-time Payment')).toBeVisible();
+        await expect(page.getByText('Monthly Subscription')).not.toBeVisible();
+
+        // 5. Reset to "All"
+        await page.getByRole('button', { name: 'All', exact: true }).click();
+
+        await expect(page.getByText('One-time Payment')).toBeVisible();
+        await expect(page.getByText('Monthly Subscription')).toBeVisible();
+    });
 });

@@ -53,6 +53,7 @@ export function useExpenses(): UseExpensesReturn {
                 date: expense.date,
                 createdAt: expense.created_at,
                 updatedAt: expense.updated_at,
+                isRecurring: /(?:^|\s)\(recurring\)|recurring transaction/i.test(expense.description || ''),
             }));
 
             setExpenses(transformedExpenses);
@@ -111,7 +112,9 @@ export function useExpenses(): UseExpensesReturn {
                         type: data.type,
                         amount: parseFloat(data.amount),
                         category: data.category,
-                        description: data.description || null,
+                        description: data.isRecurring
+                            ? `${data.description || ''} (Recurring)`.trim()
+                            : (data.description || null),
                         date: data.date,
                     } as any)
                     .select()
@@ -130,6 +133,7 @@ export function useExpenses(): UseExpensesReturn {
                     date: newExpense.date,
                     createdAt: newExpense.created_at || new Date().toISOString(),
                     updatedAt: newExpense.updated_at || new Date().toISOString(),
+                    isRecurring: /(?:^|\s)\(recurring\)|recurring transaction/i.test(newExpense.description || ''),
                 };
 
                 setExpenses((prev) => [expense, ...prev]);
@@ -158,7 +162,9 @@ export function useExpenses(): UseExpensesReturn {
                         type: data.type,
                         amount: parseFloat(data.amount),
                         category: data.category,
-                        description: data.description || null,
+                        description: data.isRecurring
+                            ? `${data.description || ''} (Recurring)`.trim()
+                            : (data.description || null),
                         date: data.date,
                     } as any)
                     .eq('id', id)
@@ -174,9 +180,12 @@ export function useExpenses(): UseExpensesReturn {
                                 type: data.type,
                                 amount: parseFloat(data.amount),
                                 category: data.category,
-                                description: data.description,
+                                description: data.isRecurring
+                                    ? `${data.description || ''} (Recurring)`.trim()
+                                    : data.description,
                                 date: data.date,
                                 updatedAt: new Date().toISOString(),
+                                isRecurring: data.isRecurring,
                             }
                             : expense
                     )
@@ -209,7 +218,9 @@ export function useExpenses(): UseExpensesReturn {
                         user_id: user.id,
                         amount: parseFloat(data.amount),
                         category: data.category,
-                        description: data.description || null,
+                        description: data.description
+                            ? (data.description.toLowerCase().includes('(recurring)') ? data.description : `${data.description} (Recurring)`)
+                            : '(Recurring)',
                         type: data.type,
                         frequency: data.frequency,
                         start_date: data.date,

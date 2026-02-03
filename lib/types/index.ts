@@ -30,6 +30,7 @@ export interface Transaction {
   date: string; // ISO 8601 format
   createdAt: string;
   updatedAt: string;
+  isRecurring?: boolean;
 }
 
 // Alias for backward compatibility during refactor, strictly deprecated

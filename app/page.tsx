@@ -15,6 +15,7 @@ import ExpenseForm from '@/components/expenses/ExpenseForm';
 import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown';
 import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
 import TypeFilter from '@/components/dashboard/TypeFilter';
+import RecurringFilter, { RecurringFilterType } from '@/components/dashboard/RecurringFilter';
 import PaginationControls from '@/components/ui/PaginationControls';
 import Modal from '@/components/ui/Modal';
 import Card from '@/components/ui/Card';
@@ -40,6 +41,7 @@ export default function Home() {
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
   const [dateRange, setDateRange] = useState<DateRangePreset>('thisMonth');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
+  const [recurringFilter, setRecurringFilter] = useState<RecurringFilterType>('all');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Pagination State
@@ -59,18 +61,26 @@ export default function Home() {
     return dateFilteredExpenses.filter(t => t.type === filterType);
   }, [dateFilteredExpenses, filterType]);
 
-  // 3. Filter by Category (NEW)
+  // 3. Filter by Recurring (NEW)
+  const recurringFilteredExpenses = useMemo(() => {
+    if (recurringFilter === 'all') return typeFilteredExpenses;
+    if (recurringFilter === 'recurring') return typeFilteredExpenses.filter(t => t.isRecurring);
+    if (recurringFilter === 'non-recurring') return typeFilteredExpenses.filter(t => !t.isRecurring);
+    return typeFilteredExpenses;
+  }, [typeFilteredExpenses, recurringFilter]);
+
+  // 4. Filter by Category
   const categoryFilteredExpenses = useMemo(() => {
-    if (!selectedCategory) return typeFilteredExpenses;
+    if (!selectedCategory) return recurringFilteredExpenses;
 
     // For "Expense"/"Income" pseudo-categories in "All" view
     if (filterType === 'all') {
-      if (selectedCategory === 'Expense') return typeFilteredExpenses.filter(t => t.type === 'expense');
-      if (selectedCategory === 'Income') return typeFilteredExpenses.filter(t => t.type === 'income');
+      if (selectedCategory === 'Expense') return recurringFilteredExpenses.filter(t => t.type === 'expense');
+      if (selectedCategory === 'Income') return recurringFilteredExpenses.filter(t => t.type === 'income');
     }
 
-    return typeFilteredExpenses.filter(t => t.category === selectedCategory);
-  }, [typeFilteredExpenses, selectedCategory, filterType]);
+    return recurringFilteredExpenses.filter(t => t.category === selectedCategory);
+  }, [recurringFilteredExpenses, selectedCategory, filterType]);
 
   // 4. Pagination Logic
   const totalItems = categoryFilteredExpenses.length;
@@ -84,12 +94,12 @@ export default function Home() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [dateRange, filterType, selectedCategory]);
+  }, [dateRange, filterType, recurringFilter, selectedCategory]);
 
   // Reset category when main filters change
   useEffect(() => {
     setSelectedCategory(null);
-  }, [dateRange, filterType]);
+  }, [dateRange, filterType, recurringFilter]);
 
   const handleCategorySelect = (category: string | null) => {
     setSelectedCategory(category);
@@ -235,6 +245,18 @@ export default function Home() {
                       />
                     </div>
                   </div>
+
+                  {filterType === 'expense' && (
+                    <div style={{ marginTop: '36px' }}>
+                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.75rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                        Recurring Status
+                      </label>
+                      <RecurringFilter
+                        selected={recurringFilter}
+                        onSelect={setRecurringFilter}
+                      />
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -286,7 +308,7 @@ export default function Home() {
                 <div className={styles.dashboardGrid}>
                   <div className={styles.chartSection} data-testid="category-chart">
                     <CategoryBreakdown
-                      expenses={typeFilteredExpenses}
+                      expenses={recurringFilteredExpenses}
                       filterType={filterType}
                       selectedCategory={selectedCategory}
                       onCategorySelect={handleCategorySelect}
