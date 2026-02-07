@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Expense, ExpenseFormData } from '../types';
 import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import type { Database } from '../supabase/types';
 
 export interface UseExpensesReturn {
@@ -21,6 +22,7 @@ export interface UseExpensesReturn {
 
 export function useExpenses(): UseExpensesReturn {
     const { user } = useAuth();
+    const { checkLimit, openPricingModal } = useSubscription();
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -104,6 +106,13 @@ export function useExpenses(): UseExpensesReturn {
                 return null;
             }
 
+            console.log('Current expenses count:', expenses.length);
+            if (!checkLimit(expenses.length)) {
+                console.log('Limit reached, opening modal');
+                openPricingModal();
+                return null;
+            }
+
             try {
                 const { data: newExpenseData, error } = await (supabase
                     .from('expenses') as any)
@@ -145,7 +154,7 @@ export function useExpenses(): UseExpensesReturn {
                 return null;
             }
         },
-        [user]
+        [user, expenses, checkLimit, openPricingModal]
     );
 
     const updateExpense = useCallback(
@@ -206,6 +215,11 @@ export function useExpenses(): UseExpensesReturn {
                 return;
             }
 
+            if (!checkLimit(expenses.length)) {
+                openPricingModal();
+                return;
+            }
+
             if (!data.isRecurring || !data.frequency) {
                 setError('Invalid recurrence data');
                 return;
@@ -235,7 +249,7 @@ export function useExpenses(): UseExpensesReturn {
                 console.error('Error adding recurring transaction:', err);
             }
         },
-        [user]
+        [user, expenses, checkLimit, openPricingModal]
     );
 
     const deleteExpense = useCallback(

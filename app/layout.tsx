@@ -4,13 +4,15 @@ import "./globals.css";
 
 import { SettingsProvider } from '@/lib/context/SettingsContext';
 import { AuthProvider } from '@/lib/context/AuthContext';
+import { SubscriptionProvider } from '@/lib/context/SubscriptionContext';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import RecurringTransactionManager from '@/components/RecurringTransactionManager';
+import PricingModal from '@/components/pricing-modal';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: "BiBudget - Manage Your Finances",
-  description: "Track your expenses, visualize spending patterns, and manage your budget effectively with BiBudget.",
+  title: "Bibudget - Manage Your Finances",
+  description: "Track your expenses, visualize spending patterns, and manage your budget effectively with Bibudget.",
 };
 
 export default function RootLayout({
@@ -20,15 +22,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body>
         <AuthProvider>
-          <RecurringTransactionManager />
-          <SettingsProvider>
-            <ThemeProvider>
-              {children}
-              <Toaster position="top-center" />
-            </ThemeProvider>
-          </SettingsProvider>
+          <SubscriptionProvider>
+            <RecurringTransactionManager />
+            <SettingsProvider>
+              <ThemeProvider>
+                {children}
+                <PricingModal />
+                <Toaster position="top-center" />
+              </ThemeProvider>
+            </SettingsProvider>
+          </SubscriptionProvider>
         </AuthProvider>
       </body>
     </html>

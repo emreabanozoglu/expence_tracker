@@ -15,6 +15,7 @@ import BudgetSettings from '@/components/settings/BudgetSettings';
 import CategoriesSettings from '@/components/settings/CategoriesSettings';
 import RecurringTransactionsList from '@/components/settings/RecurringTransactionsList';
 import ExportSettings from '@/components/settings/ExportSettings';
+import SubscriptionSettings from '@/components/settings/SubscriptionSettings';
 
 export default function SettingsPage() {
     const { isLoading } = useSettingsContext();
@@ -55,6 +56,8 @@ export default function SettingsPage() {
                         <RecurringTransactionsList />
                     </div>
                 );
+            case 'subscription':
+                return <SubscriptionSettings />;
             case 'export':
                 return <ExportSettings />;
             default:

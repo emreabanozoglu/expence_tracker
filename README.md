@@ -1,4 +1,4 @@
-# BiBudget
+# Bibudget
 
 A modern, responsive expense tracking application built with Next.js 16, Supabase, and React 19. Manage your personal finances with ease, visualize spending habits, and customize your experience.
 

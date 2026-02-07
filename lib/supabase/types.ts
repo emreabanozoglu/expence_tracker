@@ -11,6 +11,46 @@ export type Database = {
     // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
     public: {
         Tables: {
+            profiles: {
+                Row: {
+                    id: string
+                    email: string | null
+                    is_pro: boolean
+                    stripe_customer_id: string | null
+                    stripe_subscription_id: string | null
+                    subscription_end_date: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id: string
+                    email?: string | null
+                    is_pro?: boolean
+                    stripe_customer_id?: string | null
+                    stripe_subscription_id?: string | null
+                    subscription_end_date?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    email?: string | null
+                    is_pro?: boolean
+                    stripe_customer_id?: string | null
+                    stripe_subscription_id?: string | null
+                    subscription_end_date?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "profiles_id_fkey"
+                        columns: ["id"]
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
             expenses: {
                 Row: {
                     amount: number

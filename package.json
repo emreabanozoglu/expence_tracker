@@ -14,6 +14,7 @@
     "test:report": "playwright show-report"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^8.7.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.91.1",
     "currency-codes": "^2.2.0",
@@ -24,7 +25,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
-    "recharts": "^3.7.0"
+    "recharts": "^3.7.0",
+    "stripe": "^20.3.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.0",

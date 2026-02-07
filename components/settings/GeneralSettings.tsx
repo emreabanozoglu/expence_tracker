@@ -7,6 +7,7 @@ import CurrencySelector from './CurrencySelector';
 import DateFormatSelector from './DateFormatSelector';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import { User } from 'lucide-react';
+import InstallPrompt from '@/components/pwa/InstallPrompt';
 import styles from './GeneralSettings.module.css';
 
 export default function GeneralSettings() {
@@ -69,6 +70,10 @@ export default function GeneralSettings() {
                         onFormatChange={updateDateFormat}
                     />
                 </div>
+                <div className={styles.divider} />
+
+                {/* App Installation Section - Only visible on mobile web */}
+                <InstallPrompt />
             </div>
         </div>
     );

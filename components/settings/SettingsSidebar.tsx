@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Settings, PieChart, Tag, RefreshCw, Download, LogOut } from 'lucide-react';
+import { Settings, PieChart, Tag, RefreshCw, Download, LogOut, CreditCard } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import styles from './SettingsSidebar.module.css';
 
@@ -15,6 +15,7 @@ const TABS = [
     { id: 'budget', label: 'Budget', icon: <PieChart size={18} /> },
     { id: 'categories', label: 'Categories', icon: <Tag size={18} /> },
     { id: 'recurring', label: 'Recurring', icon: <RefreshCw size={18} /> },
+    { id: 'subscription', label: 'Subscription', icon: <CreditCard size={18} /> },
     { id: 'export', label: 'Export Data', icon: <Download size={18} /> },
 ];
 

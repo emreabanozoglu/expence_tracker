@@ -20,7 +20,7 @@ export default function TermsOfService({ isOpen, onClose }: TermsOfServiceProps)
                 </div>
                 <div className={styles.content}>
                     <h3>1. Introduction</h3>
-                    <p>Welcome to BiBudget. By creating an account, you agree to these Terms and Conditions.</p>
+                    <p>Welcome to Bibudget. By creating an account, you agree to these Terms and Conditions.</p>
 
                     <h3>2. Privacy Policy</h3>
                     <p>We respect your privacy. Your data is stored securely and is only used to provide the expense tracking service. We do not sell your data to third parties.</p>
