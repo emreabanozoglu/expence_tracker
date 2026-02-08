@@ -195,9 +195,22 @@ button {
   border: none;
   outline: none;
   outline: none;
-  transition: all var(--transition-base);
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Only apply transitions on devices with hover capability */
+@media (hover: hover) {
+  button {
+    transition: all var(--transition-base);
+  }
+}
+
+/* On touch devices, disable transitions for instant feedback */
+@media (hover: none) {
+  button {
+    transition: none !important;
+  }
 }
 
 button:disabled {

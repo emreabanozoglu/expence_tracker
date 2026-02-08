@@ -45,7 +45,6 @@
     background: transparent;
     color: var(--gray-500);
     cursor: pointer;
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,6 +53,20 @@
     /* concise width */
     touch-action: manipulation;
     /* Faster tap response on mobile */
+}
+
+/* Only apply transitions on hover-capable devices */
+@media (hover: hover) {
+    .button {
+        transition: all 0.2s ease;
+    }
+}
+
+/* Disable transitions on touch devices for instant feedback */
+@media (hover: none) {
+    .button {
+        transition: none !important;
+    }
 }
 
 /* Only apply hover effects on devices that support hover (not touch devices) */
