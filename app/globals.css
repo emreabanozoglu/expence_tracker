@@ -188,6 +188,31 @@ a {
   }
 }
 
+/* ===== Mobile Touch Optimization ===== */
+/* Apply touch-action: manipulation to all interactive elements globally */
+/* This disables double-tap-to-zoom and the 300ms tap delay */
+@media (pointer: coarse) {
+
+  a,
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea,
+  label,
+  [onclick],
+  [tabindex] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Disable transitions that can cause perceptual delays on touch */
+  * {
+    transition-duration: 0s !important;
+    animation-duration: 0.1s !important;
+  }
+}
+
 /* ===== Buttons ===== */
 button {
   font-family: inherit;

@@ -38,11 +38,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color var(--transition-fast);
 }
 
-.toggleButton:hover {
-    color: var(--foreground);
+@media (hover: hover) {
+    .toggleButton {
+        transition: color var(--transition-fast);
+    }
+
+    .toggleButton:hover {
+        color: var(--foreground);
+    }
 }
 
 /* Show content by default on desktop */
@@ -74,12 +79,18 @@
     background: transparent;
     color: var(--foreground);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    touch-action: manipulation;
 }
 
-.button:hover {
-    background: var(--hover-bg);
-    border-color: var(--primary-500);
+@media (hover: hover) {
+    .button {
+        transition: all var(--transition-fast);
+    }
+
+    .button:hover {
+        background: var(--hover-bg);
+        border-color: var(--primary-500);
+    }
 }
 
 .button.active {
@@ -194,17 +205,23 @@
         border-radius: var(--radius-lg);
         border: 1px solid var(--border);
         cursor: pointer;
-        transition: background-color var(--transition-fast);
         order: 1;
         margin-bottom: var(--spacing-sm);
+        touch-action: manipulation;
     }
 
-    .filterHeader:hover {
-        background: var(--hover-bg);
-    }
+    @media (hover: hover) {
+        .filterHeader {
+            transition: background-color var(--transition-fast);
+        }
 
-    .filterHeader:active {
-        transform: scale(0.98);
+        .filterHeader:hover {
+            background: var(--hover-bg);
+        }
+
+        .filterHeader:active {
+            transform: scale(0.98);
+        }
     }
 
     /* Order 2: Type Controls (Below header, ALWAYS VISIBLE) */

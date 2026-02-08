@@ -5,13 +5,19 @@
     background: var(--card-bg);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
-    transition: all var(--transition-base);
     animation: fadeIn var(--transition-slow) ease-out;
+    touch-action: manipulation;
 }
 
-.item:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .item {
+        transition: all var(--transition-base);
+    }
+
+    .item:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
 }
 
 .categoryBadge {
@@ -93,19 +99,25 @@
     cursor: pointer;
     padding: var(--spacing-sm);
     border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
 }
 
-.actionButton:hover {
-    background: var(--hover-bg);
-    color: var(--primary-500);
-}
+@media (hover: hover) {
+    .actionButton {
+        transition: all var(--transition-fast);
+    }
 
-.deleteButton:hover {
-    color: var(--error);
+    .actionButton:hover {
+        background: var(--hover-bg);
+        color: var(--primary-500);
+    }
+
+    .deleteButton:hover {
+        color: var(--error);
+    }
 }
 
 @media (max-width: 768px) {

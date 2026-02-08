@@ -3,14 +3,20 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
     box-shadow: var(--shadow-md);
-    transition: all var(--transition-base);
 }
 
-.hoverable:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .card {
+        transition: all var(--transition-base);
+    }
+
+    .hoverable:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+    }
 }
 
 .clickable {
     cursor: pointer;
+    touch-action: manipulation;
 }
