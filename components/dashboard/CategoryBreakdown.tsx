@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Expense, TransactionType } from '@/lib/types';
 import { calculateCategoryTotals } from '@/lib/utils/calculations';
@@ -28,6 +28,11 @@ export default function CategoryBreakdown({
 }: CategoryBreakdownProps) {
     const { settings } = useSettingsContext();
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+    const [isTouch, setIsTouch] = useState(false);
+
+    useEffect(() => {
+        setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    }, []);
 
     // Calculate data based on filter type
     const chartData = useMemo(() => {
@@ -188,10 +193,12 @@ export default function CategoryBreakdown({
                                         );
                                     })}
                                 </Pie>
-                                <Tooltip
-                                    content={() => null}
-                                    cursor={false}
-                                />
+                                {!isTouch && (
+                                    <Tooltip
+                                        content={() => null}
+                                        cursor={false}
+                                    />
+                                )}
                             </PieChart>
                         </ResponsiveContainer>
 

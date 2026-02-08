@@ -177,13 +177,27 @@ a {
   }
 }
 
+/* Prevent sticky hover on mobile */
+@media (hover: none) {
+
+  button:hover,
+  a:hover,
+  .card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
 /* ===== Buttons ===== */
 button {
   font-family: inherit;
   cursor: pointer;
   border: none;
   outline: none;
+  outline: none;
   transition: all var(--transition-base);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button:disabled {
