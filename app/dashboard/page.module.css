@@ -76,8 +76,8 @@
   /* Faster tap response on mobile */
 }
 
-/* Only apply hover/active transforms and transitions on devices that support hover (not touch devices) */
-@media (hover: hover) {
+/* Only apply hover/active transforms and transitions on devices with a real mouse */
+@media (hover: hover) and (pointer: fine) {
   .fab {
     transition: all var(--transition-base);
   }
@@ -89,13 +89,6 @@
 
   .fab:active {
     transform: scale(0.95);
-  }
-}
-
-/* Disable transitions on touch devices for instant feedback */
-@media (hover: none) {
-  .fab {
-    transition: none !important;
   }
 }
 

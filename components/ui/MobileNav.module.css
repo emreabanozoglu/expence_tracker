@@ -7,15 +7,22 @@
   color: var(--foreground);
   cursor: pointer;
   border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.hamburger:hover {
-  background: var(--hover-bg);
-}
+@media (hover: hover) and (pointer: fine) {
+  .hamburger {
+    transition: background-color var(--transition-fast);
+  }
 
-.hamburger:active {
-  transform: scale(0.95);
+  .hamburger:hover {
+    background: var(--hover-bg);
+  }
+
+  .hamburger:active {
+    transform: scale(0.95);
+  }
 }
 
 /* Backdrop */
@@ -81,11 +88,17 @@
   color: var(--foreground);
   cursor: pointer;
   border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
+  touch-action: manipulation;
 }
 
-.closeButton:hover {
-  background: var(--hover-bg);
+@media (hover: hover) and (pointer: fine) {
+  .closeButton {
+    transition: background-color var(--transition-fast);
+  }
+
+  .closeButton:hover {
+    background: var(--hover-bg);
+  }
 }
 
 /* Drawer Content */
@@ -117,11 +130,16 @@
   align-items: center;
   padding: var(--spacing-lg);
   border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
 }
 
-.themeToggleWrapper:hover {
-  background: var(--hover-bg);
+@media (hover: hover) and (pointer: fine) {
+  .themeToggleWrapper {
+    transition: background-color var(--transition-fast);
+  }
+
+  .themeToggleWrapper:hover {
+    background: var(--hover-bg);
+  }
 }
 
 .themeLabel {

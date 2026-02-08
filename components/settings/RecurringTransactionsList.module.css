@@ -60,12 +60,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
+@media (hover: hover) and (pointer: fine) {
+    .item {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
 }
 
 .info {
@@ -131,31 +136,40 @@
     cursor: pointer;
     padding: 0.5rem;
     border-radius: var(--radius-sm);
-    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.editButton:hover {
-    color: var(--primary-500);
-    background-color: var(--surface-hover);
+    touch-action: manipulation;
 }
 
 .deleteButton {
     margin-left: 0;
 }
 
-.deleteButton:hover {
-    color: var(--error);
-    background-color: var(--error-bg, hsla(0, 84%, 60%, 0.1));
+@media (hover: hover) and (pointer: fine) {
+    .editButton,
+    .deleteButton {
+        transition: all 0.2s;
+    }
+
+    .editButton:hover {
+        color: var(--primary-500);
+        background-color: var(--surface-hover);
+    }
+
+    .deleteButton:hover {
+        color: var(--error);
+        background-color: var(--error-bg, hsla(0, 84%, 60%, 0.1));
+    }
 }
 
 @media (prefers-color-scheme: dark) {
     .editButton {
         color: var(--gray-400);
     }
+}
 
+@media (hover: hover) and (pointer: fine) and (prefers-color-scheme: dark) {
     .editButton:hover {
         color: var(--primary-400);
         background-color: var(--gray-800);

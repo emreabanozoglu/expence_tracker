@@ -53,21 +53,14 @@
 }
 
 /* Only apply transitions on hover-capable devices */
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .button {
         transition: all 0.2s ease;
     }
 }
 
-/* Disable transitions on touch devices for instant feedback */
-@media (hover: none) {
-    .button {
-        transition: none !important;
-    }
-}
-
 /* Only apply hover effects on devices that support hover (not touch devices) */
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .button:hover {
         color: var(--foreground);
         background: rgba(0, 0, 0, 0.05);
@@ -87,7 +80,7 @@
     /* Use gray-100 which is redefined as dark in globals */
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     :global([data-theme="dark"]) .button:hover {
         background: var(--gray-200);
     }

@@ -81,11 +81,16 @@
     border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s;
 }
 
-.acceptButton:hover {
-    background-color: #0056b3;
+@media (hover: hover) and (pointer: fine) {
+    .acceptButton {
+        transition: background-color 0.2s;
+    }
+
+    .acceptButton:hover {
+        background-color: #0056b3;
+    }
 }
 
 @media (prefers-color-scheme: dark) {

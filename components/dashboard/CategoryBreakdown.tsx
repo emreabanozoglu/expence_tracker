@@ -174,8 +174,8 @@ export default function CategoryBreakdown({
                                     outerRadius={110}
                                     paddingAngle={3}
                                     dataKey="value"
-                                    onMouseEnter={(_, index) => setFocusedIndex(index)}
-                                    onMouseLeave={() => setFocusedIndex(null)}
+                                    onMouseEnter={isTouch ? undefined : (_, index) => setFocusedIndex(index)}
+                                    onMouseLeave={isTouch ? undefined : () => setFocusedIndex(null)}
                                 >
                                     {chartData.map((entry, index) => {
                                         const { color } = getCategoryStyles(entry.name);
@@ -225,8 +225,8 @@ export default function CategoryBreakdown({
                                 <div
                                     key={item.name}
                                     className={`${styles.legendItem} ${isSelected ? styles.selected : ''}`}
-                                    onMouseEnter={() => setFocusedIndex(index)}
-                                    onMouseLeave={() => setFocusedIndex(null)}
+                                    onMouseEnter={isTouch ? undefined : () => setFocusedIndex(index)}
+                                    onMouseLeave={isTouch ? undefined : () => setFocusedIndex(null)}
                                     onClick={() => handleCategoryClick(item.name)}
                                     style={{
                                         borderColor: isFocused || isSelected ? 'var(--border)' : 'transparent',

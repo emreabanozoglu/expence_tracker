@@ -71,15 +71,21 @@
     cursor: pointer;
     padding: var(--spacing-sm);
     border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
 }
 
-.closeButton:hover {
-    background: var(--hover-bg);
-    color: var(--foreground);
+@media (hover: hover) and (pointer: fine) {
+    .closeButton {
+        transition: all var(--transition-fast);
+    }
+
+    .closeButton:hover {
+        background: var(--hover-bg);
+        color: var(--foreground);
+    }
 }
 
 .content {

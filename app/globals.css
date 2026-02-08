@@ -129,7 +129,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body {
+    transition: background-color var(--transition-base), color var(--transition-base);
+  }
 }
 
 /* ===== Typography ===== */
@@ -168,49 +173,32 @@ p {
 a {
   color: var(--primary-500);
   text-decoration: none;
-  transition: color var(--transition-fast);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
+  a {
+    transition: color var(--transition-fast);
+  }
+
   a:hover {
     color: var(--primary-600);
-  }
-}
-
-/* Prevent sticky hover on mobile */
-@media (hover: none) {
-
-  button:hover,
-  a:hover,
-  .card:hover {
-    transform: none !important;
-    box-shadow: none !important;
   }
 }
 
 /* ===== Mobile Touch Optimization ===== */
 /* Apply touch-action: manipulation to all interactive elements globally */
 /* This disables double-tap-to-zoom and the 300ms tap delay */
-@media (pointer: coarse) {
-
-  a,
-  button,
-  [role="button"],
-  input,
-  select,
-  textarea,
-  label,
-  [onclick],
-  [tabindex] {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Disable transitions that can cause perceptual delays on touch */
-  * {
-    transition-duration: 0s !important;
-    animation-duration: 0.1s !important;
-  }
+a,
+button,
+[role="button"],
+input,
+select,
+textarea,
+label,
+[onclick],
+[tabindex] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ===== Buttons ===== */
@@ -219,22 +207,16 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
-  outline: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* Only apply transitions on devices with hover capability */
-@media (hover: hover) {
+/* Only apply transitions on devices with a real mouse/trackpad */
+@media (hover: hover) and (pointer: fine) {
   button {
     transition: all var(--transition-base);
-  }
-}
-
-/* On touch devices, disable transitions for instant feedback */
-@media (hover: none) {
-  button {
-    transition: none !important;
   }
 }
 
@@ -250,7 +232,6 @@ select {
   font-family: inherit;
   font-size: 1rem;
   outline: none;
-  transition: all var(--transition-base);
 }
 
 input:focus,
@@ -272,10 +253,13 @@ select:focus {
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   box-shadow: var(--shadow-md);
-  transition: box-shadow var(--transition-base);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
+  .card {
+    transition: box-shadow var(--transition-base);
+  }
+
   .card:hover {
     box-shadow: var(--shadow-lg);
   }

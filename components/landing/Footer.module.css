@@ -56,13 +56,18 @@
     align-items: center;
     justify-content: center;
     color: var(--gray-600);
-    transition: all var(--transition-base);
 }
 
-.social a:hover {
-    background: var(--primary-500);
-    color: white;
-    transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+    .social a {
+        transition: all var(--transition-base);
+    }
+
+    .social a:hover {
+        background: var(--primary-500);
+        color: white;
+        transform: translateY(-2px);
+    }
 }
 
 .links {
@@ -98,12 +103,17 @@
 .linkList li a {
     font-size: 0.9375rem;
     color: var(--gray-600);
-    transition: color var(--transition-fast);
     display: inline-block;
 }
 
-.linkList li a:hover {
-    color: var(--primary-500);
+@media (hover: hover) and (pointer: fine) {
+    .linkList li a {
+        transition: color var(--transition-fast);
+    }
+
+    .linkList li a:hover {
+        color: var(--primary-500);
+    }
 }
 
 .bottom {

@@ -24,13 +24,19 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s ease;
     position: relative;
     text-align: left;
+    touch-action: manipulation;
 }
 
-.card:hover {
-    border-color: var(--primary-400);
+@media (hover: hover) and (pointer: fine) {
+    .card {
+        transition: all 0.2s ease;
+    }
+
+    .card:hover {
+        border-color: var(--primary-400);
+    }
 }
 
 .card.selected {

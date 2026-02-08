@@ -71,17 +71,23 @@
   /* Hidden by default on desktop, shown in media query */
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-base);
   z-index: 1000;
-}
-
-.fab:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+  touch-action: manipulation;
 }
 
 .fab:active {
   transform: scale(0.95);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fab {
+    transition: all var(--transition-base);
+  }
+
+  .fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+  }
 }
 
 .main {

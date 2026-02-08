@@ -117,12 +117,18 @@
     border: none;
     background: transparent;
     color: var(--muted-foreground);
-    transition: all 0.2s;
+    touch-action: manipulation;
 }
 
-.typeButton:hover {
-    color: var(--foreground);
-    background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+    .typeButton {
+        transition: all 0.2s;
+    }
+
+    .typeButton:hover {
+        color: var(--foreground);
+        background: var(--surface);
+    }
 }
 
 .activeExpense {
@@ -148,13 +154,19 @@
     background-color: var(--surface-hover);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: background-color 0.2s;
     margin-bottom: 0.5rem;
     border: 1px solid var(--border);
+    touch-action: manipulation;
 }
 
-.toggleWrapper:hover {
-    background-color: var(--surface-active);
+@media (hover: hover) and (pointer: fine) {
+    .toggleWrapper {
+        transition: background-color 0.2s;
+    }
+
+    .toggleWrapper:hover {
+        background-color: var(--surface-active);
+    }
 }
 
 .toggleLabel {
@@ -176,11 +188,16 @@
     align-items: center;
     color: var(--text-tertiary);
     cursor: default;
-    transition: color 0.2s;
 }
 
-.infoIcon:hover {
-    color: var(--primary-500);
+@media (hover: hover) and (pointer: fine) {
+    .infoIcon {
+        transition: color 0.2s;
+    }
+
+    .infoIcon:hover {
+        color: var(--primary-500);
+    }
 }
 
 .toggleSubLabel {

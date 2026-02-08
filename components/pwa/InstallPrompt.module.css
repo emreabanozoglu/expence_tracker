@@ -48,12 +48,8 @@
     border-radius: var(--radius-sm);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
     white-space: nowrap;
-}
-
-.button:hover {
-    background: var(--primary-700);
+    touch-action: manipulation;
 }
 
 .iosModal {
@@ -68,7 +64,20 @@
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
     z-index: 100;
     transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .button {
+        transition: all 0.2s;
+    }
+
+    .button:hover {
+        background: var(--primary-700);
+    }
+
+    .iosModal {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 }
 
 .iosModal.open {
@@ -112,10 +121,15 @@
     z-index: 99;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s;
 }
 
 .overlay.open {
     opacity: 1;
     pointer-events: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .overlay {
+        transition: opacity 0.3s;
+    }
 }

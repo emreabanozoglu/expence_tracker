@@ -31,11 +31,16 @@
     align-items: center;
     gap: var(--spacing-sm);
     text-decoration: none;
-    transition: opacity var(--transition-fast);
 }
 
-.brand:hover {
-    opacity: 0.8;
+@media (hover: hover) and (pointer: fine) {
+    .brand {
+        transition: opacity var(--transition-fast);
+    }
+
+    .brand:hover {
+        opacity: 0.8;
+    }
 }
 
 .brandName {
@@ -55,11 +60,16 @@
     font-weight: 500;
     color: var(--gray-600);
     text-decoration: none;
-    transition: color var(--transition-fast);
 }
 
-.navLink:hover {
-    color: var(--primary-500);
+@media (hover: hover) and (pointer: fine) {
+    .navLink {
+        transition: color var(--transition-fast);
+    }
+
+    .navLink:hover {
+        color: var(--primary-500);
+    }
 }
 
 @media (max-width: 768px) {

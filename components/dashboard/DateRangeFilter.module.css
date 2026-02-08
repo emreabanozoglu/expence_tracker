@@ -40,7 +40,7 @@
     justify-content: center;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .toggleButton {
         transition: color var(--transition-fast);
     }
@@ -82,7 +82,7 @@
     touch-action: manipulation;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .button {
         transition: all var(--transition-fast);
     }
@@ -117,12 +117,17 @@
     color: var(--foreground);
     cursor: pointer;
     appearance: none;
-    transition: all var(--transition-fast);
 }
 
-.select:hover {
-    border-color: var(--primary-500);
-    background: var(--hover-bg);
+@media (hover: hover) and (pointer: fine) {
+    .select {
+        transition: all var(--transition-fast);
+    }
+
+    .select:hover {
+        border-color: var(--primary-500);
+        background: var(--hover-bg);
+    }
 }
 
 .select:focus {
@@ -165,7 +170,6 @@
     background: transparent;
     color: var(--gray-500);
     cursor: pointer;
-    transition: all 0.2s ease;
     flex: 1;
     /* Equal width in segmented control */
     display: flex;
@@ -173,9 +177,15 @@
     justify-content: center;
 }
 
-.typeButton:hover {
-    color: var(--foreground);
-    background: rgba(0, 0, 0, 0.05);
+@media (hover: hover) and (pointer: fine) {
+    .typeButton {
+        transition: all 0.2s ease;
+    }
+
+    .typeButton:hover {
+        color: var(--foreground);
+        background: rgba(0, 0, 0, 0.05);
+    }
 }
 
 .typeButton.activeType {
@@ -210,7 +220,7 @@
         touch-action: manipulation;
     }
 
-    @media (hover: hover) {
+    @media (hover: hover) and (pointer: fine) {
         .filterHeader {
             transition: background-color var(--transition-fast);
         }

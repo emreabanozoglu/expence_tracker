@@ -30,10 +30,13 @@
     outline: none;
     padding: 4px;
     border-radius: 4px;
+    touch-action: manipulation;
 }
 
-.select:hover {
-    background: var(--gray-100);
+@media (hover: hover) and (pointer: fine) {
+    .select:hover {
+        background: var(--gray-100);
+    }
 }
 
 .info {
@@ -57,17 +60,23 @@
     color: var(--gray-500);
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s;
-}
-
-.button:hover:not(:disabled) {
-    background: var(--gray-100);
-    color: var(--foreground);
+    touch-action: manipulation;
 }
 
 .button:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .button {
+        transition: all 0.2s;
+    }
+
+    .button:hover:not(:disabled) {
+        background: var(--gray-100);
+        color: var(--foreground);
+    }
 }
 
 @media (max-width: 600px) {

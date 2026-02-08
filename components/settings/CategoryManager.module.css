@@ -29,12 +29,18 @@
     font-size: 0.9375rem;
     font-weight: 500;
     color: var(--gray-500);
-    transition: all 0.2s;
     margin-bottom: -1px;
+    touch-action: manipulation;
 }
 
-.tab:hover {
-    color: var(--foreground);
+@media (hover: hover) and (pointer: fine) {
+    .tab {
+        transition: all 0.2s;
+    }
+
+    .tab:hover {
+        color: var(--foreground);
+    }
 }
 
 .activeTab {
@@ -81,12 +87,17 @@
     background: var(--hover-bg);
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
-    transition: all var(--transition-fast);
 }
 
-.categoryCard:hover {
-    border-color: var(--primary-500);
-    box-shadow: var(--shadow-sm);
+@media (hover: hover) and (pointer: fine) {
+    .categoryCard {
+        transition: all var(--transition-fast);
+    }
+
+    .categoryCard:hover {
+        border-color: var(--primary-500);
+        box-shadow: var(--shadow-sm);
+    }
 }
 
 .categoryInfo {
@@ -142,21 +153,27 @@
     border-radius: var(--radius-sm);
     color: var(--foreground);
     cursor: pointer;
-    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
 }
 
-.actionButton:hover {
-    background: var(--card-bg);
-    border-color: var(--primary-500);
-}
+@media (hover: hover) and (pointer: fine) {
+    .actionButton {
+        transition: all var(--transition-fast);
+    }
 
-.deleteButton:hover {
-    background: var(--error);
-    border-color: var(--error);
-    color: white;
+    .actionButton:hover {
+        background: var(--card-bg);
+        border-color: var(--primary-500);
+    }
+
+    .deleteButton:hover {
+        background: var(--error);
+        border-color: var(--error);
+        color: white;
+    }
 }
 
 @media (max-width: 768px) {

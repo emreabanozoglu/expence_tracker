@@ -9,13 +9,7 @@
     background: var(--card-bg);
     border: 1px solid var(--border);
     cursor: pointer;
-    transition: all var(--transition-base);
-}
-
-.toggle:hover {
-    background: var(--hover-bg);
-    border-color: var(--primary-500);
-    transform: scale(1.05);
+    touch-action: manipulation;
 }
 
 .toggle:active {
@@ -27,7 +21,22 @@
     align-items: center;
     justify-content: center;
     color: var(--foreground);
-    transition: all var(--transition-base);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .toggle {
+        transition: all var(--transition-base);
+    }
+
+    .toggle:hover {
+        background: var(--hover-bg);
+        border-color: var(--primary-500);
+        transform: scale(1.05);
+    }
+
+    .iconWrapper {
+        transition: all var(--transition-base);
+    }
 }
 
 .icon {

@@ -5,7 +5,7 @@
     box-shadow: var(--shadow-md);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .card {
         transition: all var(--transition-base);
     }

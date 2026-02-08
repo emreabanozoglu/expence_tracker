@@ -56,21 +56,14 @@
 }
 
 /* Only apply transitions on hover-capable devices */
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .button {
         transition: all 0.2s ease;
     }
 }
 
-/* Disable transitions on touch devices for instant feedback */
-@media (hover: none) {
-    .button {
-        transition: none !important;
-    }
-}
-
 /* Only apply hover effects on devices that support hover (not touch devices) */
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .button:hover {
         color: var(--foreground);
         background: rgba(0, 0, 0, 0.05);
@@ -88,7 +81,7 @@
 /* Dark mode adjustments using data-theme attribute */
 /* Removed incorrect overrides since gray-100 handles theme switching correctly via globals */
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     :global([data-theme="dark"]) .button:hover {
         background: var(--gray-700);
     }

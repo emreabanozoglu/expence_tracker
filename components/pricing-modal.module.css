@@ -15,14 +15,17 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     padding: var(--spacing-xl);
-    transition: all var(--transition-base);
     min-width: 280px;
-    /* Ensure minimum width */
 }
 
-/* Hover effect for non-highlighted cards */
-.card:not(.highlight):hover {
-    border-color: var(--primary-200);
+@media (hover: hover) and (pointer: fine) {
+    .card {
+        transition: all var(--transition-base);
+    }
+
+    .card:not(.highlight):hover {
+        border-color: var(--primary-200);
+    }
 }
 
 .highlight {

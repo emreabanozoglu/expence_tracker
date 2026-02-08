@@ -27,11 +27,16 @@
     font-size: 0.875rem;
     font-weight: 500;
     margin-bottom: var(--spacing-md);
-    transition: color var(--transition-fast);
 }
 
-.backButton:hover {
-    color: var(--primary-500);
+@media (hover: hover) and (pointer: fine) {
+    .backButton {
+        transition: color var(--transition-fast);
+    }
+
+    .backButton:hover {
+        color: var(--primary-500);
+    }
 }
 
 .title {
@@ -160,8 +165,10 @@
         cursor: pointer;
     }
 
-    .mobileBackButton:hover {
-        color: var(--primary-500);
+    @media (hover: hover) and (pointer: fine) {
+        .mobileBackButton:hover {
+            color: var(--primary-500);
+        }
     }
 
     .sidebar {

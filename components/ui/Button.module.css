@@ -10,10 +10,13 @@
     outline: none;
     font-family: inherit;
     touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-/* Only apply transitions on hover-capable devices */
-@media (hover: hover) {
+/* Only apply transitions on devices with a real mouse/trackpad */
+@media (hover: hover) and (pointer: fine) {
     .button {
         transition: all var(--transition-base);
     }
@@ -46,7 +49,7 @@
     color: white;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .primary:hover:not(:disabled) {
         background: var(--primary-600);
         transform: translateY(-1px);
@@ -63,7 +66,7 @@
     color: var(--foreground);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .secondary:hover:not(:disabled) {
         background: var(--gray-300);
         transform: translateY(-1px);
@@ -75,7 +78,7 @@
     color: white;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .danger:hover:not(:disabled) {
         background: hsl(0, 70%, 45%);
         transform: translateY(-1px);
@@ -89,7 +92,7 @@
     border: 1px solid var(--border);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .ghost:hover:not(:disabled) {
         background: var(--hover-bg);
     }

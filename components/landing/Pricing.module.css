@@ -53,14 +53,19 @@
     border-radius: var(--radius-xl);
     padding: var(--spacing-2xl);
     position: relative;
-    transition: all var(--transition-base);
     display: flex;
     flex-direction: column;
 }
 
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-xl);
+@media (hover: hover) and (pointer: fine) {
+    .card {
+        transition: all var(--transition-base);
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-xl);
+    }
 }
 
 .popular {

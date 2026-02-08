@@ -39,12 +39,17 @@
     border: none;
     background: transparent;
     color: var(--gray-500);
-    transition: all 0.2s;
 }
 
-.typeButton:hover {
-    color: var(--foreground);
-    background: var(--surface);
+@media (hover: hover) and (pointer: fine) {
+    .typeButton {
+        transition: all 0.2s;
+    }
+
+    .typeButton:hover {
+        color: var(--foreground);
+        background: var(--surface);
+    }
 }
 
 .activeType {
@@ -112,17 +117,23 @@
     background: var(--hover-bg);
     border: 1px solid transparent;
     cursor: pointer;
-    transition: all var(--transition-fast);
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
-    /* Prevent squashing when list is long */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.legendItem:hover {
-    border-color: var(--border);
-    transform: translateX(4px);
-    box-shadow: var(--shadow-sm);
+@media (hover: hover) and (pointer: fine) {
+    .legendItem {
+        transition: all var(--transition-fast);
+    }
+
+    .legendItem:hover {
+        border-color: var(--border);
+        transform: translateX(4px);
+        box-shadow: var(--shadow-sm);
+    }
 }
 
 .itemIcon {
@@ -208,13 +219,19 @@
     font-size: 0.75rem;
     color: var(--gray-500);
     cursor: pointer;
-    transition: all 0.2s;
+    touch-action: manipulation;
 }
 
-.clearButton:hover {
-    background: var(--gray-100);
-    color: var(--foreground);
-    border-color: var(--gray-400);
+@media (hover: hover) and (pointer: fine) {
+    .clearButton {
+        transition: all 0.2s;
+    }
+
+    .clearButton:hover {
+        background: var(--gray-100);
+        color: var(--foreground);
+        border-color: var(--gray-400);
+    }
 }
 
 .selected {

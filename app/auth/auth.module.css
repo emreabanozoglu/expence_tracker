@@ -140,7 +140,6 @@
     background: var(--input-bg);
     color: var(--foreground);
     font-size: 1rem;
-    transition: all 0.2s ease;
 }
 
 .input:focus {
@@ -161,14 +160,7 @@
     font-size: 1rem;
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-}
-
-.button:hover:not(:disabled) {
-    background: var(--primary-700);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
 }
 
 .button:disabled {
@@ -194,8 +186,24 @@
     font-size: inherit;
 }
 
-.toggleButton:hover {
-    text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+    .input {
+        transition: all 0.2s ease;
+    }
+
+    .button {
+        transition: all 0.2s ease;
+    }
+
+    .button:hover:not(:disabled) {
+        background: var(--primary-700);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+    }
+
+    .toggleButton:hover {
+        text-decoration: underline;
+    }
 }
 
 .toggleButton:focus {
