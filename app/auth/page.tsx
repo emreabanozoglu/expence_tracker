@@ -29,7 +29,7 @@ export default function AuthPage() {
             if (result.error) {
                 setError(result.error.message);
             } else {
-                router.push('/');
+                router.push('/dashboard');
             }
         } catch (err) {
             setError('An unexpected error occurred');
@@ -59,7 +59,7 @@ export default function AuthPage() {
                 const { data: { session } } = await supabase.auth.getSession();
 
                 if (session) {
-                    router.push('/');
+                    router.push('/dashboard');
                 } else {
                     setError('Check your email to confirm your account!');
                 }
