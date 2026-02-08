@@ -52,11 +52,16 @@
     white-space: nowrap;
     min-width: 60px;
     /* concise width */
+    touch-action: manipulation;
+    /* Faster tap response on mobile */
 }
 
-.button:hover {
-    color: var(--foreground);
-    background: rgba(0, 0, 0, 0.05);
+/* Only apply hover effects on devices that support hover (not touch devices) */
+@media (hover: hover) {
+    .button:hover {
+        color: var(--foreground);
+        background: rgba(0, 0, 0, 0.05);
+    }
 }
 
 .button.active {
@@ -70,8 +75,10 @@
 /* Dark mode adjustments using data-theme attribute */
 /* Removed incorrect overrides since gray-100 handles theme switching correctly via globals */
 
-:global([data-theme="dark"]) .button:hover {
-    background: var(--gray-700);
+@media (hover: hover) {
+    :global([data-theme="dark"]) .button:hover {
+        background: var(--gray-700);
+    }
 }
 
 :global([data-theme="dark"]) .button.active {

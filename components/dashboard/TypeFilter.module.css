@@ -49,11 +49,16 @@
     align-items: center;
     justify-content: center;
     white-space: nowrap;
+    touch-action: manipulation;
+    /* Faster tap response on mobile */
 }
 
-.button:hover {
-    color: var(--foreground);
-    background: rgba(0, 0, 0, 0.05);
+/* Only apply hover effects on devices that support hover (not touch devices) */
+@media (hover: hover) {
+    .button:hover {
+        color: var(--foreground);
+        background: rgba(0, 0, 0, 0.05);
+    }
 }
 
 .button.active {
@@ -69,8 +74,10 @@
     /* Use gray-100 which is redefined as dark in globals */
 }
 
-:global([data-theme="dark"]) .button:hover {
-    background: var(--gray-200);
+@media (hover: hover) {
+    :global([data-theme="dark"]) .button:hover {
+        background: var(--gray-200);
+    }
 }
 
 :global([data-theme="dark"]) .button.active {

@@ -73,15 +73,20 @@
   justify-content: center;
   transition: all var(--transition-base);
   z-index: 1000;
+  touch-action: manipulation;
+  /* Faster tap response on mobile */
 }
 
-.fab:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
-}
+/* Only apply hover/active transforms on devices that support hover (not touch devices) */
+@media (hover: hover) {
+  .fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+  }
 
-.fab:active {
-  transform: scale(0.95);
+  .fab:active {
+    transform: scale(0.95);
+  }
 }
 
 .main {
