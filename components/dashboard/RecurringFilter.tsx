@@ -3,6 +3,7 @@
 import React from 'react';
 import styles from './RecurringFilter.module.css';
 import { Repeat } from 'lucide-react';
+import { TouchButton } from '../ui/TouchButton';
 
 export type RecurringFilterType = 'all' | 'recurring' | 'non-recurring';
 
@@ -23,13 +24,13 @@ export default function RecurringFilter({ selected, onSelect }: RecurringFilterP
             <Repeat size={20} className={styles.icon} />
             <div className={styles.buttonContainer}>
                 {filters.map((option) => (
-                    <button
+                    <TouchButton
                         key={option.value}
                         className={`${styles.button} ${selected === option.value ? styles.active : ''}`}
-                        onClick={() => onSelect(option.value)}
+                        onTap={() => onSelect(option.value)}
                     >
                         {option.label}
-                    </button>
+                    </TouchButton>
                 ))}
             </div>
         </div>

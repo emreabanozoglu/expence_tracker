@@ -20,6 +20,7 @@ import PaginationControls from '@/components/ui/PaginationControls';
 import Modal from '@/components/ui/Modal';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import { TouchButton } from '@/components/ui/TouchButton';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import MobileNav from '@/components/ui/MobileNav';
 import BudgetGoalsModal from '@/components/dashboard/BudgetGoalsModal';
@@ -360,15 +361,16 @@ export default function Home() {
           </div>
         </main>
 
+
         {/* Floating Action Button - Always visible */}
-        <button
+        <TouchButton
           className={styles.fab}
-          onClick={handleAddExpense}
+          onTap={handleAddExpense}
           data-testid="fab-add-expense-button"
           aria-label="Add Transaction"
         >
           <Plus size={24} />
-        </button>
+        </TouchButton>
 
         {/* Budget Goals Modal */}
         <BudgetGoalsModal

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import styles from './TypeFilter.module.css';
-
 import { Filter } from 'lucide-react';
+import { TouchButton } from '../ui/TouchButton';
 
 interface TypeFilterProps {
     selected: 'all' | 'expense' | 'income';
@@ -22,13 +22,13 @@ export default function TypeFilter({ selected, onSelect }: TypeFilterProps) {
             <Filter size={20} className={styles.icon} />
             <div className={styles.buttonContainer}>
                 {filters.map((option) => (
-                    <button
+                    <TouchButton
                         key={option.value}
                         className={`${styles.button} ${selected === option.value ? styles.active : ''}`}
-                        onClick={() => onSelect(option.value)}
+                        onTap={() => onSelect(option.value)}
                     >
                         {option.label}
-                    </button>
+                    </TouchButton>
                 ))}
             </div>
         </div>
