@@ -1,7 +1,6 @@
 // Reusable Button Component
 
 import React from 'react';
-import styles from './Button.module.css';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -18,11 +17,28 @@ export default function Button({
     className = '',
     ...props
 }: ButtonProps) {
+    const baseClasses = 'btn';
+
+    // Map internal variants to DaisyUI classes
+    const variantClasses = {
+        primary: 'btn-primary text-white',
+        secondary: 'btn-neutral',
+        danger: 'btn-error text-white',
+        ghost: 'btn-ghost',
+    };
+
+    // Map internal sizes to DaisyUI classes
+    const sizeClasses = {
+        sm: 'btn-sm',
+        md: 'btn-md',
+        lg: 'btn-lg',
+    };
+
     const classes = [
-        styles.button,
-        styles[variant],
-        styles[size],
-        fullWidth ? styles.fullWidth : '',
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        fullWidth ? 'w-full' : '',
         className,
     ]
         .filter(Boolean)

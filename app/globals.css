@@ -1,4 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* ===== Mobile Touch Optimization ===== */
+@media (pointer: coarse) {
+
+  a,
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea,
+  label,
+  [onclick],
+  [tabindex] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 
 /* ===== CSS Variables & Design System ===== */
 :root {
@@ -108,11 +127,7 @@
 }
 
 /* ===== Base Styles ===== */
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+/* Base styles handled by Tailwind Preflight */
 
 html,
 body {
@@ -364,5 +379,34 @@ select:focus {
 
   100% {
     background-position: -200% 0;
+  }
+}
+
+/* ===== Landing Page Animations ===== */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

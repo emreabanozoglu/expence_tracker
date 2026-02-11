@@ -1,7 +1,6 @@
 // Reusable Select Component
 
 import React from 'react';
-import styles from './Select.module.css';
 
 export interface SelectOption {
     value: string;
@@ -27,15 +26,19 @@ export default function Select({
     const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
-        <div className={`${styles.selectWrapper} ${fullWidth ? styles.fullWidth : ''}`}>
+        <div className={`flex flex-col gap-1 ${fullWidth ? 'w-full' : ''}`}>
             {label && (
-                <label htmlFor={selectId} className={styles.label}>
+                <label htmlFor={selectId} className="text-sm font-semibold text-base-content mb-1">
                     {label}
                 </label>
             )}
             <select
                 id={selectId}
-                className={`${styles.select} ${error ? styles.error : ''} ${className}`}
+                className={`
+                    select select-bordered w-full transition-all text-base
+                    ${error ? 'select-error' : ''} 
+                    ${className}
+                `}
                 {...props}
             >
                 {options.map((option) => (
@@ -44,7 +47,7 @@ export default function Select({
                     </option>
                 ))}
             </select>
-            {error && <span className={styles.errorMessage}>{error}</span>}
+            {error && <span className="text-error text-sm mt-1">{error}</span>}
         </div>
     );
 }

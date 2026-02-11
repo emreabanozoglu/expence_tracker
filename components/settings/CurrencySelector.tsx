@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { CURRENCIES, getCurrencyByCode } from '@/lib/utils/currency';
-import styles from './CurrencySelector.module.css';
 
 export interface CurrencySelectorProps {
     selectedCurrency: string;
@@ -20,19 +19,19 @@ export default function CurrencySelector({ selectedCurrency, onCurrencyChange }:
     const currentCurrency = getCurrencyByCode(selectedCurrency);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h3 className={styles.title}>Currency</h3>
-                <p className={styles.description}>
+        <div className="w-full">
+            <div className="mb-4">
+                <h3 className="text-base font-bold text-base-content mb-1">Currency</h3>
+                <p className="text-sm text-base-content/60 m-0">
                     Choose your preferred currency for displaying amounts
                 </p>
             </div>
 
-            <div className={styles.content}>
+            <div className="flex flex-col gap-4">
                 <select
                     value={selectedCurrency}
                     onChange={handleChange}
-                    className={styles.select}
+                    className="select select-bordered w-full max-w-md text-base"
                     data-testid="currency-selector"
                 >
                     {CURRENCIES.map((currency) => (
@@ -42,9 +41,9 @@ export default function CurrencySelector({ selectedCurrency, onCurrencyChange }:
                     ))}
                 </select>
 
-                <div className={styles.preview}>
-                    <span className={styles.previewLabel}>Preview:</span>
-                    <span className={styles.previewAmount}>
+                <div className="flex items-center gap-3 p-3 bg-base-200/50 rounded-lg w-fit border border-base-200">
+                    <span className="text-sm font-medium text-base-content/60">Preview:</span>
+                    <span className="text-lg font-bold text-primary">
                         {currentCurrency.symbol}1,234.56
                     </span>
                 </div>

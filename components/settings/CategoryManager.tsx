@@ -7,7 +7,6 @@ import { CustomCategory, TransactionType } from '@/lib/types';
 import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 import Button from '@/components/ui/Button';
 import { Plus, Edit2, Trash2, RotateCcw } from 'lucide-react';
-import styles from './CategoryManager.module.css';
 
 export interface CategoryManagerProps {
     categories: CustomCategory[];
@@ -37,27 +36,11 @@ export default function CategoryManager({
         }
     };
 
-    // Filter categories based on active tab
-    // For Income: Include settings categories AND default income categories if not present
-    // For Expense: Include settings categories (defaults are already there usually)
     const displayedCategories = useMemo(() => {
         if (activeTab === 'expense') {
             return categories.filter(c => c.type === 'expense' || !c.type);
         } else {
-            // Get custom income categories
             const customIncome = categories.filter(c => c.type === 'income');
-
-            // If we have custom income categories (or migrated defaults), use them.
-            // Otherwise, show the defaults + any customs. 
-            // Since we don't save defaults to DB for income yet (unless new user), 
-            // we might want to show defaults if we don't have a matching name/ID in custom list?
-            // Simpler approach for now: Show everything in settings + Defaults that aren't in settings?
-            // Actually, best UX: If settings has NO income categories, show defaults. 
-            // If it has SOME, assume user is managing them?
-            // But 'settings.categories' for separate types is tricky if they weren't seeded.
-
-            // Hybrid approach: Custom categories from DB + Defaults that are "missing" from DB?
-            // Or just display Defaults if the DB list for income is empty.
             if (customIncome.length === 0) {
                 return DEFAULT_INCOME_CATEGORIES;
             }
@@ -66,19 +49,19 @@ export default function CategoryManager({
     }, [categories, activeTab]);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
+        <div className="w-full">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h3 className={styles.title}>Categories</h3>
-                    <p className={styles.description}>
+                    <h3 className="text-xl font-bold text-base-content mb-1">Categories</h3>
+                    <p className="text-sm text-base-content/60 m-0">
                         Manage your expense categories with custom colors and icons
                     </p>
                 </div>
-                <div className={styles.actions}>
+                <div className="flex gap-2 w-full md:w-auto">
                     <Button
                         variant="ghost"
                         onClick={handleReset}
-                        className={confirmReset ? styles.confirmButton : ''}
+                        className={confirmReset ? 'bg-warning text-warning-content hover:bg-warning-focus' : ''}
                         data-testid="reset-categories-button"
                     >
                         <RotateCcw size={18} />
@@ -91,41 +74,53 @@ export default function CategoryManager({
                 </div>
             </div>
 
-            <div className={styles.tabs}>
+            <div className="flex gap-1 border-b border-base-200 mb-6">
                 <button
-                    className={`${styles.tab} ${activeTab === 'expense' ? styles.activeTab : ''}`}
+                    className={`
+                        px-4 py-2 text-sm font-medium border-b-2 transition-colors
+                        ${activeTab === 'expense'
+                            ? 'text-primary border-primary'
+                            : 'text-base-content/60 border-transparent hover:text-base-content'
+                        }
+                    `}
                     onClick={() => setActiveTab('expense')}
                 >
                     Expense
                 </button>
                 <button
-                    className={`${styles.tab} ${activeTab === 'income' ? styles.activeTab : ''}`}
+                    className={`
+                        px-4 py-2 text-sm font-medium border-b-2 transition-colors
+                        ${activeTab === 'income'
+                            ? 'text-primary border-primary'
+                            : 'text-base-content/60 border-transparent hover:text-base-content'
+                        }
+                    `}
                     onClick={() => setActiveTab('income')}
                 >
                     Income
                 </button>
             </div>
 
-            <div className={styles.grid} data-testid="category-list">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="category-list">
                 {displayedCategories.map((category) => (
-                    <div key={category.id} className={styles.categoryCard} data-testid="category-card">
-                        <div className={styles.categoryInfo}>
+                    <div key={category.id} className="flex items-center justify-between p-4 bg-base-100 border border-base-200 rounded-xl hover:border-primary/50 transition-all shadow-sm" data-testid="category-card">
+                        <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
                             <div
-                                className={styles.categoryIcon}
+                                className="w-10 h-10 rounded-lg flex items-center justify-center text-xl shrink-0 text-white shadow-sm"
                                 style={{ backgroundColor: category.color }}
                             >
                                 {category.icon}
                             </div>
-                            <div className={styles.categoryDetails}>
-                                <div className={styles.categoryName}>{category.name}</div>
+                            <div className="flex flex-col overflow-hidden">
+                                <div className="font-bold text-base-content truncate">{category.name}</div>
                                 {category.isDefault && (
-                                    <span className={styles.defaultBadge}>Default</span>
+                                    <span className="text-xs text-base-content/50 font-medium">Default</span>
                                 )}
                             </div>
                         </div>
-                        <div className={styles.categoryActions}>
+                        <div className="flex gap-1 shrink-0">
                             <button
-                                className={styles.actionButton}
+                                className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-primary"
                                 onClick={() => onEditCategory(category)}
                                 aria-label="Edit category"
                                 data-testid="edit-category-button"
@@ -134,7 +129,7 @@ export default function CategoryManager({
                             </button>
                             {!category.isDefault && (
                                 <button
-                                    className={`${styles.actionButton} ${styles.deleteButton}`}
+                                    className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error hover:bg-error/10"
                                     onClick={() => onDeleteCategory(category.id)}
                                     aria-label="Delete category"
                                     data-testid="delete-category-button"

@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import styles from './page.module.css';
 
 // Components
 import SettingsSidebar from '@/components/settings/SettingsSidebar';
@@ -33,15 +32,14 @@ export default function SettingsPage() {
 
     if (isLoading) {
         return (
-            <div className={styles.loading} data-testid="settings-loading">
-                <div className={styles.spinner}></div>
-                <p>Loading settings...</p>
+            <div className="flex flex-col items-center justify-center min-h-screen gap-6" data-testid="settings-loading">
+                <span className="loading loading-spinner loading-lg text-primary"></span>
+                <p className="text-base-content/60 font-medium">Loading settings...</p>
             </div>
         );
     }
 
     const renderContent = () => {
-        // ... (switch case same as before)
         switch (activeTab) {
             case 'general':
                 return <GeneralSettings />;
@@ -52,7 +50,7 @@ export default function SettingsPage() {
             case 'recurring':
                 return (
                     <div>
-                        <h2 className={styles.sectionTitle}>Recurring Transactions</h2>
+                        <h2 className="text-xl font-bold mb-6 text-base-content">Recurring Transactions</h2>
                         <RecurringTransactionsList />
                     </div>
                 );
@@ -66,28 +64,28 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className={styles.page}>
-            <header className={styles.header}>
-                <div className={styles.headerContent}>
-                    <Link href="/" className={styles.backButton}>
+        <div className="min-h-screen bg-base-100 flex flex-col">
+            <header className="bg-base-100 border-b border-base-200 py-8">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 w-full">
+                    <Link href="/" className="inline-flex items-center gap-2 text-base-content/60 text-sm font-medium mb-4 hover:text-primary transition-colors">
                         <ArrowLeft size={20} />
                         Back to Dashboard
                     </Link>
-                    <h1 className={styles.title}>Settings</h1>
-                    <p className={styles.subtitle}>
+                    <h1 className="text-3xl font-bold mb-2 text-base-content">Settings</h1>
+                    <p className="text-base-content/60 text-base m-0">
                         Customize your expense tracker preferences
                     </p>
                 </div>
             </header>
 
-            <main className={styles.main}>
-                <div className={`${styles.layout} ${isMobileListOpen ? styles.mobileListOpen : styles.mobileDetailOpen}`}>
-                    <aside className={styles.sidebar}>
+            <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-8">
+                <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start">
+                    <aside className={`w-full md:w-60 shrink-0 md:sticky md:top-8 ${isMobileListOpen ? 'block' : 'hidden md:block'}`}>
                         <SettingsSidebar activeTab={activeTab} onTabChange={handleTabChange} />
                     </aside>
-                    <section className={styles.content}>
+                    <section className={`flex-1 min-w-0 animate-fade-in ${!isMobileListOpen ? 'block' : 'hidden md:block'}`}>
                         <button
-                            className={styles.mobileBackButton}
+                            className="md:hidden flex items-center gap-2 bg-transparent border-none text-base-content/60 text-sm font-medium p-0 mb-6 cursor-pointer hover:text-primary"
                             onClick={handleBackToMenu}
                         >
                             <ArrowLeft size={16} />

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useRecurringTransactions, RecurringTransaction } from '@/lib/hooks/useRecurringTransactions';
-import styles from './RecurringTransactionsList.module.css';
 import { Trash2, Calendar, Repeat, Edit2 } from 'lucide-react';
 import { formatCurrency, formatDateDynamic } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
@@ -39,15 +38,15 @@ export default function RecurringTransactionsList() {
     };
 
     if (isLoading) {
-        return <div className={styles.loading}>Loading recurring transactions...</div>;
+        return <div className="text-center p-8 text-base-content/60">Loading recurring transactions...</div>;
     }
 
     if (recurringTransactions.length === 0) {
         return (
-            <div className={styles.empty}>
-                <Repeat className={styles.emptyIcon} size={48} />
+            <div className="flex flex-col items-center gap-2 text-center p-8 text-base-content/60">
+                <Repeat className="text-base-content/40 mb-2 opacity-50" size={48} />
                 <p>No recurring transactions found.</p>
-                <span className={styles.emptyHint}>Add one when creating a new transaction!</span>
+                <span className="text-sm text-base-content/40">Add one when creating a new transaction!</span>
             </div>
         );
     }
@@ -65,56 +64,56 @@ export default function RecurringTransactionsList() {
 
     return (
         <>
-            <div className={styles.summary}>
-                <div className={styles.summaryItem}>
-                    <span className={styles.summaryValue}>{totalIncome}</span>
-                    <span className={`${styles.summaryValue} ${styles.income}`}>
+            <div className="flex flex-wrap gap-4 mb-6">
+                <div className="bg-base-100 border border-base-200 p-4 rounded-xl flex-1 min-w-[150px] flex flex-col items-center justify-center shadow-sm">
+                    <span className="text-2xl font-bold mb-1 block text-base-content">{totalIncome}</span>
+                    <span className="text-lg font-bold mb-1 block text-success">
                         {formatCurrency(totalIncomeValue, settings.currencySymbol)}
                     </span>
-                    <span className={styles.summaryLabel}>Total Recurring Incomes</span>
+                    <span className="text-sm text-base-content/60 font-medium text-center">Total Recurring Incomes</span>
                 </div>
-                <div className={styles.summaryItem}>
-                    <span className={styles.summaryValue}>{totalExpense}</span>
-                    <span className={`${styles.summaryValue} ${styles.expense}`}>
+                <div className="bg-base-100 border border-base-200 p-4 rounded-xl flex-1 min-w-[150px] flex flex-col items-center justify-center shadow-sm">
+                    <span className="text-2xl font-bold mb-1 block text-base-content">{totalExpense}</span>
+                    <span className="text-lg font-bold mb-1 block text-error">
                         {formatCurrency(totalExpenseValue, settings.currencySymbol)}
                     </span>
-                    <span className={styles.summaryLabel}>Total Recurring Expenses</span>
+                    <span className="text-sm text-base-content/60 font-medium text-center">Total Recurring Expenses</span>
                 </div>
             </div>
 
-            <div className={styles.list}>
+            <div className="flex flex-col gap-4">
                 {recurringTransactions.map(transaction => (
-                    <div key={transaction.id} className={styles.item} data-testid="recurring-item">
-                        <div className={styles.info}>
-                            <div className={styles.header}>
-                                <span className={styles.category}>{transaction.category}</span>
-                                <span className={`${styles.amount} ${transaction.type === 'income' ? styles.income : styles.expense}`}>
+                    <div key={transaction.id} className="bg-base-100 border border-base-200 rounded-xl p-4 flex justify-between items-center transition-all hover:-translate-y-0.5 hover:shadow-md" data-testid="recurring-item">
+                        <div className="flex-1">
+                            <div className="flex justify-between items-center mb-2 pr-4">
+                                <span className="font-semibold text-base text-base-content">{transaction.category}</span>
+                                <span className={`font-bold text-base ${transaction.type === 'income' ? 'text-success' : 'text-error'}`}>
                                     {transaction.type === 'income' ? '+' : '-'}
                                     {formatCurrency(transaction.amount, settings.currencySymbol)}
                                 </span>
                             </div>
-                            <div className={styles.details}>
-                                <span className={styles.detail}>
+                            <div className="flex gap-4 mb-1">
+                                <span className="flex items-center gap-1 text-xs text-base-content/60 capitalize">
                                     <Repeat size={14} /> {transaction.frequency}
                                 </span>
-                                <span className={styles.detail}>
+                                <span className="flex items-center gap-1 text-xs text-base-content/60 capitalize">
                                     <Calendar size={14} /> Next: {formatDateDynamic(transaction.next_run, settings.dateFormat)}
                                 </span>
                             </div>
                             {transaction.description && (
-                                <div className={styles.description}>{transaction.description}</div>
+                                <div className="italic text-sm text-base-content/60 mt-1">{transaction.description}</div>
                             )}
                         </div>
-                        <div className={styles.actions}>
+                        <div className="flex items-center gap-2">
                             <button
-                                className={styles.editButton}
+                                className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-primary hover:bg-base-200"
                                 onClick={() => handleEdit(transaction)}
                                 aria-label="Edit recurring transaction"
                             >
                                 <Edit2 size={18} />
                             </button>
                             <button
-                                className={styles.deleteButton}
+                                className="btn btn-ghost btn-sm btn-square text-base-content/60 hover:text-error hover:bg-error/10"
                                 onClick={() => deleteTransaction(transaction.id)}
                                 aria-label="Delete recurring transaction"
                             >

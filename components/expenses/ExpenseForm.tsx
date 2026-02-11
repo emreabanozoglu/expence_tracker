@@ -9,7 +9,6 @@ import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
-import styles from './ExpenseForm.module.css';
 import { Info } from 'lucide-react';
 import Tooltip from '../ui/Tooltip';
 
@@ -31,26 +30,14 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
     const initialType: TransactionType = expense?.type || 'expense';
 
     // Get available categories based on type
-    // Get available categories based on type
     const getCategories = (type: TransactionType) => {
         if (type === 'income') {
             const customIncome = settings.categories.filter(c => c.type === 'income');
-            // Filter out any default categories that might be in settings to avoid duplicates if we merge
-            // But simpler: Combine defaults + custom. 
-            // Note: settings.categories are 'CustomCategory' objects (id, name, color, icon...).
-            // DEFAULT_INCOME_CATEGORIES are likely simple objects or similar.
-            // Let's map defaults to CustomCategory shape if needed, or just return mix.
-            // The Select below uses 'cat.name', 'cat.icon'.
-
-            // Create a map by name to ensure uniqueness if a custom category overrides a default name
             const allIncome = [...DEFAULT_INCOME_CATEGORIES, ...customIncome];
-
             // Deduplicate by name
             const uniqueIncome = Array.from(new Map(allIncome.map(item => [item.name, item])).values());
             return uniqueIncome;
         }
-        // Filter settings.categories to ensuring we only show expense categories if mixed, 
-        // though currently they are likely all expense or untyped (legacy)
         return settings.categories.filter(c => c.type === 'expense' || !c.type);
     };
 
@@ -63,17 +50,6 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
         isRecurring: initialRecurringState?.isRecurring ?? false,
         frequency: initialRecurringState?.frequency ?? 'monthly',
     });
-
-    // ... existing code ...
-
-    // Find the toggle rendering and wrap it
-    // Logic: If showRecurringToggle is false, we don't render the toggle.
-    // However, if we don't render the toggle, we should still render the frequency if it IS recurring.
-    // The frequency block is below the toggle block.
-
-    // ... inside return ...
-
-
 
     const [errors, setErrors] = useState<Partial<Record<keyof ExpenseFormData, string>>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -156,13 +132,16 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
     };
 
     return (
-        <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.formGrid}>
-                <div className={styles.fullWidth} style={{ marginBottom: '1rem' }}>
-                    <div className={styles.typeToggle}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="col-span-full flex flex-col gap-2 mb-4">
+                    <div className="flex p-1 bg-base-200 rounded-lg gap-1 border border-base-300">
                         <button
                             type="button"
-                            className={`${styles.typeButton} ${formData.type === 'expense' ? styles.activeExpense : ''}`}
+                            className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${formData.type === 'expense'
+                                ? 'bg-base-100 text-error shadow-sm font-semibold'
+                                : 'text-base-content/60 hover:text-base-content hover:bg-base-100/50'
+                                }`}
                             onClick={() => setFormData({ ...formData, type: 'expense' })}
                             data-testid="type-expense"
                         >
@@ -170,7 +149,10 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                         </button>
                         <button
                             type="button"
-                            className={`${styles.typeButton} ${formData.type === 'income' ? styles.activeIncome : ''}`}
+                            className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${formData.type === 'income'
+                                ? 'bg-base-100 text-success shadow-sm font-semibold'
+                                : 'text-base-content/60 hover:text-base-content hover:bg-base-100/50'
+                                }`}
                             onClick={() => setFormData({ ...formData, type: 'income' })}
                             data-testid="type-income"
                         >
@@ -193,15 +175,15 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                     data-testid="expense-amount"
                 />
 
-                <div className={styles.field}>
-                    <label htmlFor="category" className={styles.label}>
+                <div className="form-control w-full">
+                    <label htmlFor="category" className="label label-text font-semibold">
                         Category *
                     </label>
                     <select
                         id="category"
                         value={formData.category}
                         onChange={(e) => setFormData({ ...formData, category: e.target.value as Category })}
-                        className={styles.select}
+                        className="select select-bordered w-full text-base transition-all focus:border-primary"
                         data-testid="expense-category"
                     >
                         {getCategories(formData.type).map((cat) => (
@@ -210,12 +192,12 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                             </option>
                         ))}
                     </select>
-                    {errors.category && <span className={styles.error}>{errors.category}</span>}
+                    {errors.category && <span className="text-error text-sm mt-1">{errors.category}</span>}
                 </div>
 
                 {(formData.isRecurring && formData.frequency === 'monthly') ? (
-                    <div className={styles.field}>
-                        <label htmlFor="dayOfMonth" className={styles.label}>
+                    <div className="form-control w-full">
+                        <label htmlFor="dayOfMonth" className="label label-text font-semibold">
                             Day of Month *
                         </label>
                         <select
@@ -224,7 +206,6 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                             onChange={(e) => {
                                 const day = parseInt(e.target.value);
                                 const [yStr, mStr] = formData.date.split('-');
-                                // Create specific date object to handle month overflow correctly (e.g. Feb 30 -> Mar 2)
                                 const newDate = new Date(parseInt(yStr), parseInt(mStr) - 1, day);
 
                                 const y = newDate.getFullYear();
@@ -233,7 +214,7 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
 
                                 setFormData({ ...formData, date: `${y}-${m}-${d}` });
                             }}
-                            className={styles.select}
+                            className="select select-bordered w-full text-base transition-all focus:border-primary"
                             data-testid="expense-day-of-month"
                         >
                             {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
@@ -242,7 +223,7 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                                 </option>
                             ))}
                         </select>
-                        <p className={styles.helperText} style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: 'var(--gray-500)' }}>
+                        <p className="mt-2 text-xs text-base-content/60">
                             Transaction will repeat on this day every month.
                         </p>
                     </div>
@@ -263,13 +244,16 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                     />
                 )}
 
-                <div className={styles.fullWidth}>
-                    <label htmlFor="description" className={styles.label}>
+                <div className="col-span-full form-control w-full">
+                    <label htmlFor="description" className="label label-text font-semibold">
                         Description
                     </label>
                     <textarea
                         id="description"
-                        className={styles.textarea}
+                        className={`
+                            textarea textarea-bordered w-full text-base h-16 transition-all focus:border-primary
+                            ${errors.description ? 'textarea-error' : ''}
+                        `}
                         placeholder="Add a note about this expense..."
                         value={formData.description}
                         onChange={(e) => {
@@ -278,60 +262,62 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                                 setErrors({ ...errors, description: undefined });
                             }
                         }}
-                        rows={3}
                         maxLength={200}
                         data-testid="expense-description"
                     />
-                    {errors.description && <span className={styles.error}>{errors.description}</span>}
-                    <span className={styles.charCount}>{formData.description.length}/200</span>
+                    {errors.description && <span className="text-error text-sm mt-1">{errors.description}</span>}
+                    <span className="text-xs text-base-content/60 text-right mt-1">{formData.description.length}/200</span>
                 </div>
 
                 {showRecurringToggle && (
-                    <div className={styles.fullWidth}>
-                        <div
-                            className={styles.toggleWrapper}
-                            onClick={() => !expense && setFormData({ ...formData, isRecurring: !formData.isRecurring })}
-                            data-testid="recurring-toggle-wrapper"
-                        >
-                            <div className={styles.toggleLabel}>
-                                Recurring Transaction
-                                <span className={styles.toggleSubLabel}>Repeat this transaction automatically</span>
-                            </div>
-                            <div className={styles.switchGroup}>
-                                <div
-                                    onClick={(e) => e.stopPropagation()}
-                                    className={styles.infoIcon}
-                                >
-                                    <Tooltip content="Automatically creates a new transaction based on the selected frequency (e.g., monthly subscription).">
-                                        <Info size={16} />
-                                    </Tooltip>
-                                </div>
-                                <label className={styles.switch} onClick={(e) => e.stopPropagation()}>
-                                    <input
-                                        type="checkbox"
-                                        id="isRecurring"
-                                        checked={formData.isRecurring}
-                                        onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                                        disabled={!!expense}
-                                        data-testid="expense-is-recurring"
-                                    />
-                                    <span className={styles.slider}></span>
-                                </label>
-                            </div>
+                    <div className="col-span-full">
+                        <div className="flex items-center gap-2">
+                            <label className="label label-text font-semibold flex items-center gap-1.5">
+                                Is this transaction recurring?
+                                <Tooltip content="Automatically creates a new transaction based on the selected frequency (e.g., monthly subscription).">
+                                    <Info size={14} className="text-base-content/50 hover:text-primary transition-colors cursor-help" />
+                                </Tooltip>
+                            </label>
+                        </div>
+                        <div className="flex p-1 bg-base-200 rounded-lg gap-1 border border-base-300 mt-2">
+                            <button
+                                type="button"
+                                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${!formData.isRecurring
+                                    ? 'bg-base-100 text-base-content shadow-sm font-semibold'
+                                    : 'text-base-content/60 hover:text-base-content hover:bg-base-100/50'
+                                    }`}
+                                onClick={() => !expense && setFormData({ ...formData, isRecurring: false })}
+                                disabled={!!expense}
+                                data-testid="recurring-no"
+                            >
+                                No
+                            </button>
+                            <button
+                                type="button"
+                                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${formData.isRecurring
+                                    ? 'bg-base-100 text-primary shadow-sm font-semibold'
+                                    : 'text-base-content/60 hover:text-base-content hover:bg-base-100/50'
+                                    }`}
+                                onClick={() => !expense && setFormData({ ...formData, isRecurring: true })}
+                                disabled={!!expense}
+                                data-testid="expense-is-recurring"
+                            >
+                                Yes
+                            </button>
                         </div>
                     </div>
                 )}
 
                 {formData.isRecurring && (
-                    <div className={styles.field}>
-                        <label htmlFor="frequency" className={styles.label}>
+                    <div className="form-control w-full">
+                        <label htmlFor="frequency" className="label label-text font-semibold">
                             Frequency *
                         </label>
                         <select
                             id="frequency"
                             value={formData.frequency}
                             onChange={(e) => setFormData({ ...formData, frequency: e.target.value as RecurrenceFrequency })}
-                            className={styles.select}
+                            className="select select-bordered w-full text-base transition-all focus:border-primary"
                             data-testid="expense-frequency"
                         >
                             <option value="daily">Daily</option>
@@ -343,11 +329,11 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                 )}
             </div>
 
-            <div className={styles.actions}>
-                <Button type="button" variant="ghost" onClick={onCancel} data-testid="cancel-button">
+            <div className="flex justify-end gap-3 pt-4 border-t border-base-200 flex-col-reverse md:flex-row">
+                <Button type="button" variant="ghost" onClick={onCancel} data-testid="cancel-button" className="w-full md:w-auto">
                     Cancel
                 </Button>
-                <Button type="submit" variant="primary" disabled={isSubmitting} data-testid="submit-expense-button">
+                <Button type="submit" variant="primary" disabled={isSubmitting} data-testid="submit-expense-button" className="w-full md:w-auto">
                     {expense ? 'Update Transaction' : 'Add Transaction'}
                 </Button>
             </div>

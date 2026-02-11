@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Check } from 'lucide-react';
-import styles from './DateFormatSelector.module.css';
 
 interface DateFormatSelectorProps {
     selectedFormat: string;
@@ -17,22 +16,28 @@ const DATE_FORMATS = [
 
 export default function DateFormatSelector({ selectedFormat, onFormatChange }: DateFormatSelectorProps) {
     return (
-        <div className={styles.container}>
-            <h2 className={styles.title}>Date Format</h2>
-            <div className={styles.grid}>
+        <div className="w-full">
+            <h2 className="text-base font-bold text-base-content mb-3">Date Format</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {DATE_FORMATS.map((format) => (
                     <button
                         key={format.value}
-                        className={`${styles.card} ${selectedFormat === format.value ? styles.selected : ''}`}
+                        className={`
+                            relative flex flex-col items-start p-3 rounded-lg text-left transition-all duration-200 border
+                            ${selectedFormat === format.value
+                                ? 'border-primary bg-primary/5 shadow-sm'
+                                : 'border-base-200 bg-base-100 hover:border-primary/50'
+                            }
+                        `}
                         onClick={() => onFormatChange(format.value)}
                         type="button"
                         data-testid={`date-format-${format.value}`}
                     >
-                        <div className={styles.label}>{format.label}</div>
-                        <div className={styles.example}>{format.example}</div>
+                        <div className="font-semibold text-sm text-base-content mb-0.5">{format.label}</div>
+                        <div className="text-xs text-base-content/60">{format.example}</div>
                         {selectedFormat === format.value && (
-                            <div className={styles.checkIcon}>
-                                <Check size={16} />
+                            <div className="absolute top-2 right-2 text-primary bg-base-100 rounded-full p-0.5 shadow-sm border border-base-200">
+                                <Check size={14} />
                             </div>
                         )}
                     </button>

@@ -34,86 +34,49 @@ export default function TransactionDetailsModal({ isOpen, onClose, expense }: Tr
             title="Transaction Details"
             size="sm"
         >
-            <div style={{ padding: '0 0 16px 0' }}>
+            <div className="pb-8">
                 {/* Header Section with Icon and Amount */}
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    marginBottom: '24px',
-                    borderBottom: '1px solid var(--border)',
-                    paddingBottom: '24px'
-                }}>
-                    <div style={{
-                        backgroundColor: categoryColor,
-                        width: '64px',
-                        height: '64px',
-                        borderRadius: '20px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '2rem',
-                        marginBottom: '16px',
-                        boxShadow: 'var(--shadow-md)'
-                    }}>
-                        {categoryIcon}
+                <div className="flex flex-col items-center mb-6 border-b border-base-content/10 pb-6">
+                    <div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg mb-4 text-white"
+                        style={{ backgroundColor: categoryColor }}
+                    >
+                        <span className="drop-shadow-md">{categoryIcon}</span>
                     </div>
 
-                    <h2 style={{
-                        fontSize: '2rem',
-                        fontWeight: 700,
-                        color: isIncome ? 'var(--success)' : 'var(--foreground)',
-                        marginBottom: '4px'
-                    }}>
+                    <h2 className={`text-3xl font-bold mb-2 ${isIncome ? 'text-success' : 'text-base-content'}`}>
                         {isIncome ? '+' : '-'}{formatCurrency(expense.amount, settings.currencySymbol)}
                     </h2>
 
-                    <span style={{
-                        fontSize: '0.875rem',
-                        color: 'var(--gray-500)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        fontWeight: 600
-                    }}>
+                    <span className="text-lg font-medium text-base-content/80">
                         {expense.category}
                     </span>
                 </div>
 
                 {/* Details Grid */}
-                <div style={{ display: 'grid', gap: '20px' }}>
+                <div className="flex flex-col gap-5">
 
                     {/* Date */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.925rem' }}>Date</span>
-                        <span style={{ fontWeight: 500, color: 'var(--foreground)' }}>
+                    <div className="flex justify-between items-center">
+                        <span className="text-base-content/60 text-[15px]">Date</span>
+                        <span className="font-medium text-base-content">
                             {formatDateDynamic(expense.date, settings.dateFormat)}
                         </span>
                     </div>
 
                     {/* Type */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.925rem' }}>Type</span>
-                        <span style={{
-                            fontWeight: 500,
-                            color: isIncome ? 'var(--success)' : 'var(--foreground)',
-                            textTransform: 'capitalize'
-                        }}>
+                    <div className="flex justify-between items-center">
+                        <span className="text-base-content/60 text-[15px]">Type</span>
+                        <span className={`font-medium capitalize ${isIncome ? 'text-success' : 'text-base-content'}`}>
                             {expense.type}
                         </span>
                     </div>
 
                     {/* Description */}
                     {expense.description && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <span style={{ color: 'var(--gray-500)', fontSize: '0.925rem' }}>Description</span>
-                            <div style={{
-                                backgroundColor: 'var(--gray-100)',
-                                padding: '12px',
-                                borderRadius: '8px',
-                                fontSize: '0.925rem',
-                                color: 'var(--gray-700)',
-                                lineHeight: 1.5
-                            }}>
+                        <div className="flex flex-col gap-2">
+                            <span className="text-base-content/60 text-[15px]">Description</span>
+                            <div className="bg-base-200 p-3 rounded-xl text-[15px] text-base-content leading-relaxed">
                                 {expense.description}
                             </div>
                         </div>

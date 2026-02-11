@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import styles from './Tooltip.module.css';
+import React from 'react';
 
 interface TooltipProps {
     content: string;
@@ -8,13 +7,8 @@ interface TooltipProps {
 
 export default function Tooltip({ content, children }: TooltipProps) {
     return (
-        <div className={styles.container}>
-            <div className={styles.trigger}>
-                {children}
-            </div>
-            <div className={styles.tooltip} role="tooltip">
-                {content}
-            </div>
+        <div className="tooltip tooltip-top inline-flex items-center cursor-help" data-tip={content}>
+            {children}
         </div>
     );
 }

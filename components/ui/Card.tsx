@@ -1,7 +1,6 @@
 // Reusable Card Component
 
 import React from 'react';
-import styles from './Card.module.css';
 
 export interface CardProps {
     children: React.ReactNode;
@@ -12,9 +11,9 @@ export interface CardProps {
 
 export default function Card({ children, className = '', hoverable = false, onClick }: CardProps) {
     const classes = [
-        styles.card,
-        hoverable ? styles.hoverable : '',
-        onClick ? styles.clickable : '',
+        'bg-[var(--card-bg)] rounded-3xl p-6 shadow-sm border border-base-content/5',
+        hoverable ? 'hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200' : '',
+        onClick ? 'cursor-pointer active:scale-[0.98] touch-manipulation' : '',
         className,
     ]
         .filter(Boolean)

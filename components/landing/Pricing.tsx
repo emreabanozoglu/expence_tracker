@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { Check, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import styles from './Pricing.module.css';
 
 const plans = [
     {
@@ -51,61 +50,70 @@ const plans = [
 
 export default function Pricing() {
     return (
-        <section className={styles.pricing} id="pricing">
-            <div className={styles.container}>
-                <div className={styles.header}>
-                    <h2 className={styles.title}>
+        <section className="py-24 px-4 bg-base-200" id="pricing">
+            <div className="max-w-[1200px] mx-auto">
+                <div className="text-center mb-16">
+                    <h2 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4 text-base-content">
                         Simple, Transparent
-                        <span className={styles.gradient}> Pricing</span>
+                        <span className="bg-gradient-to-br from-primary to-purple-500 bg-clip-text text-transparent"> Pricing</span>
                     </h2>
-                    <p className={styles.subtitle}>
+                    <p className="text-lg text-base-content/60 max-w-[600px] mx-auto">
                         Start free, upgrade when you need more. No hidden fees.
                     </p>
                 </div>
 
-                <div className={styles.grid}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[900px] mx-auto">
                     {plans.map((plan, index) => (
                         <div
                             key={index}
-                            className={`${styles.card} ${plan.popular ? styles.popular : ''}`}
+                            className={`
+                                relative flex flex-col bg-base-100 border-2 rounded-2xl p-8
+                                hover:-translate-y-2 hover:shadow-xl transition-all duration-300
+                                ${plan.popular ? 'border-primary shadow-[0_0_0_1px_rgba(var(--primary),1)]' : 'border-base-300'}
+                            `}
                         >
                             {plan.popular && (
-                                <div className={styles.badge}>Most Popular</div>
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-purple-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+                                    Most Popular
+                                </div>
                             )}
 
-                            <div className={styles.cardHeader}>
-                                <h3 className={styles.planName}>{plan.name}</h3>
-                                <div className={styles.priceWrapper}>
-                                    <div className={styles.price}>{plan.price}</div>
-                                    <div className={styles.period}>{plan.period}</div>
+                            <div className="text-center mb-6 pb-6 border-b border-base-200">
+                                <h3 className="text-2xl font-bold mb-4 text-base-content">{plan.name}</h3>
+                                <div className="mb-2">
+                                    <div className="text-5xl font-extrabold text-base-content leading-none">{plan.price}</div>
+                                    <div className="text-sm text-base-content/60 mt-1">{plan.period}</div>
                                 </div>
                                 {plan.yearlyPrice && (
-                                    <div className={styles.yearlyPrice}>
+                                    <div className="text-sm text-base-content/70 mt-2 flex items-center justify-center gap-2">
                                         or {plan.yearlyPrice} {plan.yearlyPeriod}
-                                        <span className={styles.savings}>Save 17%</span>
+                                        <span className="bg-success/10 text-success px-2 py-0.5 rounded text-xs font-bold">Save 17%</span>
                                     </div>
                                 )}
-                                <p className={styles.description}>{plan.description}</p>
+                                <p className="text-sm text-base-content/60 mt-4 m-0">{plan.description}</p>
                             </div>
 
-                            <ul className={styles.features}>
+                            <ul className="space-y-3 mb-8 flex-1">
                                 {plan.features.map((feature, i) => (
-                                    <li key={i} className={styles.feature}>
-                                        <span className={`${styles.icon} ${feature.included ? styles.included : styles.excluded}`}>
-                                            {feature.included ? <Check size={18} /> : <X size={18} />}
+                                    <li key={i} className="flex items-start gap-3 text-[15px]">
+                                        <span className={`
+                                            flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5
+                                            ${feature.included ? 'bg-success/10 text-success' : 'bg-base-200 text-base-content/40'}
+                                        `}>
+                                            {feature.included ? <Check size={14} /> : <X size={14} />}
                                         </span>
-                                        <span className={feature.included ? '' : styles.excludedText}>
+                                        <span className={feature.included ? 'text-base-content/80' : 'text-base-content/40 line-through'}>
                                             {feature.text}
                                         </span>
                                     </li>
                                 ))}
                             </ul>
 
-                            <Link href={plan.href}>
+                            <Link href={plan.href} className="mt-auto">
                                 <Button
                                     variant={plan.popular ? 'primary' : 'ghost'}
                                     size="lg"
-                                    style={{ width: '100%' }}
+                                    className="w-full"
                                 >
                                     {plan.cta}
                                 </Button>

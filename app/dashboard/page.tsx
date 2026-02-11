@@ -34,7 +34,6 @@ import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { useRouter } from 'next/navigation';
 import PaymentVerification from '@/components/dashboard/PaymentVerification';
 import toast from 'react-hot-toast';
-import styles from './page.module.css';
 
 export default function Home() {
   const { expenses, addExpense, addRecurringTransaction, updateExpense, deleteExpense, isLoading } = useExpenses();
@@ -172,8 +171,8 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className={styles.loading} data-testid="loading-page">
-        <div className={styles.spinner}></div>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 text-base-content/60" data-testid="loading-page">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
         <p>Loading transactions...</p>
       </div>
     );
@@ -184,16 +183,16 @@ export default function Home() {
       <Suspense fallback={null}>
         <PaymentVerification />
       </Suspense>
-      <div className={styles.page}>
-        <header className={styles.header}>
-          <div className={styles.headerContent}>
-            <div className={styles.branding}>
-              <Image src="/logo.png" alt="Bibudget Logo" width={32} height={32} className={styles.logo} priority />
-              <h1 className={styles.title}>Bibudget</h1>
+      <div className="min-h-screen flex flex-col bg-base-100">
+        <header className="bg-base-100/80 backdrop-blur-md border-b border-base-200 py-4 sticky top-0 z-50">
+          <div className="w-full max-w-6xl mx-auto px-4 md:px-8 flex justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Image src="/logo.png" alt="Bibudget Logo" width={32} height={32} className="text-primary" priority />
+              <h1 className="text-2xl font-bold m-0 text-transparent bg-clip-text bg-gradient-to-br from-primary to-primary-focus">Bibudget</h1>
             </div>
 
             {/* Mobile Navigation */}
-            <div className={styles.mobileNav}>
+            <div className="md:hidden flex items-center">
               <MobileNav
                 onSettingsClick={handleSettingsClick}
                 onExportClick={handleExport}
@@ -204,7 +203,7 @@ export default function Home() {
             </div>
 
             {/* Desktop Navigation */}
-            <div className={styles.headerActions}>
+            <div className="hidden md:flex gap-3">
               <Button variant="ghost" onClick={() => setIsBudgetModalOpen(true)}>
                 <Target size={20} />
                 Budget
@@ -229,18 +228,18 @@ export default function Home() {
 
 
 
-        <main className={styles.main}>
-          <div className={styles.container}>
+        <main className="flex-1 py-8 pb-24 md:pb-8">
+          <div className="w-full max-w-6xl mx-auto px-4 md:px-8 flex flex-col gap-8">
 
             {/* Filter Section */}
             {expenses.length > 0 && (
               <>
 
 
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'stretch' }}>
-                    <div style={{ flex: 1, minWidth: '300px' }}>
-                      <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                <div className="mb-6">
+                  <div className="flex gap-2 flex-wrap items-stretch">
+                    <div className="flex-1 min-w-[300px]">
+                      <label className="block mb-2 text-sm font-medium text-base-content/60">
                         Transaction Type
                       </label>
                       <TypeFilter
@@ -248,8 +247,8 @@ export default function Home() {
                         onSelect={setFilterType}
                       />
                     </div>
-                    <div style={{ flex: 1, minWidth: '300px' }}>
-                      <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                    <div className="flex-1 min-w-[300px] relative">
+                      <label className="block mb-2 text-sm font-medium text-base-content/60">
                         Date Period
                       </label>
                       <DateRangeFilter
@@ -261,8 +260,8 @@ export default function Home() {
                   </div>
 
                   {filterType === 'expense' && (
-                    <div style={{ marginTop: '36px' }}>
-                      <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.75rem', color: 'var(--gray-500)', fontWeight: 500 }}>
+                    <div className="mt-9">
+                      <label className="block mb-1 text-xs font-medium text-base-content/60">
                         Recurring Status
                       </label>
                       <RecurringFilter
@@ -277,40 +276,18 @@ export default function Home() {
 
             {/* Empty State */}
             {dateFilteredExpenses.length === 0 && (
-              <div data-testid="empty-state" style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '48px 24px',
-                textAlign: 'center',
-                color: 'var(--gray-500)',
-                backgroundColor: 'var(--card-bg)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border)',
-                marginTop: '12px'
-              }}>
-                <div style={{
-                  backgroundColor: 'var(--gray-100)',
-                  padding: '16px',
-                  borderRadius: '50%',
-                  marginBottom: '16px'
-                }}>
+              <div data-testid="empty-state" className="flex flex-col items-center justify-center py-12 px-6 text-center text-base-content/60 bg-base-100 border border-base-200 rounded-xl mt-3">
+                <div className="bg-base-200 p-4 rounded-full mb-4">
                   <Inbox size={32} strokeWidth={1.5} />
                 </div>
-                <h3 style={{
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                  color: 'var(--foreground)',
-                  marginBottom: '8px'
-                }}>
+                <h3 className="text-lg font-semibold text-base-content mb-2">
                   No transactions found
                 </h3>
-                <p style={{ maxWidth: '300px', margin: '0 0 24px 0' }}>
+                <p className="max-w-xs mx-auto mb-6">
                   There are no transactions for this period. Try selecting a different date range or add a new transaction.
                 </p>
                 <Button variant="primary" onClick={handleAddExpense} data-testid="add-expense-button-empty">
-                  <Plus size={18} style={{ marginRight: '8px' }} />
+                  <Plus size={18} className="mr-2" />
                   Add Transaction
                 </Button>
               </div>
@@ -319,8 +296,8 @@ export default function Home() {
             {/* Breakdown Section */}
             {dateFilteredExpenses.length > 0 && (
               <>
-                <div className={styles.dashboardGrid}>
-                  <div className={styles.chartSection} data-testid="category-chart">
+                <div className="grid grid-cols-1 gap-8">
+                  <div className="min-h-[300px] md:min-h-[400px]" data-testid="category-chart">
                     <CategoryBreakdown
                       expenses={recurringFilteredExpenses}
                       filterType={filterType}
@@ -330,14 +307,14 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className={styles.listSection} data-testid="expense-list-section">
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <h2 className={styles.sectionTitle} style={{ marginBottom: 0 }}>
+                <div className="flex flex-col gap-6" data-testid="expense-list-section">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-2xl font-bold m-0 text-base-content">
                       {getDateRangeLabel(dateRange)}
                     </h2>
                     {selectedCategory && (
-                      <Button variant="ghost" size="sm" onClick={clearCategoryFilter} style={{ fontSize: '0.8rem', height: '32px' }}>
-                        {selectedCategory} <X size={14} style={{ marginLeft: 6 }} />
+                      <Button variant="ghost" size="sm" onClick={clearCategoryFilter} className="text-xs h-8">
+                        {selectedCategory} <X size={14} className="ml-1.5" />
                       </Button>
                     )}
                   </div>
@@ -362,9 +339,9 @@ export default function Home() {
         </main>
 
 
-        {/* Floating Action Button - Always visible */}
+        {/* Floating Action Button - Always visible on mobile */}
         <TouchButton
-          className={styles.fab}
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-focus text-primary-content border-none shadow-lg cursor-pointer flex items-center justify-center z-[1000] active:scale-95 md:hidden"
           onTap={handleAddExpense}
           data-testid="fab-add-expense-button"
           aria-label="Add Transaction"

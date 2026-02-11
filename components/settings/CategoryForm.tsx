@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { CustomCategory, TransactionType } from '@/lib/types';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import styles from './CategoryForm.module.css';
 
 const EMOJI_OPTIONS = ['🍔', '🚗', '🎬', '📄', '🛍️', '⚕️', '📚', '📦', '🏠', '✈️', '🎮', '💼', '🎨', '⚽', '🐾', '💰'];
 const COLOR_OPTIONS = [
@@ -53,19 +52,31 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
     };
 
     return (
-        <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.field}>
-                <div className={styles.typeToggle}>
+        <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-2">
+                <div className="flex bg-base-200 p-1 rounded-lg gap-1 border border-base-300">
                     <button
                         type="button"
-                        className={`${styles.typeButton} ${type === 'expense' ? styles.activeExpense : ''}`}
+                        className={`
+                            flex-1 py-2 rounded-md text-sm font-medium transition-all
+                            ${type === 'expense'
+                                ? 'bg-base-100 text-error shadow-sm font-bold'
+                                : 'text-base-content/60 hover:bg-base-100/50 hover:text-base-content'
+                            }
+                        `}
                         onClick={() => setType('expense')}
                     >
                         Expense
                     </button>
                     <button
                         type="button"
-                        className={`${styles.typeButton} ${type === 'income' ? styles.activeIncome : ''}`}
+                        className={`
+                            flex-1 py-2 rounded-md text-sm font-medium transition-all
+                            ${type === 'income'
+                                ? 'bg-base-100 text-success shadow-sm font-bold'
+                                : 'text-base-content/60 hover:bg-base-100/50 hover:text-base-content'
+                            }
+                        `}
                         onClick={() => setType('income')}
                     >
                         Income
@@ -73,8 +84,8 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
                 </div>
             </div>
 
-            <div className={styles.field}>
-                <label htmlFor="category-name" className={styles.label}>
+            <div className="flex flex-col gap-2">
+                <label htmlFor="category-name" className="text-sm font-bold text-base-content">
                     Category Name
                 </label>
                 <Input
@@ -91,14 +102,21 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
                 />
             </div>
 
-            <div className={styles.field}>
-                <label className={styles.label}>Icon</label>
-                <div className={styles.iconGrid}>
+            <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-base-content">Icon</label>
+                <div className="grid grid-cols-8 gap-2">
                     {EMOJI_OPTIONS.map((emoji) => (
                         <button
                             key={emoji}
                             type="button"
-                            className={`${styles.iconOption} ${icon === emoji ? styles.selected : ''}`}
+                            className={`
+                                aspect-square flex items-center justify-center text-2xl rounded-xl transition-all
+                                border-2 
+                                ${icon === emoji
+                                    ? 'border-primary bg-primary/10 scale-110 shadow-sm'
+                                    : 'border-base-200 bg-base-100 hover:border-primary/50 hover:scale-105'
+                                }
+                            `}
                             onClick={() => setIcon(emoji)}
                         >
                             {emoji}
@@ -107,14 +125,20 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
                 </div>
             </div>
 
-            <div className={styles.field}>
-                <label className={styles.label}>Color</label>
-                <div className={styles.colorGrid}>
+            <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-base-content">Color</label>
+                <div className="grid grid-cols-10 gap-2">
                     {COLOR_OPTIONS.map((colorOption) => (
                         <button
                             key={colorOption}
                             type="button"
-                            className={`${styles.colorOption} ${color === colorOption ? styles.selected : ''}`}
+                            className={`
+                                aspect-square rounded-full cursor-pointer transition-all border-2
+                                ${color === colorOption
+                                    ? 'border-base-content scale-110 shadow-md ring-2 ring-base-100'
+                                    : 'border-transparent hover:scale-110 hover:shadow-sm'
+                                }
+                            `}
                             style={{ backgroundColor: colorOption }}
                             onClick={() => setColor(colorOption)}
                             aria-label={`Select color ${colorOption}`}
@@ -123,15 +147,18 @@ export default function CategoryForm({ category, onSubmit, onCancel }: CategoryF
                 </div>
             </div>
 
-            <div className={styles.preview}>
-                <span className={styles.previewLabel}>Preview:</span>
-                <div className={styles.previewBadge} style={{ backgroundColor: color }}>
-                    <span className={styles.previewIcon}>{icon}</span>
-                    <span className={styles.previewName}>{name || 'Category Name'}</span>
+            <div className="flex items-center gap-4 p-4 bg-base-200/50 rounded-xl border border-base-200 mt-2">
+                <span className="text-sm font-medium text-base-content/60">Preview:</span>
+                <div
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-white shadow-sm"
+                    style={{ backgroundColor: color }}
+                >
+                    <span className="text-lg leading-none">{icon}</span>
+                    <span className="font-bold text-sm">{name || 'Category Name'}</span>
                 </div>
             </div>
 
-            <div className={styles.actions}>
+            <div className="flex justify-end gap-3 pt-4 border-t border-base-200">
                 <Button type="button" variant="ghost" onClick={onCancel} data-testid="cancel-category-button">
                     Cancel
                 </Button>

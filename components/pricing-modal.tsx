@@ -6,7 +6,6 @@ import Button from '@/components/ui/Button';
 import { useSubscription } from '@/lib/context/SubscriptionContext';
 import { Check, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
-import styles from './pricing-modal.module.css';
 
 export default function PricingModal() {
     const { isPricingModalOpen, closePricingModal } = useSubscription();
@@ -89,39 +88,45 @@ export default function PricingModal() {
             title="Upgrade to Pro"
             size="lg"
         >
-            <div className={styles.container}>
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-stretch justify-center p-2 w-full">
                 {plans.map((plan) => (
                     <div
                         key={plan.name}
-                        className={`${styles.card} ${plan.highlight ? styles.highlight : ''}`}
+                        className={`
+                            flex-1 flex flex-col relative bg-base-100 border rounded-2xl p-6 min-w-[280px] transition-all duration-300
+                            ${plan.highlight
+                                ? 'border-primary shadow-[0_0_25px_rgba(var(--primary),0.15)] bg-gradient-to-b from-base-100 to-primary/5 z-10 scale-100 md:scale-105'
+                                : 'border-base-200 hover:border-primary/30'
+                            }
+                        `}
                     >
                         {plan.highlight && (
-                            <div className={styles.badge}>
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-br from-primary to-primary-focus text-primary-content text-xs font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1 whitespace-nowrap z-20">
                                 <Sparkles size={12} fill="currentColor" />
                                 BEST VALUE
                             </div>
                         )}
 
-                        <div className={styles.header}>
-                            <h3 className={styles.planName}>{plan.name}</h3>
-                            <p className={styles.description}>{plan.description}</p>
+                        <div className="text-center mb-6">
+                            <h3 className="text-xl font-bold text-base-content mb-1">{plan.name}</h3>
+                            <p className="text-sm text-base-content/60 m-0">{plan.description}</p>
                         </div>
 
-                        <div className={styles.priceContainer}>
-                            <span className={styles.price}>{plan.price}</span>
-                            <span className={styles.period}>{plan.period}</span>
+                        <div className="text-center mb-6">
+                            <span className="text-4xl font-extrabold text-base-content">{plan.price}</span>
+                            <span className="text-base font-medium text-base-content/60 ml-1">{plan.period}</span>
                         </div>
 
-                        <ul className={styles.features}>
+                        <ul className="list-none p-0 m-0 mb-8 flex flex-col gap-3 flex-1">
                             {plan.features.map((feature) => (
-                                <li key={feature} className={styles.featureItem}>
-                                    <Check size={16} className={styles.checkIcon} />
+                                <li key={feature} className="flex items-start gap-2 text-sm text-base-content/80">
+                                    <Check size={16} className={`shrink-0 mt-0.5 ${plan.highlight ? 'text-primary font-bold' : 'text-primary'}`} />
                                     <span>{feature}</span>
                                 </li>
                             ))}
                         </ul>
 
-                        <div className={styles.buttonContainer}>
+                        <div className="mt-auto">
                             <Button
                                 onClick={() => handleSubscribe(plan.priceId)}
                                 disabled={isLoading}
@@ -136,7 +141,7 @@ export default function PricingModal() {
                 ))}
             </div>
 
-            <p className={styles.footer}>
+            <p className="text-center text-xs text-base-content/40 mt-6">
                 Secure payments powered by Stripe. Cancel anytime.
             </p>
         </Modal>

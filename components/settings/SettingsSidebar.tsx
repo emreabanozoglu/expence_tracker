@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Settings, PieChart, Tag, RefreshCw, Download, LogOut, CreditCard } from 'lucide-react';
+import { Settings, PieChart, Tag, RefreshCw, Download, LogOut, CreditCard, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
-import styles from './SettingsSidebar.module.css';
 
 interface SettingsSidebarProps {
     activeTab: string;
@@ -23,29 +22,53 @@ export default function SettingsSidebar({ activeTab, onTabChange }: SettingsSide
     const { signOut } = useAuth();
 
     return (
-        <nav className={styles.nav}>
-            {TABS.map((tab) => (
-                <button
-                    key={tab.id}
-                    className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
-                    onClick={() => onTabChange(tab.id)}
-                    data-testid={`settings-tab-${tab.id}`}
-                >
-                    <span className={styles.icon}>{tab.icon}</span>
-                    <span className={styles.label}>{tab.label}</span>
-                </button>
-            ))}
+        <nav className="flex flex-col gap-2 w-full">
+            {TABS.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                    <button
+                        key={tab.id}
+                        className={`
+                            group flex items-center gap-3 w-full text-left transition-all duration-200 rounded-xl
+                            p-4 md:px-4 md:py-3 md:rounded-lg
+                            border border-base-200 md:border-transparent
+                            bg-base-100 md:bg-transparent
+                            justify-between md:justify-start
+                            ${isActive
+                                ? 'border-primary md:bg-primary/10 text-primary font-semibold shadow-sm md:shadow-none'
+                                : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'
+                            }
+                        `}
+                        onClick={() => onTabChange(tab.id)}
+                        data-testid={`settings-tab-${tab.id}`}
+                    >
+                        <div className="flex items-center gap-3">
+                            <span className={isActive ? 'text-primary' : ''}>{tab.icon}</span>
+                            <span>{tab.label}</span>
+                        </div>
+                        <ChevronRight size={16} className={`md:hidden text-base-content/40 ${isActive ? 'text-primary' : ''}`} />
+                    </button>
+                );
+            })}
 
-            <div style={{ height: '1px', background: 'var(--border)', margin: '8px 0' }} />
+            <div className="h-px bg-base-200 my-2 hidden md:block" />
 
             <button
-                className={styles.tab}
+                className={`
+                    group flex items-center gap-3 w-full text-left transition-all duration-200 rounded-xl
+                    p-4 md:px-4 md:py-3 md:rounded-lg
+                    border border-base-200 md:border-transparent
+                    bg-base-100 md:bg-transparent
+                    justify-between md:justify-start
+                    text-error/80 hover:text-error hover:bg-error/10
+                `}
                 onClick={() => signOut()}
-                style={{ color: 'var(--error)' }}
                 data-testid="settings-signout"
             >
-                <span className={styles.icon}><LogOut size={18} /></span>
-                <span className={styles.label}>Sign Out</span>
+                <div className="flex items-center gap-3">
+                    <LogOut size={18} />
+                    <span>Sign Out</span>
+                </div>
             </button>
         </nav>
     );

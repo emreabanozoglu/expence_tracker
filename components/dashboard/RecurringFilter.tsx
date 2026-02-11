@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import styles from './RecurringFilter.module.css';
 import { Repeat } from 'lucide-react';
 import { TouchButton } from '../ui/TouchButton';
 
@@ -20,13 +19,18 @@ export default function RecurringFilter({ selected, onSelect }: RecurringFilterP
     ];
 
     return (
-        <div className={styles.filterWrapper}>
-            <Repeat size={20} className={styles.icon} />
-            <div className={styles.buttonContainer}>
+        <div className="inline-flex items-center gap-2 p-1 bg-transparent border-none h-auto flex-nowrap">
+            <Repeat size={16} className="text-base-content/60 flex-shrink-0" />
+            <div className="flex gap-0.5 bg-base-200 p-0.5 rounded items-center border border-base-content/10 h-8">
                 {filters.map((option) => (
                     <TouchButton
                         key={option.value}
-                        className={`${styles.button} ${selected === option.value ? styles.active : ''}`}
+                        className={`
+                            px-2 py-0.5 text-xs font-medium border-none rounded bg-transparent cursor-pointer flex items-center justify-center whitespace-nowrap min-w-[60px] touch-manipulation transition-all
+                            ${selected === option.value
+                                ? 'bg-base-100 text-primary shadow-sm font-semibold'
+                                : 'text-base-content/60 hover:text-base-content hover:bg-base-content/5'}
+                        `}
                         onTap={() => onSelect(option.value)}
                     >
                         {option.label}

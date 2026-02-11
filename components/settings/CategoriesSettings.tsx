@@ -6,7 +6,6 @@ import { CustomCategory } from '@/lib/types';
 import CategoryManager from './CategoryManager';
 import CategoryForm from './CategoryForm';
 import Modal from '@/components/ui/Modal';
-import styles from './CategoriesSettings.module.css';
 
 export default function CategoriesSettings() {
     const {
@@ -46,10 +45,10 @@ export default function CategoriesSettings() {
     };
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>
-                <h2 className={styles.title}>Categories</h2>
-                <p className={styles.subtitle}>Manage your income and expense categories.</p>
+        <div className="w-full">
+            <div className="mb-6">
+                <h2 className="text-xl font-bold text-base-content mb-1">Categories</h2>
+                <p className="text-sm text-base-content/60">Manage your income and expense categories.</p>
             </div>
 
             <CategoryManager

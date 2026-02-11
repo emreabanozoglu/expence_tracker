@@ -1,8 +1,9 @@
+// Pagination Controls Component
+
 'use client';
 
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import styles from './PaginationControls.module.css';
 
 interface PaginationControlsProps {
     currentPage: number;
@@ -29,11 +30,11 @@ export default function PaginationControls({
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
     return (
-        <div className={styles.container}>
-            <div className={styles.rowsPerPage}>
-                <span className={styles.label}>Rows per page:</span>
+        <div className="flex items-center justify-end gap-5 py-4 text-sm text-gray-500 border-t border-base-200 mt-4 flex-wrap sm:justify-between">
+            <div className="flex items-center gap-2 order-1 sm:order-none">
+                <span className="whitespace-nowrap">Rows per page:</span>
                 <select
-                    className={styles.select}
+                    className="select select-bordered select-xs w-full max-w-xs font-medium cursor-pointer"
                     value={itemsPerPage}
                     onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
                 >
@@ -45,13 +46,13 @@ export default function PaginationControls({
                 </select>
             </div>
 
-            <div className={styles.info}>
+            <div className="whitespace-nowrap order-2 sm:order-none">
                 {startItem}-{endItem} of {totalItems}
             </div>
 
-            <div className={styles.actions}>
+            <div className="flex items-center gap-2 order-3 ml-auto sm:ml-0">
                 <button
-                    className={styles.button}
+                    className="btn btn-sm btn-circle btn-ghost"
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                     aria-label="Previous page"
@@ -59,7 +60,7 @@ export default function PaginationControls({
                     <ChevronLeft size={20} />
                 </button>
                 <button
-                    className={styles.button}
+                    className="btn btn-sm btn-circle btn-ghost"
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     aria-label="Next page"
@@ -70,3 +71,4 @@ export default function PaginationControls({
         </div>
     );
 }
+

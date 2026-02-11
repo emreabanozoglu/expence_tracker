@@ -4,14 +4,13 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Expense, TransactionType } from '@/lib/types';
+import { Expense } from '@/lib/types';
 import { calculateCategoryTotals } from '@/lib/utils/calculations';
 import { formatCurrency, formatPercentage } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '@/lib/constants';
 import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 import Card from '../ui/Card';
-import styles from './CategoryBreakdown.module.css';
 
 export interface CategoryBreakdownProps {
     expenses: Expense[];
@@ -141,14 +140,14 @@ export default function CategoryBreakdown({
     };
 
     return (
-        <Card className={styles.card}>
-            <div className={styles.header}>
-                <h3 className={styles.title}>
+        <Card className="flex flex-col min-h-auto p-0 gap-0 overflow-hidden">
+            <div className="flex justify-between items-center p-5 border-b border-base-content/5 flex-wrap gap-3 bg-base-100/50">
+                <h3 className="text-xl font-bold m-0">
                     {filterType === 'all' ? 'Income vs Expense' : 'Breakdown'}
                 </h3>
                 {selectedCategory && (
                     <button
-                        className={styles.clearButton}
+                        className="bg-transparent border border-base-content/20 px-3 py-1 rounded text-xs text-base-content/60 cursor-pointer touch-manipulation transition-all hover:bg-base-200 hover:text-base-content hover:border-base-content/40"
                         onClick={() => onCategorySelect?.(null)}
                     >
                         Clear Filter
@@ -157,13 +156,13 @@ export default function CategoryBreakdown({
             </div>
 
             {chartData.length === 0 ? (
-                <div className={styles.empty}>
+                <div className="flex-1 flex flex-col items-center justify-center p-12 text-base-content/60 border-2 border-dashed border-base-content/10 rounded-xl w-full text-center">
                     <p>No data to display</p>
                 </div>
             ) : (
-                <div className={styles.content}>
+                <div className="flex flex-1 gap-8 items-center justify-center p-6 max-[900px]:flex-col max-[900px]:gap-6 max-[900px]:items-stretch">
                     {/* Donut Chart */}
-                    <div className={styles.chartContainer}>
+                    <div className="flex-1 h-[300px] relative flex items-center justify-center max-[900px]:w-full max-[900px]:min-h-[300px] max-[900px]:max-w-[350px] max-[900px]:mx-auto max-[900px]:flex-none max-[900px]:block">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -203,14 +202,14 @@ export default function CategoryBreakdown({
                         </ResponsiveContainer>
 
                         {/* Center Text */}
-                        <div className={styles.centerText}>
-                            <div className={styles.centerLabel}>{centerInfo.label}</div>
-                            <div className={styles.centerValue}>{centerInfo.value}</div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                            <div className="text-sm text-base-content/60 mb-1">{centerInfo.label}</div>
+                            <div className="text-2xl font-bold text-base-content">{centerInfo.value}</div>
                         </div>
                     </div>
 
                     {/* Interactive Legend List */}
-                    <div className={styles.legend}>
+                    <div className="flex-[1.2] flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 max-[900px]:w-full max-[900px]:max-h-none custom-scrollbar">
                         {chartData.map((item, index) => {
                             const { color, icon } = getCategoryStyles(item.name);
                             const isFocused = focusedIndex === index;
@@ -224,19 +223,21 @@ export default function CategoryBreakdown({
                             return (
                                 <div
                                     key={item.name}
-                                    className={`${styles.legendItem} ${isSelected ? styles.selected : ''}`}
+                                    className={`
+                                        flex items-center gap-3 p-3 rounded-xl bg-base-200 border border-transparent cursor-pointer relative overflow-hidden flex-shrink-0 touch-manipulation tap-highlight-transparent transition-all
+                                        ${isSelected ? 'border-primary bg-primary/5' : ''}
+                                        ${(isFocused || isSelected) ? 'shadow-sm translate-x-1 border-base-300' : ''}
+                                    `}
                                     onMouseEnter={isTouch ? undefined : () => setFocusedIndex(index)}
                                     onMouseLeave={isTouch ? undefined : () => setFocusedIndex(null)}
                                     onClick={() => handleCategoryClick(item.name)}
                                     style={{
-                                        borderColor: isFocused || isSelected ? 'var(--border)' : 'transparent',
-                                        background: isFocused || isSelected ? 'var(--hover-bg)' : 'transparent',
                                         opacity: isDimmed ? 0.5 : 1,
                                     }}
                                 >
                                     {/* Background Progress Bar */}
                                     <div
-                                        className={styles.progressBar}
+                                        className="absolute left-0 top-0 bottom-0 bg-base-100 opacity-50 z-0 transition-[width] duration-500 ease-in-out"
                                         style={{
                                             width: `${relativeWidth}%`,
                                             backgroundColor: color,
@@ -244,17 +245,17 @@ export default function CategoryBreakdown({
                                         }}
                                     />
 
-                                    <div className={styles.itemIcon} style={{ color: color }}>
+                                    <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xl bg-base-100 flex-shrink-0 relative z-[2]" style={{ color: color }}>
                                         {icon}
                                     </div>
 
-                                    <div className={styles.itemContent}>
-                                        <div className={styles.itemHeader}>
-                                            <span className={styles.itemName}>{item.name}</span>
-                                            <span className={styles.itemValue}>{formatCurrency(item.value, settings.currencySymbol)}</span>
+                                    <div className="flex-1 relative z-[2]">
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="font-semibold text-[15px] whitespace-nowrap overflow-hidden text-ellipsis mr-2">{item.name}</span>
+                                            <span className="text-sm text-base-content/70 font-medium">{formatCurrency(item.value, settings.currencySymbol)}</span>
                                         </div>
-                                        <div className={styles.itemHeader} style={{ marginBottom: 0 }}>
-                                            <span className={styles.itemPercentage}>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-base-content/60">
                                                 {formatPercentage(item.percentage)}
                                                 {filterType !== 'all' && ` • ${item.count} txns`}
                                             </span>

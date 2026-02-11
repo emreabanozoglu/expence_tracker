@@ -1,7 +1,6 @@
 // Reusable Input Component
 
 import React from 'react';
-import styles from './Input.module.css';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -20,18 +19,22 @@ export default function Input({
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
-        <div className={`${styles.inputWrapper} ${fullWidth ? styles.fullWidth : ''}`}>
+        <div className={`flex flex-col gap-1 ${fullWidth ? 'w-full' : ''}`}>
             {label && (
-                <label htmlFor={inputId} className={styles.label}>
+                <label htmlFor={inputId} className="text-sm font-semibold text-base-content mb-1">
                     {label}
                 </label>
             )}
             <input
                 id={inputId}
-                className={`${styles.input} ${error ? styles.error : ''} ${className}`}
+                className={`
+                    input input-bordered w-full transition-all
+                    ${error ? 'input-error' : ''} 
+                    ${className}
+                `}
                 {...props}
             />
-            {error && <span className={styles.errorMessage}>{error}</span>}
+            {error && <span className="text-error text-sm mt-1">{error}</span>}
         </div>
     );
 }

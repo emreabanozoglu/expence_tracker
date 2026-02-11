@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { Download, Share, PlusSquare, X } from 'lucide-react';
-import styles from './InstallPrompt.module.css';
 
 interface BeforeInstallPromptEvent extends Event {
     prompt: () => Promise<void>;
@@ -63,27 +62,27 @@ export default function InstallPrompt() {
     }
 
     return (
-        <div style={{ marginBottom: '2rem' }}>
-            <label className={styles.sectionLabel}>App Installation</label>
-            <div className={styles.container}>
-                <div className={styles.content}>
-                    <div className={styles.icon}>
+        <div className="mb-8">
+            <label className="block mb-3 text-sm uppercase tracking-wider text-base-content/60 font-semibold">App Installation</label>
+            <div className="flex items-center justify-between gap-4 p-6 bg-base-100 border border-base-200 rounded-xl">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-focus flex items-center justify-center text-primary-content shrink-0 shadow-sm">
                         <Download size={24} />
                     </div>
-                    <div className={styles.text}>
-                        <h3 style={{ fontSize: '1rem' }}>Install App</h3>
-                        <p style={{ fontSize: '0.85rem' }}>Get the best experience</p>
+                    <div className="flex flex-col">
+                        <h3 className="text-base font-semibold m-0 mb-1 text-base-content">Install App</h3>
+                        <p className="m-0 text-sm text-base-content/60">Get the best experience</p>
                     </div>
                 </div>
 
                 {isAndroid && (
-                    <button className={styles.button} onClick={handleInstallClick}>
+                    <button className="btn btn-primary btn-sm" onClick={handleInstallClick}>
                         Install
                     </button>
                 )}
 
                 {isIOS && (
-                    <button className={styles.button} onClick={() => setShowIOSInstructions(true)}>
+                    <button className="btn btn-primary btn-sm" onClick={() => setShowIOSInstructions(true)}>
                         Install
                     </button>
                 )}
@@ -91,23 +90,23 @@ export default function InstallPrompt() {
 
             {/* iOS Instructions Modal */}
             <div
-                className={`${styles.overlay} ${showIOSInstructions ? styles.open : ''}`}
+                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${showIOSInstructions ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setShowIOSInstructions(false)}
             />
-            <div className={`${styles.iosModal} ${showIOSInstructions ? styles.open : ''}`}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 className={styles.iosTitle} style={{ marginBottom: 0 }}>Install Application</h3>
-                    <button onClick={() => setShowIOSInstructions(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--foreground)' }}>
+            <div className={`fixed bottom-0 left-0 right-0 bg-base-100 p-8 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] z-50 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${showIOSInstructions ? 'translate-y-0' : 'translate-y-full'}`}>
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl font-bold m-0 text-base-content">Install Application</h3>
+                    <button onClick={() => setShowIOSInstructions(false)} className="btn btn-circle btn-ghost btn-sm text-base-content">
                         <X size={24} />
                     </button>
                 </div>
 
-                <div className={styles.iosStep}>
-                    <Share className={styles.iosIcon} size={24} />
+                <div className="flex items-center gap-4 mb-4 text-base text-base-content">
+                    <Share className="text-primary" size={24} />
                     <span>1. Tap the <strong>Share</strong> button</span>
                 </div>
-                <div className={styles.iosStep}>
-                    <PlusSquare className={styles.iosIcon} size={24} />
+                <div className="flex items-center gap-4 mb-2 text-base text-base-content">
+                    <PlusSquare className="text-primary" size={24} />
                     <span>2. Select <strong>Add to Home Screen</strong></span>
                 </div>
             </div>

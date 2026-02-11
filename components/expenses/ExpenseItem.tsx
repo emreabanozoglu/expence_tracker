@@ -8,7 +8,7 @@ import { formatCurrency, formatDateDynamic } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '@/lib/constants';
 import { Edit2, Trash2 } from 'lucide-react';
-import styles from './ExpenseItem.module.css';
+import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 
 export interface ExpenseItemProps {
     expense: Expense;
@@ -16,8 +16,6 @@ export interface ExpenseItemProps {
     onDelete: (id: string) => void;
     onClick?: (expense: Expense) => void;
 }
-
-import { DEFAULT_INCOME_CATEGORIES } from '@/lib/constants/defaultCategories';
 
 export default function ExpenseItem({ expense, onEdit, onDelete, onClick }: ExpenseItemProps) {
     const { settings } = useSettingsContext();
@@ -45,34 +43,41 @@ export default function ExpenseItem({ expense, onEdit, onDelete, onClick }: Expe
 
     return (
         <div
-            className={styles.item}
+            className={`
+                flex gap-4 p-4 rounded-2xl animate-[fadeIn_0.3s_ease-out] touch-manipulation
+                hover:bg-[var(--hover-bg)] transition-all duration-200
+                items-center border-b border-base-content/5 last:border-none
+            `}
             data-testid="expense-item"
             onClick={() => onClick && onClick(expense)}
             style={{ cursor: onClick ? 'pointer' : 'default' }}
         >
-            <div className={styles.categoryBadge} style={{ backgroundColor: categoryColor }}>
-                <span className={styles.icon}>{categoryIcon}</span>
+            <div
+                className="flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm bg-base-100"
+                style={{ backgroundColor: categoryColor }}
+            >
+                <span className="drop-shadow-sm">{categoryIcon}</span>
             </div>
 
-            <div className={styles.content}>
-                <div className={styles.header}>
+            <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start gap-3 mb-0.5">
                     <div>
-                        <h3 className={styles.category}>{expense.category}</h3>
-                        <p className={styles.date}>{formatDateDynamic(expense.date, settings.dateFormat)}</p>
+                        <h3 className="text-base font-bold text-base-content m-0 leading-tight">{expense.category}</h3>
+                        <p className="text-xs text-base-content/60 m-0 mt-0.5 font-medium">{formatDateDynamic(expense.date, settings.dateFormat)}</p>
                     </div>
-                    <div className={`${styles.amount} ${isIncome ? styles.income : styles.expense}`}>
+                    <div className={`text-base font-bold whitespace-nowrap ${isIncome ? 'text-success' : 'text-base-content'}`}>
                         {isIncome ? '+' : '-'}{formatCurrency(expense.amount, settings.currencySymbol)}
                     </div>
                 </div>
 
                 {expense.description && (
-                    <p className={styles.description}>{expense.description}</p>
+                    <p className="text-sm text-base-content/70 m-0 leading-relaxed truncate mt-1">{expense.description}</p>
                 )}
             </div>
 
-            <div className={styles.actions}>
+            <div className="flex gap-1 flex-shrink-0 ml-1">
                 <button
-                    className={styles.actionButton}
+                    className="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-primary hover:bg-base-200"
                     onClick={handleEdit}
                     aria-label="Edit expense"
                     title="Edit"
@@ -81,7 +86,7 @@ export default function ExpenseItem({ expense, onEdit, onDelete, onClick }: Expe
                     <Edit2 size={18} />
                 </button>
                 <button
-                    className={`${styles.actionButton} ${styles.deleteButton}`}
+                    className="btn btn-ghost btn-sm btn-square text-base-content/50 hover:text-error hover:bg-error/10"
                     onClick={handleDelete}
                     aria-label="Delete expense"
                     title="Delete"
