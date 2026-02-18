@@ -18,30 +18,22 @@ import TypeFilter from '@/components/dashboard/TypeFilter';
 import RecurringFilter, { RecurringFilterType } from '@/components/dashboard/RecurringFilter';
 import PaginationControls from '@/components/ui/PaginationControls';
 import Modal from '@/components/ui/Modal';
-import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { TouchButton } from '@/components/ui/TouchButton';
-import ThemeToggle from '@/components/ui/ThemeToggle';
-import MobileNav from '@/components/ui/MobileNav';
+import BottomNav from '@/components/ui/BottomNav';
 import BudgetGoalsModal from '@/components/dashboard/BudgetGoalsModal';
 import TransactionDetailsModal from '@/components/dashboard/TransactionDetailsModal';
-import { Plus, Download, Wallet, Settings, LogOut, Inbox, X, Target } from 'lucide-react';
+import { Plus, Settings, LogOut, Inbox, X, Target } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
-import { useSubscription } from '@/lib/context/SubscriptionContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
-import { useRouter } from 'next/navigation';
 import PaymentVerification from '@/components/dashboard/PaymentVerification';
-import toast from 'react-hot-toast';
 
 export default function Home() {
   const { expenses, addExpense, addRecurringTransaction, updateExpense, deleteExpense, isLoading } = useExpenses();
   const { settings } = useSettingsContext();
   const { signOut } = useAuth();
-  const { refreshSubscription } = useSubscription();
   // searchParams logic moved to PaymentVerification component
-  const router = useRouter();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
@@ -161,14 +153,6 @@ export default function Home() {
     exportToCSV(typeFilteredExpenses, settings.dateFormat);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
-  const handleSettingsClick = () => {
-    window.location.href = '/settings';
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 text-base-content/60" data-testid="loading-page">
@@ -191,16 +175,7 @@ export default function Home() {
               <h1 className="text-2xl font-bold m-0 text-transparent bg-clip-text bg-gradient-to-br from-primary to-primary-focus">Bibudget</h1>
             </div>
 
-            {/* Mobile Navigation */}
-            <div className="md:hidden flex items-center">
-              <MobileNav
-                onSettingsClick={handleSettingsClick}
-                onExportClick={handleExport}
-                onSignOutClick={handleSignOut}
-                onBudgetClick={() => setIsBudgetModalOpen(true)}
-                showExport={expenses.length > 0}
-              />
-            </div>
+
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex gap-3">
@@ -228,7 +203,7 @@ export default function Home() {
 
 
 
-        <main className="flex-1 py-8 pb-24 md:pb-8">
+        <main className="flex-1 py-8 pb-24 md:pb-8" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
           <div className="w-full max-w-6xl mx-auto px-4 md:px-8 flex flex-col gap-8">
 
             {/* Filter Section */}
@@ -339,15 +314,13 @@ export default function Home() {
         </main>
 
 
-        {/* Floating Action Button - Always visible on mobile */}
-        <TouchButton
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-focus text-primary-content border-none shadow-lg cursor-pointer flex items-center justify-center z-[1000] active:scale-95 md:hidden"
-          onTap={handleAddExpense}
-          data-testid="fab-add-expense-button"
-          aria-label="Add Transaction"
-        >
-          <Plus size={24} />
-        </TouchButton>
+        {/* Mobile Bottom Navigation */}
+        <BottomNav
+          activePage="dashboard"
+          onAddClick={handleAddExpense}
+          onBudgetClick={() => setIsBudgetModalOpen(true)}
+          onExportClick={handleExport}
+        />
 
         {/* Budget Goals Modal */}
         <BudgetGoalsModal

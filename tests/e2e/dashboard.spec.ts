@@ -161,24 +161,17 @@ test.describe('Dashboard and Analytics', () => {
         await expect(page.getByRole('button', { name: 'Clear Filter' })).toBeVisible();
     });
 
-    test('should open budget modal from mobile menu', async ({ page, isMobile }) => {
+    test('should open budget modal from mobile bottom nav', async ({ page, isMobile }) => {
         // Only run on mobile
         if (!isMobile) return;
 
         await dashboardPage.goto();
         await dashboardPage.waitForDataToLoad();
 
-        // Open mobile menu - expecting hamburger button
-        await page.getByLabel('Toggle menu').click();
-
-        // Check Theme button is GONE
-        await expect(page.getByText('Theme', { exact: true })).not.toBeVisible();
-
-        // Click Budget button
+        // Click Budget button directly in the bottom navigation bar
         await page.getByRole('button', { name: 'Budget' }).click();
 
         // Verify modal opens
-        // The modal title might be "Budget & Goals" or similar
         await expect(page.getByText('Budget & Goals')).toBeVisible();
     });
     test('should open transaction details modal when clicking on transaction', async ({ page }) => {

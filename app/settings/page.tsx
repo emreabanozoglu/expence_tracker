@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import BottomNav from '@/components/ui/BottomNav';
 
 // Components
 import SettingsSidebar from '@/components/settings/SettingsSidebar';
@@ -78,7 +79,7 @@ export default function SettingsPage() {
                 </div>
             </header>
 
-            <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-8">
+            <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-8" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
                 <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start">
                     <aside className={`w-full md:w-60 shrink-0 md:sticky md:top-8 ${isMobileListOpen ? 'block' : 'hidden md:block'}`}>
                         <SettingsSidebar activeTab={activeTab} onTabChange={handleTabChange} />
@@ -95,6 +96,8 @@ export default function SettingsPage() {
                     </section>
                 </div>
             </main>
+
+            <BottomNav activePage="settings" />
         </div>
     );
 }
