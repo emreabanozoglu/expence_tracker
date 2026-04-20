@@ -13,16 +13,15 @@ import ExpenseList from '@/components/expenses/ExpenseList';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 
 import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown';
-import DateRangeFilter from '@/components/dashboard/DateRangeFilter';
-import TypeFilter from '@/components/dashboard/TypeFilter';
-import RecurringFilter, { RecurringFilterType } from '@/components/dashboard/RecurringFilter';
+import FilterDrawer from '@/components/dashboard/FilterDrawer';
+import { RecurringFilterType } from '@/components/dashboard/RecurringFilter';
 import PaginationControls from '@/components/ui/PaginationControls';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import BottomNav from '@/components/ui/BottomNav';
 import BudgetGoalsModal from '@/components/dashboard/BudgetGoalsModal';
 import TransactionDetailsModal from '@/components/dashboard/TransactionDetailsModal';
-import { Plus, Settings, LogOut, Inbox, X, Target } from 'lucide-react';
+import { Plus, Settings, LogOut, Inbox, X, Target, Filter } from 'lucide-react';
 import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -43,6 +42,14 @@ export default function Home() {
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
   const [recurringFilter, setRecurringFilter] = useState<RecurringFilterType>('all');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  const handleResetFilters = () => {
+    setDateRange('thisMonth');
+    setFilterType('all');
+    setRecurringFilter('all');
+    setSelectedCategory(null);
+  };
 
   // Payment verification logic moved to PaymentVerification component
 
@@ -189,10 +196,6 @@ export default function Home() {
                   Settings
                 </Button>
               </Link>
-              <Button onClick={signOut} variant="ghost" data-testid="logout-button">
-                <LogOut size={20} />
-                Logout
-              </Button>
               <Button onClick={handleAddExpense} variant="primary" data-testid="add-expense-button">
                 <Plus size={20} />
                 Add Transaction
@@ -206,47 +209,42 @@ export default function Home() {
         <main className="flex-1 py-8 pb-24 md:pb-8" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
           <div className="w-full max-w-6xl mx-auto px-4 md:px-8 flex flex-col gap-8">
 
-            {/* Filter Section */}
+            {/* Filter Controls Row */}
             {expenses.length > 0 && (
-              <>
-
-
-                <div className="mb-6">
-                  <div className="flex gap-2 flex-wrap items-stretch">
-                    <div className="flex-1 min-w-[300px]">
-                      <label className="block mb-2 text-sm font-medium text-base-content/60">
-                        Transaction Type
-                      </label>
-                      <TypeFilter
-                        selected={filterType}
-                        onSelect={setFilterType}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-[300px] relative">
-                      <label className="block mb-2 text-sm font-medium text-base-content/60">
-                        Date Period
-                      </label>
-                      <DateRangeFilter
-                        selected={dateRange}
-                        onSelect={setDateRange}
-                        expenses={expenses}
-                      />
-                    </div>
-                  </div>
-
-                  {filterType === 'expense' && (
-                    <div className="mt-9">
-                      <label className="block mb-1 text-xs font-medium text-base-content/60">
-                        Recurring Status
-                      </label>
-                      <RecurringFilter
-                        selected={recurringFilter}
-                        onSelect={setRecurringFilter}
-                      />
-                    </div>
-                  )}
-                </div>
-              </>
+              <div className="flex flex-wrap items-center justify-between gap-4 bg-[var(--card-bg)] p-4 rounded-2xl shadow-sm border border-base-content/5 mb-6">
+                 <div className="flex items-center gap-3">
+                   <h2 className="text-xl font-bold m-0 text-base-content">
+                     Overview
+                   </h2>
+                 </div>
+                 
+                 <div className="flex gap-3">
+                    {(filterType !== 'all' || dateRange !== 'thisMonth' || recurringFilter !== 'all' || selectedCategory) && (
+                      <Button variant="ghost" size="sm" onClick={handleResetFilters} className="text-xs h-10 hidden md:flex text-base-content/70 hover:text-base-content">
+                        Clear all filters
+                      </Button>
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsFilterDrawerOpen(true)} 
+                      className={`relative h-10 px-4 rounded-xl transition-all border border-base-content/10 ${
+                        (filterType !== 'all' || dateRange !== 'thisMonth' || recurringFilter !== 'all') 
+                          ? 'bg-primary/5 text-primary border-primary/20 hover:bg-primary/10' 
+                          : 'hover:bg-base-200'
+                      }`}
+                    >
+                      <Filter size={16} className="mr-2" />
+                      Filters
+                      {(filterType !== 'all' || dateRange !== 'thisMonth' || recurringFilter !== 'all') && (
+                         <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                           <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                         </span>
+                      )}
+                    </Button>
+                 </div>
+              </div>
             )}
 
             {/* Empty State */}
@@ -352,6 +350,20 @@ export default function Home() {
             onCancel={handleCancel}
           />
         </Modal>
+
+        {/* Filter Drawer */}
+        <FilterDrawer
+          isOpen={isFilterDrawerOpen}
+          onClose={() => setIsFilterDrawerOpen(false)}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          filterType={filterType}
+          setFilterType={setFilterType}
+          recurringFilter={recurringFilter}
+          setRecurringFilter={setRecurringFilter}
+          expenses={expenses}
+          onReset={handleResetFilters}
+        />
       </div>
     </ProtectedRoute>
   );
