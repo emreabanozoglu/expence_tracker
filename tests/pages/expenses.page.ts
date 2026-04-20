@@ -99,16 +99,7 @@ export class ExpensesPage {
         }
 
         if (data.isRecurring) {
-            // Check if not already checked (it shouldn't be by default, but good practice)
-            if (!(await this.isRecurringToggle.isChecked())) {
-                // Click the wrapper to toggle
-                await this.page.locator('[data-testid="recurring-toggle-wrapper"]').click();
-            }
-
-            if (data.frequency) {
-                await this.frequencySelect.waitFor({ state: 'visible' });
-                await this.frequencySelect.selectOption(data.frequency);
-            }
+            await this.isRecurringToggle.click();
         }
 
         // Submit the form

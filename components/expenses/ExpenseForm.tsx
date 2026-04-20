@@ -195,41 +195,24 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                     {errors.category && <span className="text-error text-sm mt-1">{errors.category}</span>}
                 </div>
 
-                {(formData.isRecurring && formData.frequency === 'monthly') ? (
-                    <div className="form-control w-full">
-                        <label htmlFor="dayOfMonth" className="label label-text font-semibold">
-                            Day of Month *
-                        </label>
-                        <select
-                            id="dayOfMonth"
-                            value={parseInt(formData.date.split('-')[2])}
-                            onChange={(e) => {
-                                const day = parseInt(e.target.value);
-                                const [yStr, mStr] = formData.date.split('-');
-                                const newDate = new Date(parseInt(yStr), parseInt(mStr) - 1, day);
-
-                                const y = newDate.getFullYear();
-                                const m = String(newDate.getMonth() + 1).padStart(2, '0');
-                                const d = String(newDate.getDate()).padStart(2, '0');
-
-                                setFormData({ ...formData, date: `${y}-${m}-${d}` });
-                            }}
-                            className="select select-bordered w-full text-base transition-all focus:border-primary"
-                            data-testid="expense-day-of-month"
-                        >
-                            {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                                <option key={day} value={day}>
-                                    {day}{[1, 21, 31].includes(day) ? 'st' : [2, 22].includes(day) ? 'nd' : [3, 23].includes(day) ? 'rd' : 'th'}
-                                </option>
-                            ))}
-                        </select>
-                        <p className="mt-2 text-xs text-base-content/60">
-                            Transaction will repeat on this day every month.
-                        </p>
-                    </div>
+                {formData.isRecurring ? (
+                    <Input
+                        label="Start Month *"
+                        type="month"
+                        value={formData.date.substring(0, 7)}
+                        onChange={(e) => {
+                            setFormData({ ...formData, date: `${e.target.value}-01` });
+                            if (errors.date) {
+                                setErrors({ ...errors, date: undefined });
+                            }
+                        }}
+                        error={errors.date}
+                        fullWidth
+                        data-testid="expense-date"
+                    />
                 ) : (
                     <Input
-                        label={formData.isRecurring ? "Start Date *" : "Date *"}
+                        label="Date *"
                         type="date"
                         value={formData.date}
                         onChange={(e) => {
@@ -298,7 +281,7 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                                     ? 'bg-base-100 text-primary shadow-sm font-semibold'
                                     : 'text-base-content/60 hover:text-base-content hover:bg-base-100/50'
                                     }`}
-                                onClick={() => !expense && setFormData({ ...formData, isRecurring: true })}
+                                onClick={() => !expense && setFormData({ ...formData, isRecurring: true, frequency: 'monthly', date: `${formData.date.substring(0, 7)}-01` })}
                                 disabled={!!expense}
                                 data-testid="expense-is-recurring"
                             >
@@ -308,25 +291,7 @@ export default function ExpenseForm({ expense, initialRecurringState, showRecurr
                     </div>
                 )}
 
-                {formData.isRecurring && (
-                    <div className="form-control w-full">
-                        <label htmlFor="frequency" className="label label-text font-semibold">
-                            Frequency *
-                        </label>
-                        <select
-                            id="frequency"
-                            value={formData.frequency}
-                            onChange={(e) => setFormData({ ...formData, frequency: e.target.value as RecurrenceFrequency })}
-                            className="select select-bordered w-full text-base transition-all focus:border-primary"
-                            data-testid="expense-frequency"
-                        >
-                            <option value="daily">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                            <option value="yearly">Yearly</option>
-                        </select>
-                    </div>
-                )}
+
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-base-200 flex-col-reverse md:flex-row">

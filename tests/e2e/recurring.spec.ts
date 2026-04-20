@@ -34,8 +34,7 @@ test.describe('Recurring Transactions', () => {
         // 1. Add Recurring Expense
         await expensesPage.addExpense({
             ...expenseData,
-            isRecurring: true,
-            frequency: 'monthly'
+            isRecurring: true
         });
 
         // 2. Go to Settings
@@ -50,13 +49,11 @@ test.describe('Recurring Transactions', () => {
 
         // 4. Edit it
         await settingsPage.editRecurringTransaction('Netflix Subscription', {
-            amount: '20.00',
-            frequency: 'weekly'
+            amount: '20.00'
         });
 
         // 5. Verify updates in the list (simple text check)
         await expect(recurringItem).toContainText('$20.00');
-        await expect(recurringItem).toContainText('weekly');
 
         // 6. Verify Toggle is NOT visible in Modal (User Requirement)
         // Re-open modal
@@ -66,11 +63,6 @@ test.describe('Recurring Transactions', () => {
         // Check toggle is hidden
         const toggle = page.locator('[data-testid="expense-is-recurring"]');
         await expect(toggle).not.toBeVisible();
-
-        // Check frequency is visible
-        const frequency = page.locator('[data-testid="expense-frequency"]');
-        await expect(frequency).toBeVisible();
-        await expect(frequency).toHaveValue('weekly');
     });
 
     test('should delete a recurring transaction', async () => {
@@ -79,8 +71,7 @@ test.describe('Recurring Transactions', () => {
         // Add
         await expensesPage.addExpense({
             ...expenseData,
-            isRecurring: true,
-            frequency: 'monthly'
+            isRecurring: true
         });
 
         // Go to Settings
@@ -103,8 +94,7 @@ test.describe('Recurring Transactions', () => {
             type: 'expense',
             amount: '50.00',
             description: 'Monthly Sub',
-            isRecurring: true,
-            frequency: 'monthly'
+            isRecurring: true
         }));
 
         // 2. Add Recurring Income
@@ -112,8 +102,7 @@ test.describe('Recurring Transactions', () => {
             type: 'income',
             amount: '1000.00',
             description: 'Monthly Salary',
-            isRecurring: true,
-            frequency: 'monthly'
+            isRecurring: true
         }));
 
         // 3. Go to Settings > Recurring

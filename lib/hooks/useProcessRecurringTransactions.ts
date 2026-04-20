@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
 import { RecurringTransaction } from './useRecurringTransactions';
-import { addDays, addMonths, addWeeks, addYears, startOfDay } from 'date-fns';
+import { addMonths } from 'date-fns';
 
 export function useProcessRecurringTransactions() {
     const { user } = useAuth();
@@ -72,22 +72,10 @@ export function useProcessRecurringTransactions() {
                         }
                     }
 
-                    // Calculate next run
+                    // Calculate next run to always be the 1st of the next month
                     let nextRun = new Date(t.next_run);
-                    switch (t.frequency) {
-                        case 'daily':
-                            nextRun = addDays(nextRun, 1);
-                            break;
-                        case 'weekly':
-                            nextRun = addWeeks(nextRun, 1);
-                            break;
-                        case 'monthly':
-                            nextRun = addMonths(nextRun, 1);
-                            break;
-                        case 'yearly':
-                            nextRun = addYears(nextRun, 1);
-                            break;
-                    }
+                    nextRun = addMonths(nextRun, 1);
+                    nextRun.setDate(1);
 
                     const nextRunStr = nextRun.toISOString().split('T')[0];
 

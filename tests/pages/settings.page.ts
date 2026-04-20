@@ -60,9 +60,7 @@ export class SettingsPage {
             await this.page.locator('[data-testid="expense-amount"]').fill(updates.amount);
         }
 
-        if (updates.frequency) {
-            await this.page.locator('[data-testid="expense-frequency"]').selectOption(updates.frequency);
-        }
+
 
         await this.page.locator('[data-testid="submit-expense-button"]').click();
         await this.page.getByText('Edit Recurring Transaction').waitFor({ state: 'hidden' });
