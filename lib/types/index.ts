@@ -60,7 +60,8 @@ export interface DateRange {
   end: Date;
 }
 
-export type DateRangePreset = 'all' | 'thisMonth' | 'lastMonth' | string; // string format: 'YYYY-MM' for specific months
+// 'YYYY-MM' for a calendar month, 'cycle:YYYY-MM' for a salary cycle
+export type DateRangePreset = 'all' | 'thisMonth' | 'lastMonth' | 'currentCycle' | string;
 
 export interface MonthOption {
   value: string; // 'YYYY-MM' format

@@ -38,14 +38,14 @@ export default function Home() {
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [viewingExpense, setViewingExpense] = useState<Expense | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | undefined>(undefined);
-  const [dateRange, setDateRange] = useState<DateRangePreset>('thisMonth');
+  const [dateRange, setDateRange] = useState<DateRangePreset>('currentCycle');
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
   const [recurringFilter, setRecurringFilter] = useState<RecurringFilterType>('all');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const handleResetFilters = () => {
-    setDateRange('thisMonth');
+    setDateRange('currentCycle');
     setFilterType('all');
     setRecurringFilter('all');
     setSelectedCategory(null);
@@ -219,7 +219,7 @@ export default function Home() {
                  </div>
                  
                  <div className="flex gap-3">
-                    {(filterType !== 'all' || dateRange !== 'thisMonth' || recurringFilter !== 'all' || selectedCategory) && (
+                    {(filterType !== 'all' || dateRange !== 'currentCycle' || recurringFilter !== 'all' || selectedCategory) && (
                       <Button variant="ghost" size="sm" onClick={handleResetFilters} className="text-xs h-10 hidden md:flex text-base-content/70 hover:text-base-content">
                         Clear all filters
                       </Button>
@@ -229,14 +229,14 @@ export default function Home() {
                       size="sm" 
                       onClick={() => setIsFilterDrawerOpen(true)} 
                       className={`relative h-10 px-4 rounded-xl transition-all border border-base-content/10 ${
-                        (filterType !== 'all' || dateRange !== 'thisMonth' || recurringFilter !== 'all') 
+                        (filterType !== 'all' || dateRange !== 'currentCycle' || recurringFilter !== 'all') 
                           ? 'bg-primary/5 text-primary border-primary/20 hover:bg-primary/10' 
                           : 'hover:bg-base-200'
                       }`}
                     >
                       <Filter size={16} className="mr-2" />
                       Filters
-                      {(filterType !== 'all' || dateRange !== 'thisMonth' || recurringFilter !== 'all') && (
+                      {(filterType !== 'all' || dateRange !== 'currentCycle' || recurringFilter !== 'all') && (
                          <span className="absolute -top-1 -right-1 flex h-3 w-3">
                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>

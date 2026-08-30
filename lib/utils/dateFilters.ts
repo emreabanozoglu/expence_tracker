@@ -2,6 +2,11 @@
 
 import { Expense, DateRangePreset } from '../types';
 import { startOfMonth, endOfMonth, subMonths, parse, isSameMonth } from 'date-fns';
+import {
+    filterExpensesBySalaryCycle,
+    getCurrentCycle,
+    parseSalaryCyclePreset,
+} from './salaryCycle';
 
 export function filterExpensesByDateRange(
     expenses: Expense[],
@@ -9,6 +14,15 @@ export function filterExpensesByDateRange(
 ): Expense[] {
     if (preset === 'all') {
         return expenses;
+    }
+
+    if (preset === 'currentCycle') {
+        return filterExpensesBySalaryCycle(expenses, getCurrentCycle());
+    }
+
+    const cycle = parseSalaryCyclePreset(preset);
+    if (cycle) {
+        return filterExpensesBySalaryCycle(expenses, cycle);
     }
 
     const now = new Date();

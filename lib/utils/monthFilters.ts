@@ -2,6 +2,7 @@
 
 import { Expense } from '../types';
 import { format, parse, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
+import { getCurrentCycle, parseSalaryCyclePreset } from './salaryCycle';
 
 export interface MonthOption {
     value: string; // 'YYYY-MM' format
@@ -63,6 +64,10 @@ export function getDateRangeLabel(preset: string): string {
     if (preset === 'all') return 'All Time';
     if (preset === 'thisMonth') return 'This Month';
     if (preset === 'lastMonth') return 'Last Month';
+    if (preset === 'currentCycle') return `Current Cycle · ${getCurrentCycle().label}`;
+
+    const cycle = parseSalaryCyclePreset(preset);
+    if (cycle) return cycle.label;
 
     // If it's a month key (YYYY-MM format), parse and format it
     if (/^\d{4}-\d{2}$/.test(preset)) {
