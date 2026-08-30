@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
-import { RecurrenceFrequency, TransactionType, Category } from '../types';
+import { RecurrenceFrequency, TransactionType, Category, PaydayRule } from '../types';
 
 export interface RecurringTransaction {
     id: string;
@@ -14,6 +14,8 @@ export interface RecurringTransaction {
     next_run: string;
     last_processed: string | null;
     active: boolean;
+    payday_rule: PaydayRule | null;
+    payday_day_of_month: number | null;
 }
 
 export function useRecurringTransactions() {
@@ -61,5 +63,26 @@ export function useRecurringTransactions() {
         );
     };
 
-    return { recurringTransactions, isLoading, deleteTransaction, updateTransaction, loadTransactions };
+    /** Clear the payday rule from every recurring row except `keepId`. */
+    const clearOtherPaydayRules = useCallback(async (keepId: string) => {
+        if (!user) return;
+
+        const { error } = await (supabase
+            .from('recurring_transactions') as any)
+            .update({ payday_rule: null, payday_day_of_month: null })
+            .eq('user_id', user.id)
+            .neq('id', keepId)
+            .not('payday_rule', 'is', null);
+
+        if (error) throw error;
+    }, [user]);
+
+    return {
+        recurringTransactions,
+        isLoading,
+        deleteTransaction,
+        updateTransaction,
+        loadTransactions,
+        clearOtherPaydayRules,
+    };
 }

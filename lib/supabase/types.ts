@@ -98,6 +98,8 @@ export type Database = {
                     id: string
                     last_processed: string | null
                     next_run: string
+                    payday_day_of_month: number | null
+                    payday_rule: string | null
                     start_date: string
                     type: string
                     updated_at: string
@@ -113,6 +115,8 @@ export type Database = {
                     id?: string
                     last_processed?: string | null
                     next_run: string
+                    payday_day_of_month?: number | null
+                    payday_rule?: string | null
                     start_date: string
                     type: string
                     updated_at?: string
@@ -128,6 +132,8 @@ export type Database = {
                     id?: string
                     last_processed?: string | null
                     next_run?: string
+                    payday_day_of_month?: number | null
+                    payday_rule?: string | null
                     start_date?: string
                     type?: string
                     updated_at?: string

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { SettingsProvider } from '@/lib/context/SettingsContext';
+import { PaydayProvider } from '@/lib/context/PaydayContext';
 import { AuthProvider } from '@/lib/context/AuthContext';
 import { SubscriptionProvider } from '@/lib/context/SubscriptionContext';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
@@ -34,11 +35,13 @@ export default function RootLayout({
           <SubscriptionProvider>
             <RecurringTransactionManager />
             <SettingsProvider>
-              <ThemeProvider>
-                {children}
-                <PricingModal />
-                <Toaster position="top-center" />
-              </ThemeProvider>
+              <PaydayProvider>
+                <ThemeProvider>
+                  {children}
+                  <PricingModal />
+                  <Toaster position="top-center" />
+                </ThemeProvider>
+              </PaydayProvider>
             </SettingsProvider>
           </SubscriptionProvider>
         </AuthProvider>

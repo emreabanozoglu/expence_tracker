@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { useRecurringTransactions, RecurringTransaction } from '@/lib/hooks/useRecurringTransactions';
-import { Trash2, Calendar, Repeat, Edit2 } from 'lucide-react';
+import { Trash2, Calendar, Repeat, Edit2, Wallet } from 'lucide-react';
 import { formatCurrency, formatDateDynamic } from '@/lib/utils/formatting';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
 import Modal from '@/components/ui/Modal';
 import ExpenseForm from '@/components/expenses/ExpenseForm';
 import { ExpenseFormData, TransactionType, Category, RecurrenceFrequency } from '@/lib/types';
+import { usePaydayContext } from '@/lib/context/PaydayContext';
+import { describePaydayConfig, getNextPaydayAfter, toDateKey } from '@/lib/utils/salaryCycle';
 import { toast } from 'react-hot-toast';
 
 export default function RecurringTransactionsList() {
-    const { recurringTransactions, isLoading, deleteTransaction, updateTransaction } = useRecurringTransactions();
+    const { recurringTransactions, isLoading, deleteTransaction, updateTransaction, loadTransactions, clearOtherPaydayRules } = useRecurringTransactions();
     const { settings } = useSettingsContext();
+    const { reloadPaydayConfig } = usePaydayContext();
     const [editingTransaction, setEditingTransaction] = useState<RecurringTransaction | null>(null);
 
     const handleEdit = (transaction: RecurringTransaction) => {
@@ -21,15 +24,34 @@ export default function RecurringTransactionsList() {
         if (!editingTransaction) return;
 
         try {
+            // Only one recurring row may carry the payday rule, so clear the
+            // previous salary before claiming it here.
+            if (data.isSalary) {
+                await clearOtherPaydayRules(editingTransaction.id);
+            }
+
+            // Realign the schedule so next_run lands on the rule's payday.
+            const nextRun = data.isSalary && data.paydayRule
+                ? toDateKey(getNextPaydayAfter(new Date(), {
+                    rule: data.paydayRule,
+                    dayOfMonth: data.paydayDayOfMonth,
+                }))
+                : data.date;
+
             await updateTransaction(editingTransaction.id, {
                 amount: parseFloat(data.amount),
                 category: data.category,
                 description: data.description,
                 type: data.type,
                 frequency: data.frequency,
-                next_run: data.date, // ExpenseForm 'date' maps to 'next_run'
-            });
+                next_run: nextRun, // ExpenseForm 'date' maps to 'next_run'
+                payday_rule: data.isSalary ? data.paydayRule ?? null : null,
+                payday_day_of_month: data.isSalary ? data.paydayDayOfMonth ?? null : null,
+            } as any);
+
             setEditingTransaction(null);
+            await loadTransactions();
+            await reloadPaydayConfig();
             toast.success('Recurring transaction updated');
         } catch (error) {
             console.error('Failed to update transaction:', error);
@@ -100,6 +122,15 @@ export default function RecurringTransactionsList() {
                                     <Calendar size={14} /> Next: {formatDateDynamic(transaction.next_run, settings.dateFormat)}
                                 </span>
                             </div>
+                            {transaction.payday_rule && (
+                                <span className="inline-flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 rounded-md px-2 py-0.5 mt-1">
+                                    <Wallet size={12} />
+                                    Salary cycle: {describePaydayConfig({
+                                        rule: transaction.payday_rule,
+                                        dayOfMonth: transaction.payday_day_of_month ?? undefined,
+                                    })}
+                                </span>
+                            )}
                             {transaction.description && (
                                 <div className="italic text-sm text-base-content/60 mt-1">{transaction.description}</div>
                             )}
@@ -144,6 +175,11 @@ export default function RecurringTransactionsList() {
                         initialRecurringState={{
                             isRecurring: true,
                             frequency: editingTransaction.frequency
+                        }}
+                        initialPaydayState={{
+                            isSalary: !!editingTransaction.payday_rule,
+                            paydayRule: editingTransaction.payday_rule ?? undefined,
+                            paydayDayOfMonth: editingTransaction.payday_day_of_month ?? undefined,
                         }}
                         showRecurringToggle={false}
                         onSubmit={handleUpdate}

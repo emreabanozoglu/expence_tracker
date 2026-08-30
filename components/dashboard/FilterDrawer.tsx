@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { X, RotateCcw } from 'lucide-react';
-import { DateRangePreset, Expense } from '@/lib/types';
+import { DateRangePreset, Expense, PaydayConfig } from '@/lib/types';
 import TypeFilter from './TypeFilter';
 import DateRangeFilter from './DateRangeFilter';
 import RecurringFilter, { RecurringFilterType } from './RecurringFilter';
@@ -18,6 +18,7 @@ export interface FilterDrawerProps {
     recurringFilter: RecurringFilterType;
     setRecurringFilter: (type: RecurringFilterType) => void;
     expenses: Expense[];
+    paydayConfig?: PaydayConfig;
     onReset: () => void;
 }
 
@@ -31,6 +32,7 @@ export default function FilterDrawer({
     recurringFilter,
     setRecurringFilter,
     expenses,
+    paydayConfig,
     onReset,
 }: FilterDrawerProps) {
     // Prevent body scroll when open
@@ -116,7 +118,7 @@ export default function FilterDrawer({
                         </label>
                         {/* We use a wrapper here to ensure z-index issues don't occur if DateRangeFilter expands inside the drawer */}
                         <div className="relative z-50">
-                            <DateRangeFilter selected={dateRange} onSelect={setDateRange} expenses={expenses} />
+                            <DateRangeFilter selected={dateRange} onSelect={setDateRange} expenses={expenses} paydayConfig={paydayConfig} />
                         </div>
                     </div>
                 </div>

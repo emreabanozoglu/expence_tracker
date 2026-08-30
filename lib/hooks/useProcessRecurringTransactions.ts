@@ -3,6 +3,7 @@ import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
 import { RecurringTransaction } from './useRecurringTransactions';
 import { addMonths } from 'date-fns';
+import { getNextPaydayAfter, parseDateKey, toDateKey } from '../utils/salaryCycle';
 
 export function useProcessRecurringTransactions() {
     const { user } = useAuth();
@@ -72,12 +73,23 @@ export function useProcessRecurringTransactions() {
                         }
                     }
 
-                    // Calculate next run to always be the 1st of the next month
-                    let nextRun = new Date(t.next_run);
-                    nextRun = addMonths(nextRun, 1);
-                    nextRun.setDate(1);
+                    // Salary rows follow their payday rule; everything else keeps
+                    // landing on the 1st of the next month.
+                    let nextRunStr: string;
 
-                    const nextRunStr = nextRun.toISOString().split('T')[0];
+                    if (t.payday_rule) {
+                        nextRunStr = toDateKey(
+                            getNextPaydayAfter(parseDateKey(t.next_run), {
+                                rule: t.payday_rule,
+                                dayOfMonth: t.payday_day_of_month ?? undefined,
+                            })
+                        );
+                    } else {
+                        let nextRun = new Date(t.next_run);
+                        nextRun = addMonths(nextRun, 1);
+                        nextRun.setDate(1);
+                        nextRunStr = toDateKey(nextRun);
+                    }
 
                     // Update recurring transaction
                     await supabase

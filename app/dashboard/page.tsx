@@ -26,11 +26,13 @@ import { useAuth } from '@/lib/context/AuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSettingsContext } from '@/lib/context/SettingsContext';
+import { usePaydayContext } from '@/lib/context/PaydayContext';
 import PaymentVerification from '@/components/dashboard/PaymentVerification';
 
 export default function Home() {
   const { expenses, addExpense, addRecurringTransaction, updateExpense, deleteExpense, isLoading } = useExpenses();
   const { settings } = useSettingsContext();
+  const { paydayConfig } = usePaydayContext();
   const { signOut } = useAuth();
   // searchParams logic moved to PaymentVerification component
 
@@ -59,8 +61,8 @@ export default function Home() {
 
   // 1. Filter by Date (Base for everything)
   const dateFilteredExpenses = useMemo(() => {
-    return filterExpensesByDateRange(expenses, dateRange);
-  }, [expenses, dateRange]);
+    return filterExpensesByDateRange(expenses, dateRange, paydayConfig);
+  }, [expenses, dateRange, paydayConfig]);
 
   // 2. Filter by Type
   const typeFilteredExpenses = useMemo(() => {
@@ -283,7 +285,7 @@ export default function Home() {
                 <div className="flex flex-col gap-6" data-testid="expense-list-section">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold m-0 text-base-content">
-                      {getDateRangeLabel(dateRange)}
+                      {getDateRangeLabel(dateRange, paydayConfig)}
                     </h2>
                     {selectedCategory && (
                       <Button variant="ghost" size="sm" onClick={clearCategoryFilter} className="text-xs h-8">
@@ -362,6 +364,7 @@ export default function Home() {
           recurringFilter={recurringFilter}
           setRecurringFilter={setRecurringFilter}
           expenses={expenses}
+          paydayConfig={paydayConfig}
           onReset={handleResetFilters}
         />
       </div>

@@ -8,6 +8,7 @@ import { supabase } from '../supabase/client';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import type { Database } from '../supabase/types';
+import { getNextPaydayAfter, toDateKey } from '../utils/salaryCycle';
 
 export interface UseExpensesReturn {
     expenses: Expense[];
@@ -226,6 +227,18 @@ export function useExpenses(): UseExpensesReturn {
             }
 
             try {
+                // Only one recurring row may carry the payday rule (enforced by a
+                // partial unique index), so clear any previous salary first.
+                if (data.isSalary) {
+                    const { error: clearError } = await (supabase
+                        .from('recurring_transactions') as any)
+                        .update({ payday_rule: null, payday_day_of_month: null })
+                        .eq('user_id', user.id)
+                        .not('payday_rule', 'is', null);
+
+                    if (clearError) throw clearError;
+                }
+
                 const { error } = await (supabase
                     .from('recurring_transactions') as any)
                     .insert({
@@ -238,8 +251,15 @@ export function useExpenses(): UseExpensesReturn {
                         type: data.type,
                         frequency: data.frequency,
                         start_date: data.date,
-                        next_run: data.date,
-                        active: true
+                        next_run: data.isSalary && data.paydayRule
+                            ? toDateKey(getNextPaydayAfter(new Date(), {
+                                rule: data.paydayRule,
+                                dayOfMonth: data.paydayDayOfMonth,
+                            }))
+                            : data.date,
+                        active: true,
+                        payday_rule: data.isSalary ? data.paydayRule ?? null : null,
+                        payday_day_of_month: data.isSalary ? data.paydayDayOfMonth ?? null : null,
                     } as any);
 
                 if (error) throw error;

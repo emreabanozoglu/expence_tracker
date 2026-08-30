@@ -3,10 +3,12 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
-import { DateRangePreset } from '@/lib/types';
+import { DateRangePreset, PaydayConfig } from '@/lib/types';
 import { Expense } from '@/lib/types';
 import { getAvailableMonths } from '@/lib/utils/monthFilters';
 import {
+    DEFAULT_PAYDAY_CONFIG,
+    describePaydayConfig,
     getAvailableSalaryCycles,
     getCurrentCycle,
     isSalaryCyclePreset,
@@ -18,6 +20,7 @@ export interface DateRangeFilterProps {
     selected: DateRangePreset;
     onSelect: (preset: DateRangePreset) => void;
     expenses: Expense[];
+    paydayConfig?: PaydayConfig;
 }
 
 type FilterMode = 'cycle' | 'month';
@@ -25,7 +28,12 @@ type FilterMode = 'cycle' | 'month';
 const modeOf = (preset: DateRangePreset): FilterMode =>
     preset === 'currentCycle' || isSalaryCyclePreset(preset) ? 'cycle' : 'month';
 
-export default function DateRangeFilter({ selected, onSelect, expenses }: DateRangeFilterProps) {
+export default function DateRangeFilter({
+    selected,
+    onSelect,
+    expenses,
+    paydayConfig = DEFAULT_PAYDAY_CONFIG,
+}: DateRangeFilterProps) {
     const [mode, setMode] = useState<FilterMode>(() => modeOf(selected));
 
     useEffect(() => {
@@ -33,8 +41,14 @@ export default function DateRangeFilter({ selected, onSelect, expenses }: DateRa
     }, [selected]);
 
     const availableMonths = useMemo(() => getAvailableMonths(expenses), [expenses]);
-    const availableCycles = useMemo(() => getAvailableSalaryCycles(expenses), [expenses]);
-    const currentCycleValue = useMemo(() => getCurrentCycle().value, []);
+    const availableCycles = useMemo(
+        () => getAvailableSalaryCycles(expenses, paydayConfig),
+        [expenses, paydayConfig]
+    );
+    const currentCycleValue = useMemo(
+        () => getCurrentCycle(paydayConfig).value,
+        [paydayConfig]
+    );
 
     const quickFilters: { value: DateRangePreset; label: string }[] =
         mode === 'cycle'
@@ -125,6 +139,9 @@ export default function DateRangeFilter({ selected, onSelect, expenses }: DateRa
                         ))}
                     </select>
                     <ChevronDown size={16} className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none ${dropdownActive ? 'text-primary' : 'text-base-content/50'}`} />
+                    <p className="text-xs text-base-content/60 mt-2 mb-0">
+                        Payday: {describePaydayConfig(paydayConfig)}
+                    </p>
                 </div>
             ) : (
                 availableMonths.length > 0 && (

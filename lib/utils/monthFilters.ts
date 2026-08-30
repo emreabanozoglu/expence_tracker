@@ -2,7 +2,8 @@
 
 import { Expense } from '../types';
 import { format, parse, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
-import { getCurrentCycle, parseSalaryCyclePreset } from './salaryCycle';
+import { DEFAULT_PAYDAY_CONFIG, getCurrentCycle, parseSalaryCyclePreset } from './salaryCycle';
+import { PaydayConfig } from '../types';
 
 export interface MonthOption {
     value: string; // 'YYYY-MM' format
@@ -60,13 +61,16 @@ export function filterExpensesByMonth(
 /**
  * Get the display label for a date range preset
  */
-export function getDateRangeLabel(preset: string): string {
+export function getDateRangeLabel(
+    preset: string,
+    paydayConfig: PaydayConfig = DEFAULT_PAYDAY_CONFIG
+): string {
     if (preset === 'all') return 'All Time';
     if (preset === 'thisMonth') return 'This Month';
     if (preset === 'lastMonth') return 'Last Month';
-    if (preset === 'currentCycle') return `Current Cycle · ${getCurrentCycle().label}`;
+    if (preset === 'currentCycle') return `Current Cycle · ${getCurrentCycle(paydayConfig).label}`;
 
-    const cycle = parseSalaryCyclePreset(preset);
+    const cycle = parseSalaryCyclePreset(preset, paydayConfig);
     if (cycle) return cycle.label;
 
     // If it's a month key (YYYY-MM format), parse and format it

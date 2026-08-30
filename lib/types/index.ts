@@ -38,6 +38,18 @@ export type Expense = Transaction;
 
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
+export type PaydayRule =
+  | 'dayBeforeLastWorkingDay'
+  | 'lastWorkingDay'
+  | 'fixedDayOfMonth'
+  | 'exactDayNoShift';
+
+/** Payday definition attached to a salary recurring transaction. */
+export interface PaydayConfig {
+  rule: PaydayRule;
+  dayOfMonth?: number; // required by fixedDayOfMonth / exactDayNoShift
+}
+
 export interface ExpenseFormData {
   type: TransactionType;
   amount: string;
@@ -46,6 +58,9 @@ export interface ExpenseFormData {
   date: string;
   isRecurring: boolean;
   frequency: RecurrenceFrequency;
+  isSalary?: boolean;
+  paydayRule?: PaydayRule;
+  paydayDayOfMonth?: number;
 }
 
 export interface CategoryTotal {

@@ -1,8 +1,9 @@
 // Date filtering utility functions
 
-import { Expense, DateRangePreset } from '../types';
+import { Expense, DateRangePreset, PaydayConfig } from '../types';
 import { startOfMonth, endOfMonth, subMonths, parse, isSameMonth } from 'date-fns';
 import {
+    DEFAULT_PAYDAY_CONFIG,
     filterExpensesBySalaryCycle,
     getCurrentCycle,
     parseSalaryCyclePreset,
@@ -10,17 +11,18 @@ import {
 
 export function filterExpensesByDateRange(
     expenses: Expense[],
-    preset: DateRangePreset
+    preset: DateRangePreset,
+    paydayConfig: PaydayConfig = DEFAULT_PAYDAY_CONFIG
 ): Expense[] {
     if (preset === 'all') {
         return expenses;
     }
 
     if (preset === 'currentCycle') {
-        return filterExpensesBySalaryCycle(expenses, getCurrentCycle());
+        return filterExpensesBySalaryCycle(expenses, getCurrentCycle(paydayConfig));
     }
 
-    const cycle = parseSalaryCyclePreset(preset);
+    const cycle = parseSalaryCyclePreset(preset, paydayConfig);
     if (cycle) {
         return filterExpensesBySalaryCycle(expenses, cycle);
     }
